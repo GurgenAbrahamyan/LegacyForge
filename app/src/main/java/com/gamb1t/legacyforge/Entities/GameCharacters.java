@@ -7,16 +7,15 @@ import android.graphics.BitmapFactory;
 import com.gamb1t.legacyforge.MainActivity;
 import com.gamb1t.legacyforge.R;
 
-public class Entity {
+public class GameCharacters {
+
 
 
     private Bitmap spriteSheet;
     private Bitmap[][] sprites = new Bitmap[7][4];
     private BitmapFactory.Options options = new BitmapFactory.Options();
-    public int entityX;
-    public int entityY;
 
-    Entity(int resID) {
+    GameCharacters(int resID) {
         options.inScaled = false;
         spriteSheet = BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), resID, options);
         for (int j = 0; j < sprites.length; j++)
