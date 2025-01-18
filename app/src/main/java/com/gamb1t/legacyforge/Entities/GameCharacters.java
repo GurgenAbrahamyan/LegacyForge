@@ -1,15 +1,16 @@
 package com.gamb1t.legacyforge.Entities;
 
+
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-
-import com.gamb1t.legacyforge.MainActivity;
 import com.gamb1t.legacyforge.R;
+import  com.gamb1t.legacyforge.MainActivity;
+public enum GameCharacters {
 
-public class GameCharacters {
-
-
+    PLAYER(R.drawable.player_spritesheet),
+    SKELETON(R.drawable.skeleton_spritesheet);
 
     private Bitmap spriteSheet;
     private Bitmap[][] sprites = new Bitmap[7][4];
