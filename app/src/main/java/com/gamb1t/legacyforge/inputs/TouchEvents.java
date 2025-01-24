@@ -10,10 +10,11 @@ import com.gamb1t.legacyforge.GamePanel;
 
 public class TouchEvents {
     private GamePanel gamePanel;
-    private float xCenter = 540, yCenter = 1300, radius = 100;
+    private float xCenter, yCenter, radius;
     private Paint circlePaint, yellowPaint;
     private float xTouch, yTouch;
     private boolean touchDown;
+
 
     public TouchEvents(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
@@ -26,13 +27,22 @@ public class TouchEvents {
     }
 
     public void draw(Canvas c) {
+        xCenter = c.getWidth()- c.getWidth()/ 7;
+        yCenter = c.getHeight() - c.getHeight()/3;
+        radius = c.getHeight()/10;
+
         c.drawCircle(xCenter, yCenter, radius, circlePaint);
 
         if (touchDown) {
             c.drawLine(xCenter, yCenter, xTouch, yTouch, yellowPaint);
             c.drawLine(xCenter, yCenter, xTouch, yCenter, yellowPaint);
             c.drawLine(xTouch, yTouch, xTouch, yCenter, yellowPaint);
+            c.drawCircle(xTouch, yTouch,  radius, yellowPaint);
         }
+        else{
+            c.drawCircle(xCenter, yCenter, radius, yellowPaint);
+        }
+
 
 
     }
