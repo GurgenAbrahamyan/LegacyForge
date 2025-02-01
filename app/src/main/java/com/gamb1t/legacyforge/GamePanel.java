@@ -15,17 +15,17 @@ import androidx.annotation.NonNull;
 
 import com.gamb1t.legacyforge.Entities.GameCharacters;
 import com.gamb1t.legacyforge.HelperClasses.GameConstants;
-import com.gamb1t.legacyforge.enviorment.GameMap;
+import com.gamb1t.legacyforge.enviorment.MapManaging;
 import com.gamb1t.legacyforge.inputs.TouchEvents;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private Paint redPaint = new Paint();
     private SurfaceHolder holder;
-    private float x, y;
+    private float playerX = GET_WIDTH / 2, playerY = GET_HEIGHT / 2;
+    private float cameraX, cameraY;
     private boolean movePlayer;
     private PointF lastTouchDiff;
     private Random rand = new Random();
@@ -34,12 +34,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private PointF skeletonPos;
     private int skeletonDir = GameConstants.Face_Dir.DOWN;
     private long lastDirChange = System.currentTimeMillis();
-    private int playerAniIndexY, skeletonAniIndexY, playerFaceDir = GameConstants.Face_Dir.RIGHT;
+    private int playerAniIndexY, playerFaceDir = GameConstants.Face_Dir.RIGHT;
+    private int skeletonAniIndexY = 0;
     private int aniTick, aniTick2;
     private int aniSpeed = 10;
 
-    //Implementing map (not done)
-    private GameMap testMap;
+    private MapManaging mapManager;
 
     public GamePanel(Context context) {
         super(context);
@@ -48,43 +48,31 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         redPaint.setColor(Color.RED);
         touchEvents = new TouchEvents(this);
         gameLoop = new GameLoop(this);
+        mapManager = new MapManaging();
         skeletonPos = new PointF(rand.nextInt(GET_WIDTH), rand.nextInt(GET_HEIGHT));
 
-
-
-        int[][] testArrId = {
-                {454, 276, 275, 275, 190, 275, 275, 279, 275, 275, 275, 297, 110, 0, 1, 1, 1, 2, 110, 132},
-                {454, 275, 169, 232, 238, 275, 275, 275, 276, 275, 275, 297, 110, 22, 89, 23, 23, 24, 110, 132},
-                {454, 275, 190, 276, 275, 275, 279, 275, 275, 275, 279, 297, 110, 22, 23, 23, 23, 24, 110, 132},
-                {454, 275, 190, 279, 275, 275, 169, 233, 275, 275, 275, 297, 110, 22, 23, 23, 23, 24, 110, 132},
-                {454, 275, 190, 276, 277, 275, 190, 279, 279, 279, 275, 297, 110, 22, 23, 88, 23, 24, 110, 132},
-                {454, 275, 235, 232, 232, 232, 260, 279, 276, 279, 275, 297, 110, 22, 23, 89, 23, 24, 110, 132},
-                {454, 275, 275, 275, 275, 275, 190, 279, 279, 279, 275, 297, 110, 22, 23, 23, 23, 24, 110, 132},
-                {454, 277, 275, 275, 279, 275, 257, 232, 232, 232, 238, 297, 110, 22, 88, 23, 23, 24, 110, 132},
-                {454, 275, 275, 275, 275, 275, 190, 279, 275, 275, 275, 297, 110, 22, 23, 23, 88, 24, 110, 132},
-                {454, 276, 275, 275, 190, 275, 275, 279, 275, 275, 275, 297, 110, 0, 1, 1, 1, 2, 110, 132},
-                {454, 275, 169, 232, 238, 275, 275, 275, 276, 275, 275, 297, 110, 22, 89, 23, 23, 24, 110, 1}};
-
-        testMap = new GameMap(testArrId);
 
     }
 
     public void render() {
-
         Canvas c = holder.lockCanvas();
         c.drawColor(Color.BLACK);
 
-        testMap.draw(c);
+        mapManager.draw(c);
 
         touchEvents.draw(c);
 
-        c.drawBitmap(GameCharacters.PLAYER.getSprite(playerAniIndexY, playerFaceDir), x, y, null);
-        //c.drawBitmap(GameCharacters.SKELETON.getSprite(skeletonAniIndexY, skeletonDir), skeletonPos.x, skeletonPos.y, null);
+        c.drawBitmap(GameCharacters.PLAYER.getSprite(playerAniIndexY, playerFaceDir), playerX, playerY, null);
+        c.drawBitmap(GameCharacters.SKELETON.getSprite(skeletonAniIndexY, skeletonDir), skeletonPos.x + cameraX, skeletonPos.y + cameraY, null);
 
         holder.unlockCanvasAndPost(c);
     }
 
     public void update(double delta) {
+        updatePlayerMove(delta);
+        mapManager.setCameraValues(cameraX, cameraY);
+
+
         if (System.currentTimeMillis() - lastDirChange >= 3000) {
             skeletonDir = rand.nextInt(4);
             lastDirChange = System.currentTimeMillis();
@@ -116,9 +104,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 break;
         }
 
-        updatePlayerMove(delta);
 
-        updatePlayer();
+        updatePlayerAnimation();
         updateEntity();
     }
 
@@ -133,8 +120,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         float xSpeed = (float) Math.cos(angle);
         float ySpeed = (float) Math.sin(angle);
 
-//        System.out.println("Angle: " + Math.toDegrees(angle));
-//        System.out.println("xSpeed: "+ xSpeed  +  " |  ySpeed: " + ySpeed);
 
         if (xSpeed > ySpeed) {
             if (lastTouchDiff.x > 0) playerFaceDir = GameConstants.Face_Dir.RIGHT;
@@ -149,13 +134,27 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         if (lastTouchDiff.y < 0)
             ySpeed *= -1;
 
-        x += xSpeed * baseSpeed;
-        y += ySpeed * baseSpeed;
+        int pWidth = GameConstants.Sprite.SIZE;
+        int pHeight = GameConstants.Sprite.SIZE;
+
+        if (xSpeed <= 0)
+            pWidth = 0;
+        if (ySpeed <= 0)
+            pHeight = 0;
+
+
+        float deltaX = xSpeed * baseSpeed * -1;
+        float deltaY = ySpeed * baseSpeed * -1;
+
+        if (mapManager.canMoveHere(playerX + cameraX * -1 + deltaX * -1 + pWidth, playerY + cameraY * -1 + deltaY * -1 + pHeight)) {
+            cameraX += deltaX;
+            cameraY += deltaY;
+        }
 
 
     }
 
-    private void updatePlayer() {
+    private void updatePlayerAnimation() {
         if (!movePlayer)
             return;
         aniTick++;

@@ -1,5 +1,7 @@
 package com.gamb1t.legacyforge;
 
+import android.os.Process;
+
 
 public class GameLoop implements Runnable {
 
@@ -9,6 +11,7 @@ public class GameLoop implements Runnable {
     public GameLoop(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
         gameThread = new Thread(this);
+        Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
     }
 
     @Override

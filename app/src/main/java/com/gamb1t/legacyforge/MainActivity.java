@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(new GamePanel(this));
 
-        System.out.println(GET_HEIGHT + " " + GET_HEIGHT);
      getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
                         View.SYSTEM_UI_FLAG_FULLSCREEN |
@@ -44,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
 
     }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     public static Context getGameContext() {
