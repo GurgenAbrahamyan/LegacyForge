@@ -1,0 +1,15 @@
+1room.txt
+Tiles/tileset_floor.png
+com/badlogic/gdx/utils/lsans-15.fnt
+com/badlogic/gdx/utils/lsans-15.png
+enemies_spritesheet/skeleton_spritesheet.png
+joystick.png
+libgdx.png
+player_sprites/player_spritesheet.png
+ui/font-list.fnt
+ui/font-subtitle.fnt
+ui/font-window.fnt
+ui/font.fnt
+ui/uiskin.atlas
+ui/uiskin.json
+ui/uiskin.png
