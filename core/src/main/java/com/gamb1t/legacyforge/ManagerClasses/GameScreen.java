@@ -6,13 +6,11 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamb1t.legacyforge.Entity.Enemy;
-import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 
@@ -39,12 +37,8 @@ public class GameScreen implements Screen {
 
 
 
-    private int skeletonDir = GameConstants.Face_Dir.DOWN;
     private long lastDirChange = System.currentTimeMillis();
-    private int playerAniIndexY, playerFaceDir = GameConstants.Face_Dir.RIGHT;
-    private int skeletonAniIndexY = 0;
-    private int aniTick, aniTick2;
-    private int aniSpeed = 10;
+
 
     private MapManaging mapManager;
 
@@ -74,39 +68,41 @@ public class GameScreen implements Screen {
 
 
         if (System.currentTimeMillis() - lastDirChange >= 3000) {
-            skeletonDir = rand.nextInt(4);
+            int randFaceDir = rand.nextInt(4);
+            SKELETON.setFaceDir(randFaceDir);
             lastDirChange = System.currentTimeMillis();
         }
 
-        switch (skeletonDir) {
+        switch (SKELETON.getFaceDir()) {
             case GameConstants.Face_Dir.DOWN:
                 skeletonPos.y += delta * 300;
                 if (skeletonPos.y >= GET_HEIGHT)
-                    skeletonDir = GameConstants.Face_Dir.UP;
+                    SKELETON.setFaceDir( GameConstants.Face_Dir.UP);
                 break;
 
             case GameConstants.Face_Dir.UP:
                 skeletonPos.y -= delta * 300;
                 if (skeletonPos.y <= 0)
-                    skeletonDir = GameConstants.Face_Dir.DOWN;
+                    SKELETON.setFaceDir(GameConstants.Face_Dir.DOWN);
                 break;
 
             case GameConstants.Face_Dir.RIGHT:
                 skeletonPos.x += delta * 300;
                 if (skeletonPos.x >= GET_WIDTH)
-                    skeletonDir = GameConstants.Face_Dir.LEFT;
+                    SKELETON.setFaceDir(GameConstants.Face_Dir.LEFT);
                 break;
 
             case GameConstants.Face_Dir.LEFT:
                 skeletonPos.x -= delta * 300;
                 if (skeletonPos.x <= 0)
-                    skeletonDir = GameConstants.Face_Dir.RIGHT;
+                    SKELETON.setFaceDir(GameConstants.Face_Dir.RIGHT);
                 break;
         }
 
+        if(movePlayer){
+            PLAYER.updateAnimation();}
+        SKELETON.updateAnimation();
 
-        updatePlayerAnimation();
-        updateEntity();
     }
 
     private void updatePlayerMove(double delta) {
@@ -122,11 +118,11 @@ public class GameScreen implements Screen {
 
 
         if (xSpeed > ySpeed) {
-            if (lastTouchDiff.x > 0) playerFaceDir = GameConstants.Face_Dir.RIGHT;
-            else playerFaceDir = GameConstants.Face_Dir.LEFT;
+            if (lastTouchDiff.x > 0) PLAYER.setFaceDir(GameConstants.Face_Dir.RIGHT) ;
+            else PLAYER.setFaceDir(GameConstants.Face_Dir.LEFT);
         } else {
-            if (lastTouchDiff.y > 0) playerFaceDir = GameConstants.Face_Dir.DOWN;
-            else playerFaceDir = GameConstants.Face_Dir.UP;
+            if (lastTouchDiff.y > 0) PLAYER.setFaceDir(GameConstants.Face_Dir.DOWN);
+            else PLAYER.setFaceDir(GameConstants.Face_Dir.UP);
         }
 
         if (lastTouchDiff.x < 0)
@@ -154,26 +150,7 @@ public class GameScreen implements Screen {
 
     }
 
-    private void updatePlayerAnimation() {
-        if (!movePlayer)
-            return;
-        aniTick++;
-        if (aniTick >= aniSpeed) {
-            aniTick = 0;
-            playerAniIndexY++;
-            if (playerAniIndexY >= 4)
-                playerAniIndexY = 0;
-        }
-    }
-    private void updateEntity(){
-        aniTick2++;
-        if (aniTick2 >= aniSpeed) {
-            aniTick2 = 0;
-            skeletonAniIndexY++;
-            if (skeletonAniIndexY >= 4)
-                skeletonAniIndexY = 0;
-        }
-    }
+
 
 
     public void setPlayerMoveTrue(PointF lastTouchDiff) {
@@ -183,12 +160,11 @@ public class GameScreen implements Screen {
 
     public void setPlayerMoveFalse() {
         movePlayer = false;
-        resetAnimation();
+        PLAYER.resetAnimation();
     }
 
     private void resetAnimation() {
-        aniTick = 0;
-        playerAniIndexY = 0;
+        PLAYER.resetAnimation();
     }
 
     @Override
@@ -207,8 +183,8 @@ public class GameScreen implements Screen {
         mapManager.draw(batch);
 
         batch.begin();
-        batch.draw(PLAYER.getSprite(playerAniIndexY, playerFaceDir), playerX, playerY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
-        batch.draw(SKELETON.getSprite(skeletonAniIndexY, skeletonDir), skeletonPos.x + cameraX, skeletonPos.y + cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE );
+        batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX, playerY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+        batch.draw(SKELETON.getSprite(SKELETON.getAniIndex(), SKELETON.getFaceDir()), skeletonPos.x + cameraX, skeletonPos.y + cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE );
         batch.end();
 
         touchEvents.draw(batch);
