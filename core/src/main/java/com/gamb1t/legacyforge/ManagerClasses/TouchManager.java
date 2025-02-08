@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TouchManager implements InputProcessor {
     private GameScreen gameScreen;
@@ -27,7 +28,7 @@ public class TouchManager implements InputProcessor {
         sjoysticksize = GameConstants.Sprite.SIZE * 2;
 
 
-        xCenter = GET_WIDTH - GET_WIDTH / 5f;
+        xCenter = GET_WIDTH / 6f;
         yCenter = GET_HEIGHT / 4f;
 
         joystickTexture = new Texture("joystick.png");
@@ -41,6 +42,8 @@ public class TouchManager implements InputProcessor {
         smallerJoystickSprite.setPosition(xCenter - smallerJoystickSprite.getWidth() / 2, yCenter - smallerJoystickSprite.getHeight() / 2);
 
 
+
+
         radius = bjoystickSize / 2;
 
         System.out.println(GET_HEIGHT + " " + GET_WIDTH);
@@ -48,9 +51,10 @@ public class TouchManager implements InputProcessor {
 
     public void draw(SpriteBatch batch) {
         batch.begin();
+        batch.draw(joystickSprite, xCenter - bjoystickSize/2, GET_WIDTH - (yCenter - bjoystickSize/2), GameConstants.Sprite.SIZE * 3, GameConstants.Sprite.SIZE * 3);
         batch.draw(joystickSprite, xCenter - bjoystickSize/2, yCenter - bjoystickSize/2, GameConstants.Sprite.SIZE * 3, GameConstants.Sprite.SIZE * 3);
 
-        if (touchDown) {
+        if (touchDown && xTouch < GET_WIDTH/2) {
             batch.draw(smallerJoystickSprite, xTouch - sjoysticksize / 2, yTouch - sjoysticksize / 2,
                 GameConstants.Sprite.SIZE * 2, GameConstants.Sprite.SIZE * 2);
         } else {
