@@ -1,10 +1,7 @@
 package com.gamb1t.legacyforge.ManagerClasses;
 
-
-
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
-
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -13,154 +10,89 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
+import com.gamb1t.legacyforge.Weapons.Weapon;
 
-
+import java.util.ArrayList;
 import java.util.Random;
-
-
 
 public class GameScreen implements Screen {
 
-    private float playerX = ( float) GET_WIDTH / 2, playerY = (float) GET_HEIGHT / 2;
-    private float cameraX, cameraY;
-    private boolean movePlayer;
+    public float playerX = (float) GET_WIDTH / 2, playerY = (float) GET_HEIGHT / 2;
 
-    private PointF lastTouchDiff;
     private Random rand = new Random();
     private TouchManager touchEvents;
-    private PointF skeletonPos;
     private SpriteBatch batch;
 
+    private  ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
 
-    Player PLAYER = new Player("player_sprites/player_spritesheet.png", 4, 7);
-    Enemy SKELETON = new Enemy("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
+    private static WeaponLoader weaponLoader = new WeaponLoader("melee.json");
 
-
-
-    private long lastDirChange = System.currentTimeMillis();
+    private static ArrayList<Weapon>  weapon = weaponLoader.getWeaponList();
 
 
-    private MapManaging mapManager;
+    Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
+    Enemy SKELETON = new Enemy(this);
+
+    public MapManaging mapManager;
 
     public GameScreen() {
-        touchEvents = new TouchManager(this);
+        touchEvents = new TouchManager(PLAYER, weapon.get(0));
         Gdx.input.setInputProcessor(touchEvents);
-        mapManager = new MapManaging("1room.txt","Tiles/tileset_floor.png", 30, 30);
 
-        skeletonPos = new PointF(rand.nextInt(GET_WIDTH), rand.nextInt(GET_HEIGHT));
+        mapManager = new MapManaging("1room.txt", "Tiles/tileset_floor.png", 30, 30);
+
         batch = new SpriteBatch();
 
+        PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
+        SKELETON.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
 
+        for (int i = 0; i < 10; i++) {
+            Enemies.add(new Enemy(this));
+        }
+
+        for (Enemy enemy : Enemies) {
+            enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
+        }
+
+        for (Weapon w : weapon) {
+            w.setAttackJoystick(touchEvents.getAttackJoystick());
+        }
+
+        if (weapon.isEmpty()) {
+            System.out.println("WeaponLoader No weapons loaded from the file");
+        } else {
+        }
     }
 
-    static class PointF{
-        float x, y;
-        PointF(float x, float y){
+    public int getRandom(int x) {
+        return rand.nextInt(x);
+    }
+
+    public static class PointF {
+        public float x;
+        public float y;
+
+        public PointF(float x, float y) {
             this.x = x;
             this.y = y;
         }
     }
 
-
     public void update(double delta) {
-        updatePlayerMove(delta);
-        mapManager.setCameraValues(cameraX, cameraY);
+        PLAYER.updatePlayerMove(delta);
+        mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+        SKELETON.updateMove(delta);
 
-
-        if (System.currentTimeMillis() - lastDirChange >= 3000) {
-            int randFaceDir = rand.nextInt(4);
-            SKELETON.setFaceDir(randFaceDir);
-            lastDirChange = System.currentTimeMillis();
+        if (PLAYER.getMovePlayer()) {
+            PLAYER.updateAnimation();
         }
 
-        switch (SKELETON.getFaceDir()) {
-            case GameConstants.Face_Dir.DOWN:
-                skeletonPos.y += delta * 300;
-                if (skeletonPos.y >= GET_HEIGHT)
-                    SKELETON.setFaceDir( GameConstants.Face_Dir.UP);
-                break;
-
-            case GameConstants.Face_Dir.UP:
-                skeletonPos.y -= delta * 300;
-                if (skeletonPos.y <= 0)
-                    SKELETON.setFaceDir(GameConstants.Face_Dir.DOWN);
-                break;
-
-            case GameConstants.Face_Dir.RIGHT:
-                skeletonPos.x += delta * 300;
-                if (skeletonPos.x >= GET_WIDTH)
-                    SKELETON.setFaceDir(GameConstants.Face_Dir.LEFT);
-                break;
-
-            case GameConstants.Face_Dir.LEFT:
-                skeletonPos.x -= delta * 300;
-                if (skeletonPos.x <= 0)
-                    SKELETON.setFaceDir(GameConstants.Face_Dir.RIGHT);
-                break;
-        }
-
-        if(movePlayer){
-            PLAYER.updateAnimation();}
         SKELETON.updateAnimation();
-
-    }
-
-    private void updatePlayerMove(double delta) {
-        if (!movePlayer)
-            return;
-
-        float baseSpeed = (float) (delta * 300);
-        float ratio = Math.abs(lastTouchDiff.y) / Math.abs(lastTouchDiff.x);
-        double angle = Math.atan(ratio);
-
-        float xSpeed = (float) Math.cos(angle);
-        float ySpeed = (float) Math.sin(angle);
-
-
-        if (xSpeed > ySpeed) {
-            if (lastTouchDiff.x > 0) PLAYER.setFaceDir(GameConstants.Face_Dir.RIGHT) ;
-            else PLAYER.setFaceDir(GameConstants.Face_Dir.LEFT);
-        } else {
-            if (lastTouchDiff.y > 0) PLAYER.setFaceDir(GameConstants.Face_Dir.DOWN);
-            else PLAYER.setFaceDir(GameConstants.Face_Dir.UP);
+        for (Enemy enemy : Enemies) {
+            enemy.updateMove(delta);
+            enemy.updateAnimation();
         }
-
-        if (lastTouchDiff.x < 0)
-            xSpeed *= -1;
-        if (lastTouchDiff.y < 0)
-            ySpeed *= -1;
-
-        int pWidth = GameConstants.Sprite.SIZE;
-        int pHeight = GameConstants.Sprite.SIZE;
-
-        if (xSpeed <= 0)
-            pWidth = 0;
-        if (ySpeed <= 0)
-            pHeight = 0;
-
-
-        float deltaX = xSpeed * baseSpeed * -1;
-        float deltaY = ySpeed * baseSpeed * -1;
-
-        if (mapManager.canMoveHere(playerX + cameraX * -1 + deltaX * -1 + pWidth, playerY + cameraY * -1 + deltaY * -1 + pHeight)) {
-            cameraX += deltaX;
-            cameraY += deltaY;
-        }
-
-
-    }
-
-
-
-
-    public void setPlayerMoveTrue(PointF lastTouchDiff) {
-        movePlayer = true;
-        this.lastTouchDiff = lastTouchDiff;
-    }
-
-    public void setPlayerMoveFalse() {
-        movePlayer = false;
-        PLAYER.resetAnimation();
     }
 
     private void resetAnimation() {
@@ -176,18 +108,31 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         update(delta);
 
+        if (touchEvents.isAttackPressed()) {
+            weapon.get(0).attack();
+        }
+
+        for (Enemy enemy : Enemies) {
+            PLAYER.getHit(enemy.hitbox);
+        }
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-
 
         mapManager.draw(batch);
 
         batch.begin();
+
         batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX, playerY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
-        batch.draw(SKELETON.getSprite(SKELETON.getAniIndex(), SKELETON.getFaceDir()), skeletonPos.x + cameraX, skeletonPos.y + cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE );
+
+        for (Enemy enemy : Enemies) {
+            batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX, enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+        }
+
         batch.end();
 
         touchEvents.draw(batch);
+
+        weapon.get(0).update();
     }
 
     @Override
@@ -215,5 +160,3 @@ public class GameScreen implements Screen {
         batch.dispose();
     }
 }
-
-

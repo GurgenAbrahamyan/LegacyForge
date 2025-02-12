@@ -11,8 +11,7 @@ import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
-    private SpriteBatch batch;
-    private Texture image;
+
 
     @Override
     public void create() {

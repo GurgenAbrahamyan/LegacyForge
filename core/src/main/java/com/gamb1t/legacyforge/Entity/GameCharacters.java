@@ -3,7 +3,11 @@ package com.gamb1t.legacyforge.Entity;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
+import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
+import com.gamb1t.legacyforge.Weapons.Weapon;
 
 public abstract class GameCharacters {
 
@@ -14,11 +18,54 @@ public abstract class GameCharacters {
     protected  int FaceDirection = GameConstants.Face_Dir.DOWN;
 
 
+    protected float speed;
+    protected float hp, maxHp;
+    protected GameScreen.PointF entityPos;
+
+    public Rectangle hitbox = new Rectangle();
+
+    protected GameScreen gameScreen;
+    protected Weapon weapon;
 
 
-    private TextureRegion[][] SpriteSheet;
+    public float cameraX, cameraY;
 
-    public GameCharacters(String recourceName, int spritesheetLength, int spritesheetWidth) {
+
+
+
+    protected TextureRegion[][] SpriteSheet;
+
+    public GameCharacters(float x, float y, float width, float height) {
+
+        hitbox = new Rectangle(x, y, width, height);
+
+    }
+
+    public abstract void setHitboxPosition();
+
+    public void setPosition(float x, float y){
+        entityPos.x = x;
+        entityPos.y = y;
+        setHitboxPosition();
+    }
+
+    public void applyKnockback(Enemy enemy, Weapon weapon) {
+        float knockbackForce = weapon.getKnockbackInTiles() * GameConstants.Sprite.SIZE;
+
+        Vector2 knockbackDirection = new Vector2(enemy.getEntityPos().x - getEntityPos().x,
+            enemy.getEntityPos().y - getEntityPos().y).nor();
+
+        Vector2 knockbacks = knockbackDirection.scl(knockbackForce);
+
+        enemy.setPosition(enemy.getEntityPos().x + knockbacks.x, enemy.getEntityPos().y + knockbacks.y);
+
+    }
+
+    public TextureRegion[][] getSpriteSheet() {
+        return SpriteSheet;
+    }
+
+    public void setTexture(String recourceName, int spritesheetLength, int spritesheetWidth){
 
         Texture entitiesTexture = new Texture(recourceName);
 
@@ -26,10 +73,6 @@ public abstract class GameCharacters {
 
         SpriteSheet = TextureRegion.split(entitiesTexture, GameConstants.Sprite.DEFAULT_SIZE, GameConstants.Sprite.DEFAULT_SIZE);
 
-    }
-
-    public TextureRegion[][] getSpriteSheet() {
-        return SpriteSheet;
     }
 
     public TextureRegion getSprite(int yPos, int xPos) {
@@ -62,6 +105,10 @@ public abstract class GameCharacters {
 
     public void setFaceDir(int faceDir) {
         this.FaceDirection = faceDir;
+    }
+
+    public GameScreen.PointF getEntityPos(){
+        return entityPos;
     }
 
 

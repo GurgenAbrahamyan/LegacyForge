@@ -5,6 +5,7 @@ com/badlogic/gdx/utils/lsans-15.png
 enemies_spritesheet/skeleton_spritesheet.png
 joystick.png
 libgdx.png
+melee.json
 player_sprites/player_spritesheet.png
 ui/font-list.fnt
 ui/font-subtitle.fnt
@@ -13,3 +14,4 @@ ui/font.fnt
 ui/uiskin.atlas
 ui/uiskin.json
 ui/uiskin.png
+weapons_spritesheet/swords_spritesheet/regular_sword.png

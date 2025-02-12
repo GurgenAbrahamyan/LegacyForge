@@ -12,6 +12,7 @@ dependencies {
   api "com.kotcrab.vis:vis-ui:$visUiVersion"
   api "com.squidpony:squidlib-util:$squidlibUtilVersion"
   api "com.squidpony:squidlib:$squidlibVersion"
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

@@ -44,8 +44,9 @@ android {
     coreLibraryDesugaringEnabled true
   }
   buildTypes {
+
     release {
-      minifyEnabled true
+      minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
