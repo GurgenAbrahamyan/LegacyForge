@@ -26,6 +26,8 @@ public class Player extends GameCharacters {
 
     private float armor;
 
+    private Weapon currentWeapon;
+
 
 
 
@@ -148,7 +150,6 @@ public class Player extends GameCharacters {
             cameraY += deltaY;
             entityPos.x = cameraX;
             entityPos.y = cameraY;
-            System.out.println(cameraX + " " + cameraY);
 
         }
 
@@ -207,19 +208,13 @@ public class Player extends GameCharacters {
         this.experience = experience;
     }
 
+    public void setCurrentWeapon(Weapon weapon){
 
-    public void equipWeapon(Weapon newWeapon) {
-        this.weapon = newWeapon;
+        currentWeapon =weapon;
     }
-
-    public void attack() {
-        if (weapon != null) {
-            switch (weapon.getName()){
-            }
-            weapon.attack();
-        }
+    public Weapon getCureentWeapon(){
+        return  currentWeapon;
     }
-
 
 
 

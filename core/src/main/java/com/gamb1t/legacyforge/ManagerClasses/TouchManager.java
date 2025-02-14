@@ -14,11 +14,11 @@ public class TouchManager implements InputProcessor {
     private Joystick attackJoystick;
     private Weapon weapon;
 
+    private float attackDirectionX, attackDirectionY;
+    private boolean isAiming = false;
+    float angle;
+
     private boolean[] touchDowns = new boolean[2];
-    private float[] xTouches = new float[2];
-    private float[] yTouches = new float[2];
-
-
 
     public TouchManager(Player player, Weapon weapon) {
         this.player = player;
@@ -43,13 +43,11 @@ public class TouchManager implements InputProcessor {
         if (x < GET_WIDTH / 2f && !touchDowns[0] && movementJoystick.isTouched(x, y)) {
             movementJoystick.touchDown(x, y);
             touchDowns[0] = true;
-            xTouches[0] = x;
-            yTouches[0] = y;
+
         } else if (x >= GET_WIDTH / 2f && !touchDowns[1] && attackJoystick.isTouched(x, y)) {
-            attackJoystick.touchDown(x, y);
-            touchDowns[1] = true;
-            xTouches[1] = x;
-            yTouches[1] = y;
+
+                attackJoystick.touchDown(x, y);
+                touchDowns[1] = true;
         }
 
         return true;
@@ -57,21 +55,39 @@ public class TouchManager implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        float x = screenX;
 
-        if (x < GET_WIDTH / 2f) {
+        if (screenX < GET_WIDTH / 2f) {
             movementJoystick.touchUp();
             touchDowns[0] = false;
+            player.setPlayerMoveFalse();
         } else {
             attackJoystick.touchUp();
-            weapon.setAtacking(true);
-            weapon.attack();
             touchDowns[1] = false;
-        }
 
-        player.setPlayerMoveFalse();
+            if (isAiming) {
+
+                float length = (float) Math.sqrt(attackDirectionX * attackDirectionX + attackDirectionY * attackDirectionY);
+                if (length != 0) {
+                    attackDirectionX /= length;
+                    attackDirectionY /= length;
+                }
+                else  if (attackDirectionX == 0 && attackDirectionY == 0) {
+                    attackDirectionX = 1;
+                    attackDirectionY = 0;}
+
+
+                angle = (float) Math.toDegrees(Math.atan2(attackDirectionY, attackDirectionX));
+                weapon.onJoystickRelease();
+                weapon.attack();
+                weapon.setRotation(angle);
+                weapon.setAttacking(true);
+            }
+
+            isAiming = false;
+        }
         return true;
     }
+
 
     @Override
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
@@ -83,21 +99,35 @@ public class TouchManager implements InputProcessor {
         float x = screenX;
         float y = GET_HEIGHT - screenY;
 
+        isAiming = true;
+
         if (x < GET_WIDTH / 2f && touchDowns[0]) {
             movementJoystick.touchDragged(x, y);
             player.setPlayerMoveTrue(new GameScreen.PointF(movementJoystick.getXDiff(), movementJoystick.getYDiff()));
-        } else if (x >= GET_WIDTH / 2f && touchDowns[1]) {
+        } else if (x >= GET_WIDTH / 2f && touchDowns[1]){
             attackJoystick.touchDragged(x, y);
+
+            float newX = attackJoystick.getXDiff();
+            float newY = attackJoystick.getYDiff();
+
+            if (newX != 0 || newY != 0) {
+                attackDirectionX = attackJoystick.getXDiff();
+                attackDirectionY = attackJoystick.getYDiff();
+            }
 
         }
 
         return true;
     }
-    public Joystick getAttackJoystick(){
-        return attackJoystick;
+    public boolean getIsAiming(){
+        return isAiming;
     }
+    public void setIsAiming(boolean set) { isAiming = set;}
     public boolean isAttackPressed(){
         return touchDowns[1];
+    }
+    public float getRotation(){
+        return angle;
     }
 
     @Override

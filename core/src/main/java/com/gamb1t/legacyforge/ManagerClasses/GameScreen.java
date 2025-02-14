@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
@@ -24,7 +25,7 @@ public class GameScreen implements Screen {
     private TouchManager touchEvents;
     private SpriteBatch batch;
 
-    private  ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
+    private static ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
 
     private static WeaponLoader weaponLoader = new WeaponLoader("melee.json");
 
@@ -56,13 +57,12 @@ public class GameScreen implements Screen {
         }
 
         for (Weapon w : weapon) {
-            w.setAttackJoystick(touchEvents.getAttackJoystick());
+            w.setAttackJoystick(touchEvents);
+            w.setTexture(w.getSprite(), 0, 4);
+            w.convertTxtRegToSprite();
         }
 
-        if (weapon.isEmpty()) {
-            System.out.println("WeaponLoader No weapons loaded from the file");
-        } else {
-        }
+        PLAYER.setCurrentWeapon(weapon.get(0));
     }
 
     public int getRandom(int x) {
@@ -87,6 +87,11 @@ public class GameScreen implements Screen {
         if (PLAYER.getMovePlayer()) {
             PLAYER.updateAnimation();
         }
+        if(PLAYER.getCureentWeapon().getAttacking()){
+            PLAYER.getCureentWeapon().update();
+            Rectangle hitbox = PLAYER.getCureentWeapon().createHitbox(playerX, playerY);
+            PLAYER.getCureentWeapon().checkHitboxCollisions(hitbox, Enemies);
+        }
 
         SKELETON.updateAnimation();
         for (Enemy enemy : Enemies) {
@@ -108,13 +113,11 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         update(delta);
 
-        if (touchEvents.isAttackPressed()) {
-            weapon.get(0).attack();
-        }
 
         for (Enemy enemy : Enemies) {
             PLAYER.getHit(enemy.hitbox);
         }
+
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -124,15 +127,18 @@ public class GameScreen implements Screen {
 
         batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX, playerY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
 
+
+
         for (Enemy enemy : Enemies) {
             batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX, enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
         }
+
+        PLAYER.getCureentWeapon().draw(batch, playerX, playerY);
 
         batch.end();
 
         touchEvents.draw(batch);
 
-        weapon.get(0).update();
     }
 
     @Override
@@ -158,5 +164,9 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+    }
+
+    public ArrayList<Enemy> getEnemies(){
+        return  Enemies;
     }
 }
