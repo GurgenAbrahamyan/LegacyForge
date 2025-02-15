@@ -3,12 +3,19 @@ package com.gamb1t.legacyforge.Entity;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 
 public class Enemy extends GameCharacters {
 
     private long lastDirChange = System.currentTimeMillis();
+    private int damage = 10;
+    private float playerPosX, playerPosY;
 
 
     GameScreen gameScreen;
@@ -25,6 +32,9 @@ public class Enemy extends GameCharacters {
 
 
         this.gameScreen = gameScreen;
+
+        maxHp = 100;
+        hp = maxHp;
 
 
     }
@@ -70,9 +80,38 @@ public class Enemy extends GameCharacters {
     public void setHitboxPosition() {
         hitbox.setPosition(entityPos.x, entityPos.y);
     }
+
+    @Override
+    public void drawHpBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
+
+        float barWidth = GameConstants.Sprite.SIZE;
+        float barHeight = (float) GameConstants.Sprite.SIZE /4;
+        float barX = entityPos.x ;
+        float barY = entityPos.y + GameConstants.Sprite.SIZE ;
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.DARK_GRAY);
+        shapeRenderer.rect(playerPosX+barX, playerPosY+barY, barWidth, barHeight);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect( playerPosX+barX, playerPosY+barY, barWidth * ((float) hp / maxHp), barHeight);
+        shapeRenderer.end();
+
+    }
+
     public void takeDamage(float amout){
         hp -= amout;
 
+    }
+
+    public int getDamage(){
+        return damage;
+    }
+
+    public void setPlayerPosX(float x ){
+        playerPosX = x;
+    }
+    public void setPlayerPosY(float y ){
+        playerPosY = y;
     }
 
 }

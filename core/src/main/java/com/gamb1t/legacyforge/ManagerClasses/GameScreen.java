@@ -6,12 +6,13 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
-import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ public class GameScreen implements Screen {
     private Random rand = new Random();
     private TouchManager touchEvents;
     private SpriteBatch batch;
+    private ShapeRenderer shapeRenderer;
+    private BitmapFont font;
+
 
     private static ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
 
@@ -33,8 +37,6 @@ public class GameScreen implements Screen {
 
 
     Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
-    Enemy SKELETON = new Enemy(this);
-
     public MapManaging mapManager;
 
     public GameScreen() {
@@ -46,7 +48,6 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
-        SKELETON.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
 
         for (int i = 0; i < 10; i++) {
             Enemies.add(new Enemy(this));
@@ -61,6 +62,8 @@ public class GameScreen implements Screen {
             w.setTexture(w.getSprite(), 0, 4);
             w.convertTxtRegToSprite();
         }
+        shapeRenderer = new ShapeRenderer();
+        font = new BitmapFont();
 
         PLAYER.setCurrentWeapon(weapon.get(0));
     }
@@ -82,10 +85,9 @@ public class GameScreen implements Screen {
     public void update(double delta) {
         PLAYER.updatePlayerMove(delta);
         mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-        SKELETON.updateMove(delta);
 
         if (PLAYER.getMovePlayer()) {
-            PLAYER.updateAnimation();
+            PLAYER.updateAnim();
         }
         if(PLAYER.getCureentWeapon().getAttacking()){
             PLAYER.getCureentWeapon().update();
@@ -93,11 +95,13 @@ public class GameScreen implements Screen {
             PLAYER.getCureentWeapon().checkHitboxCollisions(hitbox, Enemies);
         }
 
-        SKELETON.updateAnimation();
         for (Enemy enemy : Enemies) {
             enemy.updateMove(delta);
             enemy.updateAnimation();
+            enemy.setPlayerPosX(PLAYER.cameraX);
+            enemy.setPlayerPosY(PLAYER.cameraY);
         }
+
     }
 
     private void resetAnimation() {
@@ -115,7 +119,11 @@ public class GameScreen implements Screen {
 
 
         for (Enemy enemy : Enemies) {
-            PLAYER.getHit(enemy.hitbox);
+            if(PLAYER.getHit(enemy.hitbox)){
+                System.out.println("Damaged: " + enemy.getDamage());
+                PLAYER.takeDamage(enemy.getDamage());
+            }
+
         }
 
 
@@ -129,6 +137,7 @@ public class GameScreen implements Screen {
 
 
 
+
         for (Enemy enemy : Enemies) {
             batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX, enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
         }
@@ -136,6 +145,12 @@ public class GameScreen implements Screen {
         PLAYER.getCureentWeapon().draw(batch, playerX, playerY);
 
         batch.end();
+
+
+        for (Enemy enemy : Enemies) {
+            enemy.drawHpBar(batch, shapeRenderer, font);
+        }
+        PLAYER.drawHpBar(batch, shapeRenderer, font);
 
         touchEvents.draw(batch);
 
@@ -164,9 +179,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-    }
-
-    public ArrayList<Enemy> getEnemies(){
-        return  Enemies;
+        shapeRenderer.dispose();
     }
 }

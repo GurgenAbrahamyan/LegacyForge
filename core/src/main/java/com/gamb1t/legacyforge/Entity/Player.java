@@ -1,5 +1,10 @@
 package com.gamb1t.legacyforge.Entity;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
@@ -27,6 +32,9 @@ public class Player extends GameCharacters {
     private float armor;
 
     private Weapon currentWeapon;
+
+    private long lastTimeGetHit = System.currentTimeMillis();
+    private long deathCooldown = System.currentTimeMillis();
 
 
 
@@ -61,7 +69,7 @@ public class Player extends GameCharacters {
 
     }
 
-    public void takeDamage(float damage) {}
+
     public void regenerateMana(float amout){}
     public void addExperiance(float amout){
         experience += amout;
@@ -112,6 +120,8 @@ public class Player extends GameCharacters {
         if (!movePlayer)
             return;
 
+        if(IsAlive()){
+
         speed = (float) (delta * 300);
         float ratio = Math.abs(lastTouchDiff.y) / Math.abs(lastTouchDiff.x);
         double angle = Math.atan(ratio);
@@ -153,20 +163,72 @@ public class Player extends GameCharacters {
 
         }
 
-        setHitboxPosition();
+        setHitboxPosition();}
 
 
     }
 
-    public void getHit(Rectangle otherhitbox){
-        if(hitbox.overlaps(otherhitbox)){
-            System.out.println("Colides!");
+    public void die() {
+        if (System.currentTimeMillis() - deathCooldown >= 5000) {
+
+            entityPos.x = gameScreen.playerX;
+            entityPos.y = gameScreen.playerY;
+
+            cameraX = gameScreen.playerX;
+            cameraY = gameScreen.playerY;
+
+            setHitboxPosition();
+
+            hp = maxHp;
+
+
+
         }
+        deathCooldown = System.currentTimeMillis();
     }
+
+    public boolean getHit(Rectangle otherhitbox){
+        if(hitbox.overlaps(otherhitbox) &&  System.currentTimeMillis() - lastTimeGetHit>= 1000  ){
+            lastTimeGetHit = System.currentTimeMillis();
+
+
+            return true;
+
+        }
+        return false;
+    }
+
+        public void takeDamage(int damage) {
+            if(hp > 0){
+                hp -= damage;
+            }
+            else{
+                hp =0;
+                die();
+
+            }
+        }
+
+
+
 
     @Override
     public void setHitboxPosition() {
         hitbox.setPosition(  gameScreen.playerX - cameraX , gameScreen.playerY - cameraY);
+    }
+
+    @Override
+    public void drawHpBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
+        batch.begin();
+        font.draw(batch, "HP: " + hp, 10, 10);
+        batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.DARK_GRAY);
+        shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (float) GameConstants.GET_WIDTH /6, (float) GameConstants.GET_HEIGHT/5);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (hp / maxHp) * 100, GameConstants.GET_HEIGHT/5);
+        shapeRenderer.end();
     }
 
     public void setPlayerMoveTrue(GameScreen.PointF lastTouchDiff) {
@@ -188,7 +250,7 @@ public class Player extends GameCharacters {
         return hp;
     }
 
-    public void setHp(float hp) {
+    public void setHp(int hp) {
         this.hp = hp;
     }
 
@@ -214,6 +276,23 @@ public class Player extends GameCharacters {
     }
     public Weapon getCureentWeapon(){
         return  currentWeapon;
+    }
+
+    public boolean IsAlive(){
+        if(hp > 0){
+            isAlive = true;
+            return  true;
+
+        }
+        isAlive=false;
+        return  false;
+    }
+    public void updateAnim(){
+        if(IsAlive()){
+
+            updateAnimation();
+
+        }
     }
 
 

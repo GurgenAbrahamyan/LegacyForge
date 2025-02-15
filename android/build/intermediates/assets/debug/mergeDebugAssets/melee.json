@@ -1,0 +1,11 @@
+
+  {
+    "type": "melee",
+    "name": "Iron Sword",
+    "damage": 12,
+    "attackSpeed": 1.5,
+    "range": 1.0,
+    "knockbackInTiles": 1,
+    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+  }
+

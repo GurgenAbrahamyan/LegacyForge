@@ -2,7 +2,10 @@ package com.gamb1t.legacyforge.Entity;
 
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
@@ -19,7 +22,8 @@ public abstract class GameCharacters {
 
 
     protected float speed;
-    protected float hp, maxHp;
+    protected int hp, maxHp;
+    protected boolean isAlive;
     protected GameScreen.PointF entityPos;
 
     public Rectangle hitbox = new Rectangle();
@@ -40,6 +44,7 @@ public abstract class GameCharacters {
         hitbox = new Rectangle(x, y, width, height);
 
     }
+
 
     public abstract void setHitboxPosition();
 
@@ -81,6 +86,7 @@ public abstract class GameCharacters {
 
     public void updateAnimation() {
 
+
         aniTick++;
         if (aniTick >= aniSpeed) {
             aniTick = 0;
@@ -89,6 +95,8 @@ public abstract class GameCharacters {
                 currentFrame = 0;
         }
     }
+
+    public abstract void drawHpBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font);
 
     public void resetAnimation() {
         aniTick = 0;
