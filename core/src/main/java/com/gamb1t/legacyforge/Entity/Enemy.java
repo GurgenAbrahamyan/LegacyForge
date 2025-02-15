@@ -99,7 +99,11 @@ public class Enemy extends GameCharacters {
     }
 
     public void takeDamage(float amout){
-        hp -= amout;
+        if(hp > 0){
+        hp -= amout;}
+        else {
+            hp = 0;
+        }
 
     }
 

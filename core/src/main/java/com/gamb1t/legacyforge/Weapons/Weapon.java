@@ -21,8 +21,8 @@ public abstract class Weapon {
     protected long lastAttackTime = System.currentTimeMillis();
     protected boolean isAttacking;
     protected float rotationAngle = 0;
-    private float hitboxWidth = GameConstants.Sprite.SIZE;
-    private float hitboxHeight = GameConstants.Sprite.SIZE;
+    private float hitboxWidth;
+    private float hitboxHeight;
 
     protected Texture loadedSprite;
     protected TextureRegion[][] spriteSheet;
@@ -63,7 +63,6 @@ public abstract class Weapon {
             if (currentFrame >= animationFrameAmount)
                 currentFrame = 0;
         }
-        System.out.println(currentFrame);
     }
 
     public boolean canAttack() {
@@ -72,10 +71,6 @@ public abstract class Weapon {
         else{
             return false;
         }
-    }
-
-    private boolean isInRange(Enemy enemy, Player player) {
-        return Vector2.dst(player.getEntityPos().x, player.getEntityPos().y, enemy.getEntityPos().x, enemy.getEntityPos().y) <= range * GameConstants.Sprite.SIZE;
     }
 
     private void dealDamage(Enemy enemy) {
@@ -103,7 +98,7 @@ public abstract class Weapon {
     }
     public Rectangle createHitbox(float x, float y) {
 
-         Rectangle hitbox = new Rectangle(x, y, hitboxWidth, hitboxHeight);
+        Rectangle hitbox =  new Rectangle(x, y, hitboxWidth, hitboxHeight);
          return  hitbox;
 
     }

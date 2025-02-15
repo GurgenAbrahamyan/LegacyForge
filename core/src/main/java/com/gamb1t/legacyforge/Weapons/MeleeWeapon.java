@@ -41,6 +41,7 @@ public class MeleeWeapon extends Weapon {
         if (isAttacking) {
             Sprite spriteToDraw = changedSpritesheet[0][currentFrame];
             spriteToDraw.setPosition(x - GameConstants.Sprite.SIZE, y - GameConstants.Sprite.SIZE);
+            spriteToDraw.setOrigin(spriteToDraw.getWidth() / 2, spriteToDraw.getHeight() / 2);
             spriteToDraw.setRotation(rotationAngle);
             spriteToDraw.setSize(GameConstants.Sprite.SIZE * 3, GameConstants.Sprite.SIZE * 3);
             spriteToDraw.draw(batch);

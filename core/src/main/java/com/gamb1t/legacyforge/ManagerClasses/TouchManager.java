@@ -37,7 +37,7 @@ public class TouchManager implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if(player.IsAlive()){
+        if(!player.isDead()){
         float x = screenX;
         float y = GET_HEIGHT - screenY;
 
@@ -57,7 +57,7 @@ public class TouchManager implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 
-        if(player.IsAlive()){
+        if(!player.isDead()){
 
         if (screenX < GET_WIDTH / 2f) {
             movementJoystick.touchUp();
@@ -99,7 +99,7 @@ public class TouchManager implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(player.IsAlive()){
+        if(!player.isDead()){
         float x = screenX;
         float y = GET_HEIGHT - screenY;
 

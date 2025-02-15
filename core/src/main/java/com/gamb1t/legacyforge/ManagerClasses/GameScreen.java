@@ -82,8 +82,8 @@ public class GameScreen implements Screen {
         }
     }
 
-    public void update(double delta) {
-        PLAYER.updatePlayerMove(delta);
+    public void update(float delta) {
+        PLAYER.update(delta);
         mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
 
         if (PLAYER.getMovePlayer()) {
@@ -91,7 +91,7 @@ public class GameScreen implements Screen {
         }
         if(PLAYER.getCureentWeapon().getAttacking()){
             PLAYER.getCureentWeapon().update();
-            Rectangle hitbox = PLAYER.getCureentWeapon().createHitbox(playerX, playerY);
+            Rectangle hitbox = PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX ,  playerY - PLAYER.cameraY);
             PLAYER.getCureentWeapon().checkHitboxCollisions(hitbox, Enemies);
         }
 

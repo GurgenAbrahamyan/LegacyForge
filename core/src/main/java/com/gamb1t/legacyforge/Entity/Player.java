@@ -14,6 +14,7 @@ public class Player extends GameCharacters {
 
     private boolean movePlayer;
     private GameScreen.PointF lastTouchDiff;
+    private int DEATH_COOLDOWN_TIME = 5000;
 
     private int level;
     private int experience;
@@ -120,7 +121,7 @@ public class Player extends GameCharacters {
         if (!movePlayer)
             return;
 
-        if(IsAlive()){
+        if(!isDead()){
 
         speed = (float) (delta * 300);
         float ratio = Math.abs(lastTouchDiff.y) / Math.abs(lastTouchDiff.x);
@@ -169,7 +170,10 @@ public class Player extends GameCharacters {
     }
 
     public void die() {
-        if (System.currentTimeMillis() - deathCooldown >= 5000) {
+            deathCooldown = System.currentTimeMillis();
+            isAlive = false;
+
+            movePlayer = false;
 
             entityPos.x = gameScreen.playerX;
             entityPos.y = gameScreen.playerY;
@@ -180,11 +184,10 @@ public class Player extends GameCharacters {
             setHitboxPosition();
 
             hp = maxHp;
+        System.out.println("died");
 
 
 
-        }
-        deathCooldown = System.currentTimeMillis();
     }
 
     public boolean getHit(Rectangle otherhitbox){
@@ -198,7 +201,31 @@ public class Player extends GameCharacters {
         return false;
     }
 
-        public void takeDamage(int damage) {
+    public void update(float delta) {
+        if (isDead()) {
+            long elapsedTime = System.currentTimeMillis() - deathCooldown;
+            if (elapsedTime >= DEATH_COOLDOWN_TIME) {
+                die();
+            }
+        }
+
+        updatePlayerMove(delta);
+
+
+    }
+
+
+    private void resetAfterDeath() {
+        isAlive = true;
+        movePlayer = true;
+
+    }
+    public boolean isDead(){
+        return hp <= 0;
+    }
+
+
+    public void takeDamage(int damage) {
             if(hp > 0){
                 hp -= damage;
             }
@@ -278,17 +305,9 @@ public class Player extends GameCharacters {
         return  currentWeapon;
     }
 
-    public boolean IsAlive(){
-        if(hp > 0){
-            isAlive = true;
-            return  true;
 
-        }
-        isAlive=false;
-        return  false;
-    }
     public void updateAnim(){
-        if(IsAlive()){
+        if(!isDead()){
 
             updateAnimation();
 
