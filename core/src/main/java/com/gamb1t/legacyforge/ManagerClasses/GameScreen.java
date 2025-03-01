@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Polygon;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
@@ -28,13 +28,11 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
 
-
     private static ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
 
     private static WeaponLoader weaponLoader = new WeaponLoader("melee.json");
 
-    private static ArrayList<Weapon>  weapon = weaponLoader.getWeaponList();
-
+    private static ArrayList<Weapon> weapon = weaponLoader.getWeaponList();
 
     Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
     public MapManaging mapManager;
@@ -50,7 +48,7 @@ public class GameScreen implements Screen {
         PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
 
         for (int i = 0; i < 10; i++) {
-            Enemies.add(new Enemy(this));
+            Enemies.add(new Enemy(this, PLAYER));
         }
 
         for (Enemy enemy : Enemies) {
@@ -59,7 +57,7 @@ public class GameScreen implements Screen {
 
         for (Weapon w : weapon) {
             w.setAttackJoystick(touchEvents);
-            w.setTexture(w.getSprite(), 0, 4);
+            w.setTexture(w.getSprite(), 1, 4);
             w.convertTxtRegToSprite();
         }
         shapeRenderer = new ShapeRenderer();
@@ -89,19 +87,17 @@ public class GameScreen implements Screen {
         if (PLAYER.getMovePlayer()) {
             PLAYER.updateAnim();
         }
-        if(PLAYER.getCureentWeapon().getAttacking()){
+        if (PLAYER.getCureentWeapon().getAttacking()) {
             PLAYER.getCureentWeapon().update();
-            Rectangle hitbox = PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX ,  playerY - PLAYER.cameraY);
-            PLAYER.getCureentWeapon().checkHitboxCollisions(hitbox, Enemies);
+            PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies);
         }
 
         for (Enemy enemy : Enemies) {
             enemy.updateMove(delta);
             enemy.updateAnimation();
-            enemy.setPlayerPosX(PLAYER.cameraX);
-            enemy.setPlayerPosY(PLAYER.cameraY);
+            enemy.setPlayerPosX(playerX - GameConstants.Sprite.SIZE/2- PLAYER.cameraX);
+            enemy.setPlayerPosY(playerY - GameConstants.Sprite.SIZE/2-PLAYER.cameraY);
         }
-
     }
 
     private void resetAnimation() {
@@ -110,22 +106,18 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
     }
 
     @Override
     public void render(float delta) {
         update(delta);
 
-
         for (Enemy enemy : Enemies) {
-            if(PLAYER.getHit(enemy.hitbox)){
+            if (PLAYER.getHit(enemy.hitbox)) {
                 System.out.println("Damaged: " + enemy.getDamage());
-                PLAYER.takeDamage(enemy.getDamage());
+              PLAYER.takeDamage(enemy.getDamage());
             }
-
         }
-
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -133,47 +125,52 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
-        batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX, playerY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
-
-
-
+        batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2,
+            GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
 
         for (Enemy enemy : Enemies) {
-            batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX, enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+            batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX,
+                enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
         }
 
-        PLAYER.getCureentWeapon().draw(batch, playerX, playerY);
+        PLAYER.getCureentWeapon().draw(batch, playerX- GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2);
 
         batch.end();
 
-
         for (Enemy enemy : Enemies) {
-            enemy.drawHpBar(batch, shapeRenderer, font);
+            enemy.drawBar(batch, shapeRenderer, font);
         }
-        PLAYER.drawHpBar(batch, shapeRenderer, font);
+        PLAYER.drawBar(batch, shapeRenderer, font);
 
         touchEvents.draw(batch);
 
+        if (PLAYER.getCureentWeapon().getAttacking()) {
+
+
+            Polygon hitbox = PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX, playerY - PLAYER.cameraY);
+
+
+
+
+
+        }
     }
+
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override

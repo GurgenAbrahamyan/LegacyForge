@@ -46,6 +46,7 @@ public class Joystick {
         }
     }
 
+
     public void touchDragged(float x, float y) {
         if (touchDown) {
             xTouch = x;

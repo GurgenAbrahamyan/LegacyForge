@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.Entity.Enemy;
@@ -21,8 +23,6 @@ public abstract class Weapon {
     protected long lastAttackTime = System.currentTimeMillis();
     protected boolean isAttacking;
     protected float rotationAngle = 0;
-    private float hitboxWidth;
-    private float hitboxHeight;
 
     protected Texture loadedSprite;
     protected TextureRegion[][] spriteSheet;
@@ -41,6 +41,7 @@ public abstract class Weapon {
 
     }
     public Weapon(){}
+    public abstract Polygon createHitbox(float x, float y);
 
 
     public abstract void attack();
@@ -51,7 +52,9 @@ public abstract class Weapon {
         if (loadedSprite == null) {
             loadedSprite = new Texture(texturePath);
         }
-        spriteSheet = TextureRegion.split(loadedSprite, GameConstants.Sprite.DEFAULT_SIZE*2, GameConstants.Sprite.DEFAULT_SIZE*2);
+        spriteSheet = TextureRegion.split(loadedSprite, GameConstants.Sprite.DEFAULT_SIZE*3, GameConstants.Sprite.DEFAULT_SIZE*3);
+
+        System.out.println("Rows: " + spriteSheet.length + ", Columns: " + spriteSheet[0].length);
         animationFrameAmount = spriteSheet[0].length;
     }
 
@@ -67,6 +70,7 @@ public abstract class Weapon {
 
     public boolean canAttack() {
         if(System.currentTimeMillis() - lastAttackTime >= (1000 / attackSpeed)){
+            lastAttackTime = System.currentTimeMillis();
             return true;}
         else{
             return false;
@@ -96,20 +100,9 @@ public abstract class Weapon {
             }
         }
     }
-    public Rectangle createHitbox(float x, float y) {
 
-        Rectangle hitbox =  new Rectangle(x, y, hitboxWidth, hitboxHeight);
-         return  hitbox;
+    public void checkHitboxCollisions(ArrayList<Enemy> ENTITIES) {
 
-    }
-
-    public void checkHitboxCollisions(Rectangle hitbox, ArrayList<Enemy> ENTITIES) {
-        for (Enemy enemy : ENTITIES) {
-            if (hitbox.overlaps(enemy.hitbox)) {
-                dealDamage(enemy);
-                applyKnockback(enemy);
-            }
-        }
     }
 
 

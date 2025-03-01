@@ -26,7 +26,7 @@ public abstract class GameCharacters {
     protected boolean isAlive;
     protected GameScreen.PointF entityPos;
 
-    public Rectangle hitbox = new Rectangle();
+    public Rectangle hitbox;
 
     protected GameScreen gameScreen;
     protected Weapon weapon;
@@ -96,7 +96,7 @@ public abstract class GameCharacters {
         }
     }
 
-    public abstract void drawHpBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font);
+    public abstract void drawBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font);
 
     public void resetAnimation() {
         aniTick = 0;

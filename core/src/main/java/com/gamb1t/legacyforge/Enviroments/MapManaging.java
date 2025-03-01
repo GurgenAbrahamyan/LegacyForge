@@ -25,10 +25,10 @@ public class MapManaging {
     }
 
     public boolean canMoveHere(float x, float y) {
-        if (x < 0 || y < 0)
+        if (x - GameConstants.Sprite.SIZE/2< 0 || y - GameConstants.Sprite.SIZE/2 < 0)
             return false;
 
-        if (x >= getMaxWidthCurrentMap() || y >= getMaxHeightCurrentMap())
+        if (x - GameConstants.Sprite.SIZE/2 >= getMaxWidthCurrentMap() || y - GameConstants.Sprite.SIZE/2 >= getMaxHeightCurrentMap())
             return false;
 
         return true;

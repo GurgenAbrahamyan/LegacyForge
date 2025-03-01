@@ -10,6 +10,8 @@ import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
+import java.awt.Font;
+
 public class Player extends GameCharacters {
 
     private boolean movePlayer;
@@ -18,6 +20,7 @@ public class Player extends GameCharacters {
 
     private int level;
     private int experience;
+    private int money;
     private float hpMultiplyer = 10;
     private float mana, maxMana;
 
@@ -64,7 +67,10 @@ public class Player extends GameCharacters {
 
         this.armor = 10;
 
+
         this.weapon = weapon;
+
+        money = 0;
         entityPos = new GameScreen.PointF(x, y);
 
 
@@ -123,7 +129,7 @@ public class Player extends GameCharacters {
 
         if(!isDead()){
 
-        speed = (float) (delta * 300);
+        speed = (float) (delta * 400);
         float ratio = Math.abs(lastTouchDiff.y) / Math.abs(lastTouchDiff.x);
         double angle = Math.atan(ratio);
 
@@ -175,11 +181,11 @@ public class Player extends GameCharacters {
 
             movePlayer = false;
 
-            entityPos.x = gameScreen.playerX;
-            entityPos.y = gameScreen.playerY;
+            entityPos.x = gameScreen.playerX - GameConstants.Sprite.SIZE/2;
+            entityPos.y = gameScreen.playerY - GameConstants.Sprite.SIZE/2;
 
-            cameraX = gameScreen.playerX;
-            cameraY = gameScreen.playerY;
+            cameraX = gameScreen.playerX - GameConstants.Sprite.SIZE/2;
+            cameraY = gameScreen.playerY - GameConstants.Sprite.SIZE/2;
 
             setHitboxPosition();
 
@@ -241,21 +247,28 @@ public class Player extends GameCharacters {
 
     @Override
     public void setHitboxPosition() {
-        hitbox.setPosition(  gameScreen.playerX - cameraX , gameScreen.playerY - cameraY);
+        hitbox.setPosition(  gameScreen.playerX - cameraX - GameConstants.Sprite.SIZE/2 , gameScreen.playerY - cameraY - GameConstants.Sprite.SIZE/2);
     }
 
     @Override
-    public void drawHpBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
-        batch.begin();
-        font.draw(batch, "HP: " + hp, 10, 10);
-        batch.end();
+    public void drawBar(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
+
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (float) GameConstants.GET_WIDTH /6, (float) GameConstants.GET_HEIGHT/5);
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (hp / maxHp) * 100, GameConstants.GET_HEIGHT/5);
+        shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, GameConstants.GET_WIDTH /6 * hp / maxHp, GameConstants.GET_HEIGHT/5);
+
+
+
         shapeRenderer.end();
+        batch.begin();
+
+        font.getData().setScale(GameConstants.Sprite.SIZE/20);
+        font.draw(batch, "HP " + hp, GameConstants.GET_WIDTH / 9, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
+        font.draw(batch, "Money " + money, GameConstants.GET_WIDTH / 9 , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 3);
+        batch.end();
     }
 
     public void setPlayerMoveTrue(GameScreen.PointF lastTouchDiff) {
@@ -313,6 +326,11 @@ public class Player extends GameCharacters {
 
         }
     }
+    public void addMoney(int money){
+        this. money += money;
+
+    }
+
 
 
 

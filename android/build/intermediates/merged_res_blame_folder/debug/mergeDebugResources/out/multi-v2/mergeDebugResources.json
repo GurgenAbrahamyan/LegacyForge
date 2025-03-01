@@ -199,23 +199,6 @@
             "outputFile": "com.gamb1t.legacyforge.android-debug-11:/values_values.arsc.flat",
             "map": [
                 {
-                    "source": "D:\\LegacyForge3\\android\\res\\values\\color.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "55",
-                        "endOffsets": "106"
-                    },
-                    "to": {
-                        "startLines": "7",
-                        "startColumns": "4",
-                        "startOffsets": "406",
-                        "endColumns": "55",
-                        "endOffsets": "457"
-                    }
-                },
-                {
                     "source": "C:\\Users\\Gurgen\\.gradle\\caches\\8.12\\transforms\\507d9730626621dd32cd0f1c487c3d14\\transformed\\lifecycle-runtime-2.6.2\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
@@ -233,7 +216,26 @@
                     }
                 },
                 {
-                    "source": "D:\\LegacyForge3\\android\\res\\values\\strings.xml",
+                    "source": "D:\\LegacyForgeNew\\android\\res\\values\\styles.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endLines": "8",
+                        "endColumns": "12",
+                        "endOffsets": "476"
+                    },
+                    "to": {
+                        "startLines": "97",
+                        "startColumns": "4",
+                        "startOffsets": "5939",
+                        "endLines": "104",
+                        "endColumns": "12",
+                        "endOffsets": "6399"
+                    }
+                },
+                {
+                    "source": "D:\\LegacyForgeNew\\android\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "2",
@@ -267,22 +269,20 @@
                     }
                 },
                 {
-                    "source": "D:\\LegacyForge3\\android\\res\\values\\styles.xml",
+                    "source": "D:\\LegacyForgeNew\\android\\res\\values\\color.xml",
                     "from": {
-                        "startLines": "1",
+                        "startLines": "2",
                         "startColumns": "4",
-                        "startOffsets": "16",
-                        "endLines": "8",
-                        "endColumns": "12",
-                        "endOffsets": "476"
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
                     },
                     "to": {
-                        "startLines": "97",
+                        "startLines": "7",
                         "startColumns": "4",
-                        "startOffsets": "5939",
-                        "endLines": "104",
-                        "endColumns": "12",
-                        "endOffsets": "6399"
+                        "startOffsets": "406",
+                        "endColumns": "55",
+                        "endOffsets": "457"
                     }
                 },
                 {
