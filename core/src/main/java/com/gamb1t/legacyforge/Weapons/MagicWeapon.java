@@ -6,9 +6,8 @@ import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 
 public class MagicWeapon extends Weapon{
     private  float manaUsage;
-    public MagicWeapon(String name, float damage, float attackSpeed, float range, float knockbackInTiles, float manaUsage) {
-        super(name, "magic", damage, attackSpeed, range, knockbackInTiles);
-        this.manaUsage = manaUsage;
+    public MagicWeapon() {
+
     }
 
 

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.gamb1t.legacyforge.android-mergeDebugResources-9:/values-v21/values-v21.xml",
+            "outputFile": "com.gamb1t.legacyforge.android-mergeDebugResources-16:/values-v21/values-v21.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Gurgen\\.gradle\\caches\\8.12\\transforms\\00407c58809ab410cc3ec986170a8591\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",

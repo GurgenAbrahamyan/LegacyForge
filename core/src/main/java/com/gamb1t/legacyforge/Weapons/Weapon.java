@@ -1,5 +1,6 @@
 package com.gamb1t.legacyforge.Weapons;
 
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
@@ -24,31 +26,30 @@ public abstract class Weapon {
     protected boolean isAttacking;
     protected float rotationAngle = 0;
 
+    @JsonIgnore
     protected Texture loadedSprite;
+    @JsonIgnore
     protected TextureRegion[][] spriteSheet;
+
     protected TouchManager joystick;
     protected int aniTick, aniSpeed, animationFrameAmount, currentFrame;
+    @JsonIgnore
     protected Sprite[][] changedSpritesheet;
+    protected  Player player;
 
-    public Weapon(String name, String type, float damage, float attackSpeed, float range, float knockbackInTiles) {
-        this.name = name;
-        this.type = type;
-        this.damage = damage;
-        this.attackSpeed = attackSpeed;
-        this.range = range;
-        this.knockbackInTiles = knockbackInTiles;
+    public Weapon(){
         this.aniSpeed = (int) (10 / attackSpeed);
-
     }
-    public Weapon(){}
     public abstract Polygon createHitbox(float x, float y);
+
+
 
 
     public abstract void attack();
     public abstract void update();
     public abstract void draw(SpriteBatch batch, float x, float y);
 
-    public void setTexture(String texturePath, int spritesheetWidth, int spritesheetLength) {
+    public void setTexture(String texturePath) {
         if (loadedSprite == null) {
             loadedSprite = new Texture(texturePath);
         }
@@ -59,13 +60,7 @@ public abstract class Weapon {
     }
 
     public void updateAnimation() {
-        aniTick++;
-        if (aniTick >= aniSpeed) {
-            aniTick = 0;
-            currentFrame++;
-            if (currentFrame >= animationFrameAmount)
-                currentFrame = 0;
-        }
+
     }
 
     public boolean canAttack() {
@@ -77,18 +72,11 @@ public abstract class Weapon {
         }
     }
 
-    private void dealDamage(Enemy enemy) {
-        enemy.takeDamage(damage);
-    }
 
     private void applyKnockback(Enemy enemy) {
         enemy.applyKnockback(enemy, this);
     }
-
-    protected void resetAnimation() {
-        aniTick = 0;
-        currentFrame = 0;
-    }
+     public void resetAnimation(){}
 
     public void convertTxtRegToSprite() {
         if (spriteSheet != null) {
@@ -125,6 +113,9 @@ public abstract class Weapon {
     public void setAttacking(boolean attacking) { isAttacking = attacking; }
     public void setRotation(float angle) {
         this.rotationAngle = angle;
+    }
+    public void setPlayer(Player pl){
+        player=pl;
     }
 
     public float getRotation() {

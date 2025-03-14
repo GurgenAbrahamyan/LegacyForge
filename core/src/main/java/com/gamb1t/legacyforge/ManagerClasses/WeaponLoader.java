@@ -11,54 +11,61 @@ import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WeaponLoader {
-    private ArrayList<Weapon> weaponList;
+    private final ArrayList<Weapon> weaponList = new ArrayList<>();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Map weapon type to their corresponding class
+    private static final Map<String, Class<? extends Weapon>> weaponTypeMap = new HashMap<>();
+
+    static {
+        weaponTypeMap.put("melee", MeleeWeapon.class);
+        weaponTypeMap.put("magic", MagicWeapon.class);
+        weaponTypeMap.put("ranged", RangedWeapon.class);
+    }
 
     public WeaponLoader(String resourceName) {
-        weaponList = new ArrayList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
+        loadWeapons(resourceName);
+    }
 
+    private void loadWeapons(String resourceName) {
         try {
             FileHandle fileHandle = Gdx.files.internal(resourceName);
-
             if (!fileHandle.exists()) {
                 throw new IllegalArgumentException("File not found: " + resourceName);
             }
 
-            JsonNode jsonNode = objectMapper.readTree(fileHandle.read());
+            JsonNode rootNode = objectMapper.readTree(fileHandle.read());
 
-            if (jsonNode == null || !jsonNode.has("type")) {
-                throw new IllegalArgumentException("Invalid JSON structure in: " + resourceName);
+            if (!rootNode.isArray()) {
+                throw new IllegalArgumentException("Invalid JSON structure: Expected an array.");
             }
 
-            String type = jsonNode.get("type").asText();
-            Weapon weapon;
+            for (JsonNode jsonNode : rootNode) {
+                JsonNode typeNode = jsonNode.get("type");
+                if (typeNode == null) {
+                    Gdx.app.error("WeaponLoader", "Skipping weapon with missing 'type' field.");
+                    continue;
+                }
 
-            switch (type) {
-                case "melee":
-                    weapon = objectMapper.treeToValue(jsonNode, MeleeWeapon.class);
-                    break;
-                case "magic":
-                    weapon = objectMapper.treeToValue(jsonNode, MagicWeapon.class);
-                    break;
-                case "ranged":
-                    weapon = objectMapper.treeToValue(jsonNode, RangedWeapon.class);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown weapon type: " + type);
+                String type = typeNode.asText();
+                Class<? extends Weapon> weaponClass = weaponTypeMap.get(type);
+
+                if (weaponClass == null) {
+                    Gdx.app.error("WeaponLoader", "Unknown weapon type: " + type);
+                    continue;
+                }
+
+                Weapon weapon = objectMapper.treeToValue(jsonNode, weaponClass);
+                weaponList.add(weapon);
+                Gdx.app.log("WeaponLoader", "Loaded weapon: " + weapon.getName());
             }
 
-            weaponList.add(weapon);
-            Gdx.app.log("WeaponLoader", "Loaded weapon: " + weapon);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            Gdx.app.error("WeaponLoader", e.getMessage());
-        }
-        for(Weapon wp : weaponList){
-            System.out.println(wp.getSprite());
+        } catch (IOException | IllegalArgumentException e) {
+            Gdx.app.error("WeaponLoader", "Error loading weapons: " + e.getMessage());
         }
     }
 

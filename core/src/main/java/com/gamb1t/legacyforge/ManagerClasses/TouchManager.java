@@ -6,7 +6,10 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
+
+import java.util.Random;
 
 public class TouchManager implements InputProcessor {
     private Player player;
@@ -47,8 +50,15 @@ public class TouchManager implements InputProcessor {
 
         } else if (x >= GET_WIDTH / 2f && !touchDowns[1] && attackJoystick.isTouched(x, y)) {
             if (attackJoystick.isTouched(x, y)) {
+                if(weapon instanceof RangedWeapon ){
+                    weapon.setAttacking(true);
+                    setIsAiming(true);
+                }
+
+
                 attackJoystick.touchDown(x, y);
                 touchDowns[1] = true;
+
             }
         }}
 
@@ -70,29 +80,32 @@ public class TouchManager implements InputProcessor {
             attackJoystick.touchUp();
             touchDowns[1] = false;
 
+
             if (isAiming) {
 
-                float length = (float) Math.sqrt(attackDirectionX * attackDirectionX + attackDirectionY * attackDirectionY);
-                if (length != 0) {
-                    attackDirectionX /= length;
-                    attackDirectionY /= length;
-                }
-                else  if (attackDirectionX == 0 && attackDirectionY == 0) {
-                    attackDirectionX = 1;
-                    attackDirectionY = 0;}
 
 
-                angle = (float) Math.toDegrees(Math.atan2(attackDirectionY, attackDirectionX));
+
                 weapon.onJoystickRelease();
                 weapon.attack();
+                rotationCalc();
                 weapon.setRotation(angle);
+
                 weapon.setAttacking(true);
+                rotationCalc();
+                if(weapon instanceof RangedWeapon){
+                    ((RangedWeapon) weapon).setIsCharging(false);
+                }
             }
 
+
             isAiming = false;
+
+
         }
 
         }
+
 
 
         return true;
@@ -103,14 +116,29 @@ public class TouchManager implements InputProcessor {
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         return false;
     }
+    public void rotationCalc(){
+        float length = (float) Math.sqrt(attackDirectionX * attackDirectionX + attackDirectionY * attackDirectionY);
+        if (length != 0) {
+            attackDirectionX /= length;
+            attackDirectionY /= length;
+        }
+        else  if (attackDirectionX == 0 && attackDirectionY == 0) {
+            attackDirectionX = 1;
+            attackDirectionY = 0;}
+
+
+        angle = (float) Math.toDegrees(Math.atan2(attackDirectionY, attackDirectionX));
+    }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if(weapon instanceof RangedWeapon){
+            rotationCalc();
+        weapon.setRotation(angle);}
         if(!player.isDead()){
         float x = screenX;
         float y = GET_HEIGHT - screenY;
 
-        isAiming = true;
 
         if (x < GET_WIDTH / 2f && touchDowns[0]) {
             movementJoystick.touchDragged(x, y);
@@ -118,7 +146,12 @@ public class TouchManager implements InputProcessor {
         }
 
           else if (x > GET_WIDTH / 2f && touchDowns[1]){
+
             attackJoystick.touchDragged(x, y);
+
+                isAiming = true;
+
+
 
             float newX = attackJoystick.getXDiff();
             float newY = attackJoystick.getYDiff();
@@ -137,6 +170,9 @@ public class TouchManager implements InputProcessor {
     }
 
     public void setIsAiming(boolean set) { isAiming = set;}
+    public boolean getIsAiming(){
+        return  isAiming;
+    }
 
     public float getRotation(){
         return angle;

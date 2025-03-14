@@ -1,4 +1,4 @@
-
+[
   {
     "type": "melee",
     "name": "Iron Sword",
@@ -8,4 +8,4 @@
     "knockbackInTiles": 1,
     "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
   }
-
+]

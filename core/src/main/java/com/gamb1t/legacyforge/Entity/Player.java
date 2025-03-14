@@ -176,23 +176,23 @@ public class Player extends GameCharacters {
     }
 
     public void die() {
-            deathCooldown = System.currentTimeMillis();
+        if(deathCooldown- DEATH_COOLDOWN_TIME > 0) {
             isAlive = false;
 
             movePlayer = false;
 
-            entityPos.x = gameScreen.playerX - GameConstants.Sprite.SIZE/2;
-            entityPos.y = gameScreen.playerY - GameConstants.Sprite.SIZE/2;
+            entityPos.x = gameScreen.playerX - GameConstants.Sprite.SIZE / 2;
+            entityPos.y = gameScreen.playerY - GameConstants.Sprite.SIZE / 2;
 
-            cameraX = gameScreen.playerX - GameConstants.Sprite.SIZE/2;
-            cameraY = gameScreen.playerY - GameConstants.Sprite.SIZE/2;
+            cameraX = gameScreen.playerX - GameConstants.Sprite.SIZE / 2;
+            cameraY = gameScreen.playerY - GameConstants.Sprite.SIZE / 2;
 
             setHitboxPosition();
 
             hp = maxHp;
-        System.out.println("died");
+            System.out.println("died");
 
-
+        }
 
     }
 
@@ -209,10 +209,9 @@ public class Player extends GameCharacters {
 
     public void update(float delta) {
         if (isDead()) {
-            long elapsedTime = System.currentTimeMillis() - deathCooldown;
-            if (elapsedTime >= DEATH_COOLDOWN_TIME) {
+
+                deathCooldown = System.currentTimeMillis();
                 die();
-            }
         }
 
         updatePlayerMove(delta);

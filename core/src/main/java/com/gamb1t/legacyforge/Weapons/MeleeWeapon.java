@@ -1,13 +1,11 @@
 package com.gamb1t.legacyforge.Weapons;
 
-
-import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
-
+import com.badlogic.gdx.math.Intersector;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
@@ -18,31 +16,31 @@ public class MeleeWeapon extends Weapon {
     private final long attackCooldown = 500;
     private Polygon hitbox;
     private float[] hitboxVertices;
+    private float animationTimer = 0;
+    private final float frameDuration = 0.1f;
 
     public MeleeWeapon() {
         this.hitbox = new Polygon();
     }
+
     @Override
     public Polygon createHitbox(float x, float y) {
-        float baseSize = 2*GameConstants.Sprite.SIZE;
+        float baseSize = 2 * GameConstants.Sprite.SIZE;
         float tipDistance = range * GameConstants.Sprite.SIZE;
 
-
-        hitboxVertices = new float[]{
+        hitboxVertices = new float[] {
             -baseSize / 2, tipDistance,
             baseSize / 2, tipDistance,
-            0, 0,
+            0, 0
         };
 
         hitbox.setVertices(hitboxVertices);
-       hitbox.setOrigin(0,0);
-
-        hitbox.setPosition(x , y);
-        rotateHitbox(rotationAngle-90);
+        hitbox.setOrigin(0, 0);
+        hitbox.setPosition(x, y);
+        rotateHitbox(rotationAngle - 90);
 
         return hitbox;
     }
-
 
     private void rotateHitbox(float angle) {
         if (hitbox != null) {
@@ -61,12 +59,7 @@ public class MeleeWeapon extends Weapon {
 
     @Override
     public void update() {
-        updateAnimation( );
-
-        if (isAttacking && joystick != null) {
-            float angle = joystick.getRotation();
-            setRotation(angle);
-        }
+        updateAnimation();
     }
 
     @Override
@@ -82,18 +75,32 @@ public class MeleeWeapon extends Weapon {
             if (currentFrame == changedSpritesheet[0].length - 1) {
                 isAttacking = false;
                 if (joystick != null) joystick.setIsAiming(false);
+                resetAnimation();
             }
         }
+    }
+    public void resetAnimation(){
+        currentFrame = 0;
+        animationTimer = 0;
     }
 
     @Override
     public void updateAnimation() {
-        if (isAttacking && currentFrame < changedSpritesheet[0].length - 1) {
-            currentFrame++;
+        if (!isAttacking) return;
+
+        animationTimer += Gdx.graphics.getDeltaTime();
+
+        if (animationTimer >= frameDuration) {
+            animationTimer = 0;
+
+            if (currentFrame < changedSpritesheet[0].length - 1) {
+                currentFrame++;
+            } else {
+                isAttacking = false; // Only stop attacking when animation ends
+                resetAnimation();
+            }
         }
     }
-
-
 
     @Override
     public void checkHitboxCollisions(ArrayList<Enemy> enemies) {

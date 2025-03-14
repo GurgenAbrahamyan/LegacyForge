@@ -53,8 +53,10 @@ android {
 }
 
 repositories {
-  // needed for AAPT2, may be needed for other tools
-  google()
+  google()  // Add this for Firebase dependencies
+  mavenCentral()  // Add this if not present
+  jcenter()  // Optional: Add this if you still need it for other dependencies
+  maven { url 'https://jitpack.io' }  // Add this for other third-party libraries
 }
 
 configurations { natives }
@@ -63,6 +65,8 @@ dependencies {
   coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   implementation project(':core')
+  implementation 'com.google.firebase:firebase-auth:21.0.5'
+  implementation 'com.google.firebase:firebase-database:20.0.3'
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
