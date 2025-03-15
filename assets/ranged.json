@@ -1,0 +1,12 @@
+[
+{
+  "type": "ranged",
+  "name": "Bow",
+  "damage": 10.0,
+  "attackSpeed": 1.5,
+  "range": 50.0,
+  "knockbackInTiles": 2.0,
+  "sprite": "weapons_spritesheet/ranged_spritesheet/regular_bow.png",
+  "projectilePath": "weapons_spritesheet/ranged_spritesheet/wooden_arrow.png"
+}
+]

@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-27:12
-INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-27:12
-INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-27:12
-INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-27:12
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-28:12
+INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-28:12
+INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-28:12
+INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:2:1-28:12
 MERGED from [com.badlogicgames.gdx:gdx-backend-android:1.13.1] C:\Users\Gurgen\.gradle\caches\8.12\transforms\025dad16844e18c179b6499482e66f86\transformed\gdx-backend-android-1.13.1\AndroidManifest.xml:2:1-11:12
 MERGED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:17:1-73:12
 MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:15:1-38:12
@@ -63,9 +63,17 @@ MERGED from [com.badlogicgames.gdx:gdx-backend-android:1.13.1] C:\Users\Gurgen\.
 		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:4:17-49
 	android:required
 		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:4:50-73
+uses-permission#android.permission.INTERNET
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:5:5-66
+MERGED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:23:5-67
+MERGED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:23:5-67
+MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:26:5-67
+MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:26:5-67
+	android:name
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:5:22-64
 application
-ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:5:3-25:17
-INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:5:3-25:17
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:6:3-26:17
+INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml:6:3-26:17
 MERGED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:26:5-71:19
 MERGED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:26:5-71:19
 MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:28:5-36:19
@@ -97,43 +105,43 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Gurgen\.gradle\cac
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] C:\Users\Gurgen\.gradle\caches\8.12\transforms\00407c58809ab410cc3ec986170a8591\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 	android:label
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:11:7-39
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:12:7-39
 	android:fullBackupContent
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:7:7-39
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:8:7-39
 	android:appCategory
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:10:7-33
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:11:7-33
 	tools:ignore
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:12:7-37
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:13:7-37
 	android:icon
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:8:7-43
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:9:7-43
 	android:allowBackup
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:6:7-33
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:7:7-33
 	android:theme
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:13:7-65
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:14:7-65
 	android:isGame
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:9:7-28
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:10:7-28
 activity#com.gamb1t.legacyforge.android.AndroidLauncher
-ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:14:5-24:16
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:15:5-25:16
 	android:screenOrientation
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:17:9-46
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:18:9-46
 	android:label
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:16:9-41
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:17:9-41
 	android:exported
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:19:9-32
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:20:9-32
 	android:configChanges
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:18:9-103
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:19:9-103
 	android:name
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:15:9-70
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:16:9-70
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:20:9-23:23
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:21:9-24:23
 action#android.intent.action.MAIN
-ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:21:9-60
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:22:9-60
 	android:name
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:21:17-58
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:22:17-58
 category#android.intent.category.LAUNCHER
-ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:22:9-68
+ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:23:9-68
 	android:name
-		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:22:19-66
+		ADDED from D:\LegacyForgeBEta\android\AndroidManifest.xml:23:19-66
 uses-sdk
 INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml
@@ -224,12 +232,6 @@ MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\Gurgen\
 		INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml
 	android:minSdkVersion
 		INJECTED from D:\LegacyForgeBEta\android\AndroidManifest.xml
-uses-permission#android.permission.INTERNET
-ADDED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:23:5-67
-MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:26:5-67
-MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:26:5-67
-	android:name
-		ADDED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:23:22-64
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from [com.google.firebase:firebase-auth:21.0.5] C:\Users\Gurgen\.gradle\caches\8.12\transforms\2f8d2b571e68a081c4a8f56b73fdae38\transformed\firebase-auth-21.0.5\AndroidManifest.xml:24:5-79
 MERGED from [com.google.firebase:firebase-database:20.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\bb2fab5c90fa0d2e462fc462ab3f22ab\transformed\firebase-database-20.0.3\AndroidManifest.xml:25:5-79

@@ -22,6 +22,7 @@ public class RangedWeapon extends Weapon {
     private long lastAttackTime;
     private final long attackCooldown = 500;
     private boolean isCharging = false;
+    private boolean animOver = false;
     private float chargeTime = 0;
 
     private String projectilePath;
@@ -53,13 +54,13 @@ public class RangedWeapon extends Weapon {
 
     @Override
     public void attack() {
-        resetAnimation();
         if (isCharging) return;
         if (canAttack() && (System.currentTimeMillis() - lastAttackTime) >= attackCooldown) {
             lastAttackTime = System.currentTimeMillis();
             isCharging = true;
             chargeTime = 0;
             releaseBow();
+
         }
     }
     public void resetAnimation() {
@@ -118,7 +119,8 @@ public class RangedWeapon extends Weapon {
 
     public void updateAnimation() {
         frameDuration = attackSpeed/5 ;
-        if (!isAttacking) return;
+
+        if (!animOver) return;
 
         animationTimer += Gdx.graphics.getDeltaTime();
 
@@ -130,7 +132,10 @@ public class RangedWeapon extends Weapon {
                 if(joystick.getIsAiming()){
                 currentFrame = changedSpritesheet[0].length-1;}
                 else{
-                    currentFrame=0;
+                    resetAnimation();
+
+                    animOver=false;
+
                 }
             }
 
@@ -155,7 +160,8 @@ public class RangedWeapon extends Weapon {
                         if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemyPoly)) {
                             dealDamage(enemy);
                             applyKnockback(enemy);
-                            proj.setDestroyed(true);  // Destroy the projectile after hit
+                            proj.setDestroyed(true);
+                            System.out.println("colided");
                         }
                     }
                 }
@@ -181,6 +187,9 @@ public class RangedWeapon extends Weapon {
 
     public ArrayList<Projectile> getProjectiles() {
         return projectiles;
+    }
+    public void setAnimOver(boolean b){
+        animOver = b;
     }
 
 }

@@ -52,6 +52,7 @@ public class TouchManager implements InputProcessor {
             if (attackJoystick.isTouched(x, y)) {
                 if(weapon instanceof RangedWeapon ){
                     weapon.setAttacking(true);
+                    ((RangedWeapon) weapon).setAnimOver(true);
                     setIsAiming(true);
                 }
 
@@ -91,8 +92,12 @@ public class TouchManager implements InputProcessor {
                 rotationCalc();
                 weapon.setRotation(angle);
 
+
                 weapon.setAttacking(true);
-                rotationCalc();
+                if(weapon instanceof  RangedWeapon){
+                    ((RangedWeapon) weapon).setAnimOver(true);
+                }
+
                 if(weapon instanceof RangedWeapon){
                     ((RangedWeapon) weapon).setIsCharging(false);
                 }

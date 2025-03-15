@@ -18,6 +18,7 @@ public class MeleeWeapon extends Weapon {
     private float[] hitboxVertices;
     private float animationTimer = 0;
     private final float frameDuration = 0.1f;
+    private long lastTimeDamaged = System.currentTimeMillis();
 
     public MeleeWeapon() {
         this.hitbox = new Polygon();
@@ -53,7 +54,6 @@ public class MeleeWeapon extends Weapon {
         if (canAttack() && (System.currentTimeMillis() - lastAttackTime) >= attackCooldown) {
             lastAttackTime = System.currentTimeMillis();
             isAttacking = true;
-            resetAnimation();
         }
     }
 
@@ -126,7 +126,7 @@ public class MeleeWeapon extends Weapon {
 
     private void dealDamage(Enemy enemy) {
         if (enemy != null) {
-            enemy.takeDamage(damage);
+            enemy.takeDamage(damage/5);
         }
     }
 
