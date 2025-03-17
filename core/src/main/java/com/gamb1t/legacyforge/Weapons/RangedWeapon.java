@@ -30,7 +30,22 @@ public class RangedWeapon extends Weapon {
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private float animationTimer = 0;
     private float frameDuration = 0.1f;
-    private float percentage =0;
+
+
+    float minSpeed = 10;
+    float maxSpeed = 50;
+
+    float chargePercentage = Math.min(chargeTime / maxChargeTime, 1.0f);
+    float arrowSpeed = minSpeed + chargePercentage * (maxSpeed - minSpeed);
+
+
+
+    float minDamage = damage/5;
+    float maxDamage = damage;
+    float projectileDamage = minDamage + chargePercentage * (maxDamage - minDamage);
+
+
+    private float playerCamX, getPlayerCamY;
 
     public RangedWeapon() {
 
@@ -75,12 +90,14 @@ public class RangedWeapon extends Weapon {
     }
 
     private void shootArrow() {
-        float chargePercentage = chargeTime/maxChargeTime;
 
-        float arrowSpeed = 50;
+
+
+
+
         Vector2 direction = new Vector2((float) Math.cos(Math.toRadians(rotationAngle)), (float) Math.sin(Math.toRadians(rotationAngle)));
 
-        projectiles.add(new Projectile(GameConstants.GET_WIDTH/2-  player.cameraX , GameConstants.GET_HEIGHT/2- player.cameraY , direction, arrowSpeed, projectilePath));
+        projectiles.add(new Projectile(GameConstants.GET_WIDTH/2-  player.cameraX , GameConstants.GET_HEIGHT/2- player.cameraY , direction, 50, projectilePath));
 
     }
 
@@ -88,13 +105,11 @@ public class RangedWeapon extends Weapon {
 
     @Override
     public void update() {
-        if (isCharging) {
-            chargeTime += Gdx.graphics.getDeltaTime();
-        }
 
         for (Projectile proj : projectiles) {
             proj.update();
         }
+
 
         projectiles.removeIf(Projectile::isDestroyed);
 
@@ -113,9 +128,29 @@ public class RangedWeapon extends Weapon {
         }
 
         for (Projectile proj : projectiles) {
-            proj.draw(batch, x, y  );
+            proj.draw(batch, playerCamX, getPlayerCamY);
         }
     }
+
+    public void updateCharge() {
+
+            chargeTime += Gdx.graphics.getDeltaTime();
+            if (chargeTime > maxChargeTime) {
+                chargeTime = maxChargeTime;
+            }
+
+
+            float chargePercentage = Math.min(chargeTime / maxChargeTime, 1.0f);
+
+            currentFrame = (int) (chargePercentage * (changedSpritesheet[0].length - 1));
+
+            float stretchFactor = 1.0f + chargePercentage * 0.5f;
+            changedSpritesheet[0][currentFrame].setScale(stretchFactor);
+
+            System.out.println("Charging: " + chargeTime + "s, Charge Percentage: " + chargePercentage);
+
+    }
+
 
     public void updateAnimation() {
         frameDuration = attackSpeed/5 ;
@@ -130,7 +165,7 @@ public class RangedWeapon extends Weapon {
                 currentFrame++;
             } else if(currentFrame == changedSpritesheet[0].length-1) {
                 if(joystick.getIsAiming()){
-                currentFrame = changedSpritesheet[0].length-1;}
+                    currentFrame = changedSpritesheet[0].length-1;}
                 else{
                     resetAnimation();
 
@@ -143,6 +178,7 @@ public class RangedWeapon extends Weapon {
         System.out.println("Current Frame: " + currentFrame + ", isCharging: " + isCharging + ", isAttacking: " + isAttacking);
 
     }
+
 
     public void checkHitboxCollisions(ArrayList<Enemy> enemies) {
         for (Projectile proj : projectiles) {
@@ -190,6 +226,11 @@ public class RangedWeapon extends Weapon {
     }
     public void setAnimOver(boolean b){
         animOver = b;
+    }
+    public void setCameraValues(float x, float y){
+        playerCamX = x;
+        getPlayerCamY = y;
+
     }
 
 }

@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
 import com.gamb1t.legacyforge.Weapons.Projectile;
 import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
@@ -89,6 +90,9 @@ public class GameScreen implements Screen {
     public void update(float delta) {
         PLAYER.update(delta);
         mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+        if(PLAYER.getCureentWeapon() instanceof RangedWeapon){
+            ((RangedWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+        }
 
         if (PLAYER.getMovePlayer()) {
             PLAYER.updateAnim();
@@ -137,7 +141,7 @@ public class GameScreen implements Screen {
         }
         if(PLAYER.getCureentWeapon().getAttacking()) {
 
-            PLAYER.getCureentWeapon().draw(batch, playerX - GameConstants.Sprite.SIZE / 2, playerY - GameConstants.Sprite.SIZE / 2);
+            PLAYER.getCureentWeapon().draw(batch, playerX  - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2);
         }
 
         batch.end();
@@ -153,6 +157,7 @@ public class GameScreen implements Screen {
 
 
         if (PLAYER.getCureentWeapon().getAttacking()) {
+
 
 
             PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX, playerY - PLAYER.cameraY);

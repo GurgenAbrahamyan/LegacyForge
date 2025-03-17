@@ -1,5 +1,6 @@
 package com.gamb1t.legacyforge.Weapons;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,10 +16,11 @@ public class Projectile {
     private boolean destroyed = false;
     private Sprite sprite;
     private Polygon hitbox;
+    private float damage;
 
     public Projectile(float x, float y, Vector2 direction, float speed, String proj) {
         this.positionHitbox = new Vector2(x, y);
-        this.positionSprite = new Vector2(GameConstants.GET_WIDTH/2- GameConstants.Sprite.SIZE/2, GameConstants.GET_HEIGHT/2- GameConstants.Sprite.SIZE/2);
+        this.positionSprite = new Vector2(x - GameConstants.Sprite.SIZE/2, y - GameConstants.Sprite.SIZE/2);
         this.velocity = direction.scl(speed);
         this.sprite= new Sprite(new Texture(proj));
         this.sprite.setSize(GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
@@ -42,9 +44,9 @@ public class Projectile {
         }
     }
 
-    public void draw(SpriteBatch batch, float x, float y) {
+    public void draw(SpriteBatch batch, float camX, float camY) {
         if (!destroyed) {
-            sprite.setPosition(positionSprite.x, positionSprite.y);
+            sprite.setPosition(positionSprite.x+camX, positionSprite.y+camY);
             sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
             sprite.setRotation(velocity.angleDeg());
             hitbox.setRotation(velocity.angleDeg());;
@@ -70,4 +72,6 @@ public class Projectile {
     public void setDestroyed(boolean destroyed) {
         this.destroyed = destroyed;
     }
+
+
 }

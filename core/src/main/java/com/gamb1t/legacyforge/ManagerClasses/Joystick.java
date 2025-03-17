@@ -74,15 +74,6 @@ public class Joystick {
         return yTouch - yCenter;
     }
 
-    public float getAngle(){
-        float dx = xTouch - xCenter;
-        float dy = yTouch - yCenter;
-
-
-        float angle = (float) Math.atan2(dy, dx);
-
-        return  angle;
-    }
 
 
 

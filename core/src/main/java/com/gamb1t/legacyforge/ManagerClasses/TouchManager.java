@@ -41,27 +41,27 @@ public class TouchManager implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if(!player.isDead()){
-        float x = screenX;
-        float y = GET_HEIGHT - screenY;
+            float x = screenX;
+            float y = GET_HEIGHT - screenY;
 
-        if (x < GET_WIDTH / 2f && !touchDowns[0] && movementJoystick.isTouched(x, y)) {
-            movementJoystick.touchDown(x, y);
-            touchDowns[0] = true;
+            if (x < GET_WIDTH / 2f && !touchDowns[0] && movementJoystick.isTouched(x, y)) {
+                movementJoystick.touchDown(x, y);
+                touchDowns[0] = true;
 
-        } else if (x >= GET_WIDTH / 2f && !touchDowns[1] && attackJoystick.isTouched(x, y)) {
-            if (attackJoystick.isTouched(x, y)) {
-                if(weapon instanceof RangedWeapon ){
-                    weapon.setAttacking(true);
-                    ((RangedWeapon) weapon).setAnimOver(true);
-                    setIsAiming(true);
+            } else if (x >= GET_WIDTH / 2f && !touchDowns[1] && attackJoystick.isTouched(x, y)) {
+                if (attackJoystick.isTouched(x, y)) {
+                    if(weapon instanceof RangedWeapon ){
+                        weapon.setAttacking(true);
+                        ((RangedWeapon) weapon).setAnimOver(true);
+                        setIsAiming(true);
+                    }
+
+
+                    attackJoystick.touchDown(x, y);
+                    touchDowns[1] = true;
+
                 }
-
-
-                attackJoystick.touchDown(x, y);
-                touchDowns[1] = true;
-
-            }
-        }}
+            }}
 
         return true;
     }
@@ -71,43 +71,43 @@ public class TouchManager implements InputProcessor {
 
         if(!player.isDead()){
 
-        if (screenX < GET_WIDTH / 2f) {
-            movementJoystick.touchUp();
-            touchDowns[0] = false;
-            player.setPlayerMoveFalse();
-        }
-
-        else if(screenX > GET_WIDTH/2f) {
-            attackJoystick.touchUp();
-            touchDowns[1] = false;
-
-
-            if (isAiming) {
-
-
-
-
-                weapon.onJoystickRelease();
-                weapon.attack();
-                rotationCalc();
-                weapon.setRotation(angle);
-
-
-                weapon.setAttacking(true);
-                if(weapon instanceof  RangedWeapon){
-                    ((RangedWeapon) weapon).setAnimOver(true);
-                }
-
-                if(weapon instanceof RangedWeapon){
-                    ((RangedWeapon) weapon).setIsCharging(false);
-                }
+            if (screenX < GET_WIDTH / 2f) {
+                movementJoystick.touchUp();
+                touchDowns[0] = false;
+                player.setPlayerMoveFalse();
             }
 
+            else if(screenX > GET_WIDTH/2f) {
+                attackJoystick.touchUp();
+                touchDowns[1] = false;
 
-            isAiming = false;
+
+                if (isAiming) {
 
 
-        }
+
+
+                    weapon.onJoystickRelease();
+                    weapon.attack();
+                    rotationCalc();
+                    weapon.setRotation(angle);
+
+
+                    weapon.setAttacking(true);
+                    if(weapon instanceof  RangedWeapon){
+                        ((RangedWeapon) weapon).setAnimOver(true);
+                    }
+
+                    if(weapon instanceof RangedWeapon){
+                        ((RangedWeapon) weapon).setIsCharging(false);
+                    }
+                }
+
+
+                isAiming = false;
+
+
+            }
 
         }
 
@@ -139,34 +139,34 @@ public class TouchManager implements InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if(weapon instanceof RangedWeapon){
             rotationCalc();
-        weapon.setRotation(angle);}
+            weapon.setRotation(angle);}
         if(!player.isDead()){
-        float x = screenX;
-        float y = GET_HEIGHT - screenY;
+            float x = screenX;
+            float y = GET_HEIGHT - screenY;
 
 
-        if (x < GET_WIDTH / 2f && touchDowns[0]) {
-            movementJoystick.touchDragged(x, y);
-            player.setPlayerMoveTrue(new GameScreen.PointF(movementJoystick.getXDiff(), movementJoystick.getYDiff()));
-        }
+            if (x < GET_WIDTH / 2f && touchDowns[0]) {
+                movementJoystick.touchDragged(x, y);
+                player.setPlayerMoveTrue(new GameScreen.PointF(movementJoystick.getXDiff(), movementJoystick.getYDiff()));
+            }
 
-          else if (x > GET_WIDTH / 2f && touchDowns[1]){
+            else if (x > GET_WIDTH / 2f && touchDowns[1]){
 
-            attackJoystick.touchDragged(x, y);
+                attackJoystick.touchDragged(x, y);
 
                 isAiming = true;
 
 
 
-            float newX = attackJoystick.getXDiff();
-            float newY = attackJoystick.getYDiff();
+                float newX = attackJoystick.getXDiff();
+                float newY = attackJoystick.getYDiff();
 
-            if (newX != 0 || newY != 0) {
-                attackDirectionX = attackJoystick.getXDiff();
-                attackDirectionY = attackJoystick.getYDiff();
+                if (newX != 0 || newY != 0) {
+                    attackDirectionX = attackJoystick.getXDiff();
+                    attackDirectionY = attackJoystick.getYDiff();
+                }
+
             }
-
-        }
 
 
         }

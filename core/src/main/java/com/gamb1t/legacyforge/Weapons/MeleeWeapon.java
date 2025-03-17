@@ -26,12 +26,12 @@ public class MeleeWeapon extends Weapon {
 
     @Override
     public Polygon createHitbox(float x, float y) {
-        float baseSize = 2 * GameConstants.Sprite.SIZE;
+        float baseSize = GameConstants.Sprite.SIZE;
         float tipDistance = range * GameConstants.Sprite.SIZE;
 
         hitboxVertices = new float[] {
-            -baseSize / 2, tipDistance,
-            baseSize / 2, tipDistance,
+            -baseSize , tipDistance,
+            baseSize  , tipDistance,
             0, 0
         };
 
@@ -64,12 +64,15 @@ public class MeleeWeapon extends Weapon {
 
     @Override
     public void draw(SpriteBatch batch, float x, float y) {
+
         if (isAttacking) {
+
+            float offsetFactor = 1.5f + (range - 1.0f) * 0.25f;
             Sprite spriteToDraw = changedSpritesheet[0][currentFrame];
-            spriteToDraw.setPosition(x - 1.5f * GameConstants.Sprite.SIZE, y - 1.5f * GameConstants.Sprite.SIZE);
+            spriteToDraw.setPosition(x - offsetFactor*GameConstants.Sprite.SIZE * range, y - offsetFactor*GameConstants.Sprite.SIZE* range);
             spriteToDraw.setOrigin(spriteToDraw.getWidth() / 2, spriteToDraw.getHeight() / 2);
             spriteToDraw.setRotation(rotationAngle);
-            spriteToDraw.setSize(GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 4);
+            spriteToDraw.setSize(GameConstants.Sprite.SIZE * 4 * range, GameConstants.Sprite.SIZE * 4 * range);
             spriteToDraw.draw(batch);
 
             if (currentFrame == changedSpritesheet[0].length - 1) {
@@ -96,7 +99,7 @@ public class MeleeWeapon extends Weapon {
             if (currentFrame < changedSpritesheet[0].length - 1) {
                 currentFrame++;
             } else {
-                isAttacking = false; // Only stop attacking when animation ends
+                isAttacking = false;
                 resetAnimation();
             }
         }
