@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
@@ -25,8 +26,10 @@ public abstract class GameCharacters {
     protected int hp, maxHp;
     protected boolean isAlive;
     protected GameScreen.PointF entityPos;
+    protected  float width;
+    protected  float heigh;
 
-    public Rectangle hitbox;
+    public Polygon hitbox;
 
     protected GameScreen gameScreen;
     protected Weapon weapon;
@@ -40,8 +43,17 @@ public abstract class GameCharacters {
     protected TextureRegion[][] SpriteSheet;
 
     public GameCharacters(float x, float y, float width, float height) {
+        this.width = width;
+        this.heigh = height;
 
-        hitbox = new Rectangle(x, y, width, height);
+        float[] vertices = {
+            0, 0,
+            width, 0,
+            width, height,
+            0, height
+        };
+        hitbox = new Polygon(vertices);
+        hitbox.setPosition(x, y);
 
     }
 

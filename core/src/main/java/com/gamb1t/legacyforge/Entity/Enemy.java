@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
@@ -44,78 +45,69 @@ public class Enemy extends GameCharacters {
 
 
     }
-    public void updateMove(double delta){
+    public void updateMove(double delta) {
 
-         speed = (float) (delta * 300);
+        speed = (float) (delta * 300);
+        float deltaX = 0, deltaY = 0; // Define deltaX and deltaY
 
-    if (System.currentTimeMillis() - lastDirChange >= 3000) {
-        int randFaceDir = gameScreen.getRandom(4);
-        setFaceDir(randFaceDir);
-        lastDirChange = System.currentTimeMillis();
-    }
-    float distanceBtwPlayer = (float) Math.hypot(playerPosX- entityPos.x, playerPosY - entityPos.y);
+        if (System.currentTimeMillis() - lastDirChange >= 3000) {
+            int randFaceDir = gameScreen.getRandom(4);
+            setFaceDir(randFaceDir);
+            lastDirChange = System.currentTimeMillis();
+        }
 
-
-    if(distanceBtwPlayer > GameConstants.Sprite.SIZE*4){
-
-
-        switch (getFaceDir()) {
-        case GameConstants.Face_Dir.DOWN:
-            entityPos.y += speed;
-            if (entityPos.y >= GET_HEIGHT)
-                setFaceDir( GameConstants.Face_Dir.UP);
-            break;
-
-        case GameConstants.Face_Dir.UP:
-            entityPos.y -= speed;
-            if (entityPos.y <= 0)
-                setFaceDir(GameConstants.Face_Dir.DOWN);
-            break;
-
-        case GameConstants.Face_Dir.RIGHT:
-            entityPos.x += speed;
-            if (entityPos.x >= GET_WIDTH)
-                setFaceDir(GameConstants.Face_Dir.LEFT);
-            break;
-
-        case GameConstants.Face_Dir.LEFT:
-            entityPos.x -= speed;
-            if (entityPos.x <= 0)
-                setFaceDir(GameConstants.Face_Dir.RIGHT);
-            break;
-    }
-        setHitboxPosition();
-
-    }
-    else{
-
+        float distanceBtwPlayer = (float) Math.hypot(playerPosX - entityPos.x, playerPosY - entityPos.y);
         float dirX = playerPosX - entityPos.x;
         float dirY = playerPosY - entityPos.y;
-        float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
 
-        if (length != 0) {
-            dirX /= length;
-            dirY /= length;
-        }
+        if (distanceBtwPlayer > GameConstants.Sprite.SIZE * 4) {
+            // Wandering behavior
+            switch (getFaceDir()) {
+                case GameConstants.Face_Dir.DOWN:
+                    deltaY = speed;
+                    if (entityPos.y + deltaY >= GET_HEIGHT) setFaceDir(GameConstants.Face_Dir.UP);
+                    break;
 
-        float speed = (float) (delta * 300);
-        entityPos.x += dirX * speed;
-        entityPos.y += dirY * speed;
+                case GameConstants.Face_Dir.UP:
+                    deltaY = -speed;
+                    if (entityPos.y + deltaY <= 0) setFaceDir(GameConstants.Face_Dir.DOWN);
+                    break;
 
+                case GameConstants.Face_Dir.RIGHT:
+                    deltaX = speed;
+                    if (entityPos.x + deltaX >= GET_WIDTH) setFaceDir(GameConstants.Face_Dir.LEFT);
+                    break;
 
-        if (Math.abs(dirX) > Math.abs(dirY)) {
-            setFaceDir(dirX > 0 ? GameConstants.Face_Dir.RIGHT : GameConstants.Face_Dir.LEFT);
+                case GameConstants.Face_Dir.LEFT:
+                    deltaX = -speed;
+                    if (entityPos.x + deltaX <= 0) setFaceDir(GameConstants.Face_Dir.RIGHT);
+                    break;
+            }
         } else {
-            setFaceDir(dirY > 0 ? GameConstants.Face_Dir.DOWN : GameConstants.Face_Dir.UP);
-        }
 
+            float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+            if (length != 0) {
+                dirX /= length;
+                dirY /= length;
+            }
+
+            deltaX = dirX * speed;
+            deltaY = dirY * speed;
+
+
+            if (Math.abs(dirX) > Math.abs(dirY)) {
+                setFaceDir(dirX > 0 ? GameConstants.Face_Dir.RIGHT : GameConstants.Face_Dir.LEFT);
+            } else {
+                setFaceDir(dirY > 0 ? GameConstants.Face_Dir.DOWN : GameConstants.Face_Dir.UP);
+            }
+        }
+        if(!gameScreen.mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX, hitbox.getY() + deltaY)){
+
+        entityPos.x += deltaX;
+        entityPos.y += deltaY;}
         setHitboxPosition();
     }
 
-
-
-
-    }
 
 
     @Override
@@ -169,7 +161,7 @@ public class Enemy extends GameCharacters {
     public int getDamage(){
         return damage;
     }
-    public Rectangle getHitbox(){
+    public Polygon getHitbox(){
         return hitbox;
     }
 

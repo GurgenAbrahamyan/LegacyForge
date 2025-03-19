@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
@@ -150,30 +152,30 @@ public class Player extends GameCharacters {
         if (lastTouchDiff.y < 0)
             ySpeed *= -1;
 
-        int pWidth = GameConstants.Sprite.SIZE;
-        int pHeight = GameConstants.Sprite.SIZE;
-
-        if (xSpeed <= 0)
-            pWidth = 0;
-        if (ySpeed <= 0)
-            pHeight = 0;
 
 
-        float deltaX = xSpeed * speed * -1;
-        float deltaY = ySpeed * speed * -1;
+            float deltaX = xSpeed * speed * -1;
+            float deltaY = ySpeed * speed * -1;
 
-        if (gameScreen.mapManager.canMoveHere(gameScreen.playerX + cameraX * -1 + deltaX * -1 + pWidth, gameScreen.playerY + cameraY * -1 + deltaY * -1 + pHeight)) {
-            cameraX += deltaX;
-            cameraY += deltaY;
-            entityPos.x = cameraX;
-            entityPos.y = cameraY;
+            float xPosToCheck = gameScreen.playerX + cameraX * -1 + deltaX * -1 - GameConstants.Sprite.SIZE/2;
+            float yPosToCheck = gameScreen.playerY + cameraY * -1 + deltaY * -1 - GameConstants.Sprite.SIZE/2;
 
-        }
 
-        setHitboxPosition();}
+           if (gameScreen.mapManager.canMoveHere(xPosToCheck , yPosToCheck)) {
+            if(!gameScreen.mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX * -1, hitbox.getY() + deltaY * -1)){
+                cameraX += deltaX;
+                cameraY += deltaY;
+     }
+
+
 
 
     }
+            setHitboxPosition();
+
+        }
+    }
+
 
     public void die() {
         if(deathCooldown- DEATH_COOLDOWN_TIME > 0) {
@@ -181,8 +183,6 @@ public class Player extends GameCharacters {
 
             movePlayer = false;
 
-            entityPos.x = gameScreen.playerX - GameConstants.Sprite.SIZE / 2;
-            entityPos.y = gameScreen.playerY - GameConstants.Sprite.SIZE / 2;
 
             cameraX = gameScreen.playerX - GameConstants.Sprite.SIZE / 2;
             cameraY = gameScreen.playerY - GameConstants.Sprite.SIZE / 2;
@@ -196,9 +196,10 @@ public class Player extends GameCharacters {
 
     }
 
-    public boolean getHit(Rectangle otherhitbox){
-        if(hitbox.overlaps(otherhitbox) &&  System.currentTimeMillis() - lastTimeGetHit>= 1000  ){
+    public boolean getHit(Polygon otherhitbox){
+        if(Intersector.overlapConvexPolygons(hitbox, otherhitbox) &&  System.currentTimeMillis() - lastTimeGetHit>= 1000  ){
             lastTimeGetHit = System.currentTimeMillis();
+            System.out.println("hit!!");
 
 
             return true;

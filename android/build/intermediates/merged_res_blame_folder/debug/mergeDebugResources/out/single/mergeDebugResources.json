@@ -1,22 +1,26 @@
 [
     {
-        "merged": "com.gamb1t.legacyforge.android-debug-18:/drawable-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.gamb1t.legacyforge.android-android-19:/drawable-xxxhdpi/ic_launcher.png"
+        "merged": "com.gamb1t.legacyforge.android-debug-20:/drawable-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.gamb1t.legacyforge.android-android-21:/drawable-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.gamb1t.legacyforge.android-debug-18:/drawable-hdpi_ic_launcher.png.flat",
-        "source": "com.gamb1t.legacyforge.android-android-19:/drawable-hdpi/ic_launcher.png"
+        "merged": "com.gamb1t.legacyforge.android-debug-20:/drawable-hdpi_ic_launcher.png.flat",
+        "source": "com.gamb1t.legacyforge.android-android-21:/drawable-hdpi/ic_launcher.png"
     },
     {
-        "merged": "com.gamb1t.legacyforge.android-debug-18:/drawable-xxhdpi_ic_launcher.png.flat",
-        "source": "com.gamb1t.legacyforge.android-android-19:/drawable-xxhdpi/ic_launcher.png"
+        "merged": "com.gamb1t.legacyforge.android-debug-20:/drawable-xxhdpi_ic_launcher.png.flat",
+        "source": "com.gamb1t.legacyforge.android-android-21:/drawable-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.gamb1t.legacyforge.android-debug-18:/drawable-xhdpi_ic_launcher.png.flat",
-        "source": "com.gamb1t.legacyforge.android-android-19:/drawable-xhdpi/ic_launcher.png"
+        "merged": "com.gamb1t.legacyforge.android-debug-20:/drawable-xhdpi_ic_launcher.png.flat",
+        "source": "com.gamb1t.legacyforge.android-android-21:/drawable-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.gamb1t.legacyforge.android-debug-18:/drawable-mdpi_ic_launcher.png.flat",
-        "source": "com.gamb1t.legacyforge.android-android-19:/drawable-mdpi/ic_launcher.png"
+        "merged": "com.gamb1t.legacyforge.android-debug-20:/drawable-mdpi_ic_launcher.png.flat",
+        "source": "com.gamb1t.legacyforge.android-android-21:/drawable-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.gamb1t.legacyforge.android-debug-20:/layout_activity_firebase_login.xml.flat",
+        "source": "com.gamb1t.legacyforge.android-android-21:/layout/activity_firebase_login.xml"
     }
 ]

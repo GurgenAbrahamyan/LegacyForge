@@ -4,22 +4,26 @@ package com.gamb1t.legacyforge.Enviroments;
 
 public class GameMap {
 
-    private int[][] spriteIds;
+    private int[][] Ids;
 
     public GameMap(int[][] spriteIds) {
-        this.spriteIds = spriteIds;
+        this.Ids = spriteIds;
     }
 
     public int getSpriteID(int xIndex, int yIndex) {
-        return spriteIds[yIndex][xIndex];
+        return Ids[xIndex][yIndex];
     }
 
     public int getArrayWidth() {
-        return spriteIds[0].length;
+        return Ids[0].length;
     }
 
     public int getArrayHeight() {
-        return spriteIds.length;
+        return Ids.length;
+    }
+
+    public int[][] getIds(){
+        return Ids;
     }
 
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Intersector;
 import com.gamb1t.legacyforge.Entity.Enemy;
+import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class MeleeWeapon extends Weapon {
     }
 
     @Override
-    public void update() {
+    public void update(float delta) {
         updateAnimation();
     }
 
@@ -106,20 +107,12 @@ public class MeleeWeapon extends Weapon {
     }
 
     @Override
-    public void checkHitboxCollisions(ArrayList<Enemy> enemies) {
+    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging currentmap) {
         if (!isAttacking || hitbox == null) return;
 
         for (Enemy enemy : enemies) {
             if (enemy != null && enemy.hitbox != null) {
-                Rectangle rect = enemy.hitbox;
-                Polygon enemyPoly = new Polygon(new float[]{
-                    rect.x, rect.y,
-                    rect.x + rect.width, rect.y,
-                    rect.x + rect.width, rect.y + rect.height,
-                    rect.x, rect.y + rect.height
-                });
-
-                if (Intersector.overlapConvexPolygons(hitbox, enemyPoly)) {
+                if (Intersector.overlapConvexPolygons(hitbox, enemy.getHitbox())) {
                     dealDamage(enemy);
                     applyKnockback(enemy);
                 }

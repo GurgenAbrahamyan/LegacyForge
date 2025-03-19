@@ -1,5 +1,6 @@
 package com.gamb1t.legacyforge.android;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -9,9 +10,13 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.gamb1t.legacyforge.Main;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /** Launches the Android application. */
 public class AndroidLauncher extends AndroidApplication {
+
+    FirebaseAuth mAuth;
 
 
     @Override
@@ -35,9 +40,13 @@ public class AndroidLauncher extends AndroidApplication {
         }
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+            startGame();
+        }
 
-        AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
-        configuration.useImmersiveMode = true;
-        initialize(new Main(), configuration);
-    }
+        public void startGame(){
+            AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
+            configuration.useImmersiveMode = true;
+            initialize(new Main(), configuration);
+        }
+
 }

@@ -4,6 +4,7 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -41,18 +42,17 @@ public class GameScreen implements Screen {
     Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
     public MapManaging mapManager;
 
+    private GameUI gameUI;
     public GameScreen() {
-        touchEvents = new TouchManager(PLAYER, weapon.get(0));
-        Gdx.input.setInputProcessor(touchEvents);
 
-        mapManager = new MapManaging("1room.txt", "Tiles/tileset_floor.png", 30, 30);
+        mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/tileset_floor.png", 30, 30);
 
         batch = new SpriteBatch();
 
 
         PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
 
-        for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 10; i++) {
             Enemies.add(new Enemy(this, PLAYER));
         }
 
@@ -60,17 +60,29 @@ public class GameScreen implements Screen {
             enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
         }
 
+
+
+
+
+        shapeRenderer = new ShapeRenderer();
+        font = new BitmapFont();
+        PLAYER.setCurrentWeapon(weapon.get(0));
+        System.out.println(PLAYER.getCureentWeapon());
+
+        gameUI = new GameUI();
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        touchEvents = new TouchManager(PLAYER, PLAYER.getCureentWeapon());
+        multiplexer.addProcessor(gameUI.getStage());
+        multiplexer.addProcessor(touchEvents);
+        Gdx.input.setInputProcessor(multiplexer);
+
         for (Weapon w : weapon) {
 
-            w.setAttackJoystick(touchEvents);
+            w.setAttackJoystick((TouchManager) multiplexer.getProcessors().get(1));
             w.setTexture(w.getSprite());
             w.convertTxtRegToSprite();
             w.setPlayer(PLAYER);
         }
-        shapeRenderer = new ShapeRenderer();
-        font = new BitmapFont();
-
-        PLAYER.setCurrentWeapon(weapon.get(0));
     }
 
     public int getRandom(int x) {
@@ -98,8 +110,19 @@ public class GameScreen implements Screen {
             PLAYER.updateAnim();
         }
         if (PLAYER.getCureentWeapon().getAttacking()) {
-            PLAYER.getCureentWeapon().update();
-            PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies);
+
+
+
+            PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX, playerY - PLAYER.cameraY);
+
+
+
+
+
+        }
+        if (PLAYER.getCureentWeapon().getAttacking()) {
+            PLAYER.getCureentWeapon().update(delta);
+            PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies, mapManager);
         }
 
         for (Enemy enemy : Enemies) {
@@ -154,19 +177,8 @@ public class GameScreen implements Screen {
         PLAYER.drawBar(batch, shapeRenderer, font);
 
         touchEvents.draw(batch);
+        gameUI.render();
 
-
-        if (PLAYER.getCureentWeapon().getAttacking()) {
-
-
-
-            PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX, playerY - PLAYER.cameraY);
-
-
-
-
-
-        }
 
     }
 

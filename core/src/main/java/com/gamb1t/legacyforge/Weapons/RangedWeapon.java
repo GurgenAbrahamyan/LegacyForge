@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
@@ -104,7 +105,7 @@ public class RangedWeapon extends Weapon {
 
 
     @Override
-    public void update() {
+    public void update(float delta) {
 
         for (Projectile proj : projectiles) {
             proj.update();
@@ -180,25 +181,21 @@ public class RangedWeapon extends Weapon {
     }
 
 
-    public void checkHitboxCollisions(ArrayList<Enemy> enemies) {
+    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging currentMap) {
         for (Projectile proj : projectiles) {
             if (proj != null) {
                 for (Enemy enemy : enemies) {
-                    Rectangle rect = enemy.hitbox;
-                    Polygon enemyPoly = new Polygon(new float[]{
-                        rect.x, rect.y,
-                        rect.x + rect.width, rect.y,
-                        rect.x + rect.width, rect.y + rect.height,
-                        rect.x, rect.y + rect.height
-                    });
 
                     if (enemy != null && proj.getHitbox() != null && enemy.hitbox != null) {
-                        if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemyPoly)) {
+                        if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemy.getHitbox())) {
                             dealDamage(enemy);
                             applyKnockback(enemy);
                             proj.setDestroyed(true);
                             System.out.println("colided");
                         }
+
+                    } else if (currentMap.checkNearbyWallCollision(proj.getHitbox(),  proj.getHitbox().getX() + proj.getVelocity().x, proj.getHitbox().getY() + proj.getVelocity().y)) {
+                        proj.setDestroyed(true);
                     }
                 }
             }

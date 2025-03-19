@@ -54,6 +54,10 @@ public class Projectile {
         }
     }
 
+    public Vector2 getVelocity(){
+        return  velocity;
+    }
+
 
 
     public Vector2 getPositionHitbox() {

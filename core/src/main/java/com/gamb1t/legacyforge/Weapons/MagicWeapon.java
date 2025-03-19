@@ -22,7 +22,7 @@ public class MagicWeapon extends Weapon{
     }
 
     @Override
-    public void update() {
+    public void update(float delta) {
 
     }
 

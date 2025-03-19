@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 import com.gamb1t.legacyforge.ManagerClasses.Joystick;
@@ -46,7 +47,7 @@ public abstract class Weapon {
 
 
     public abstract void attack();
-    public abstract void update();
+    public abstract void update(float delta);
     public abstract void draw(SpriteBatch batch, float x, float y);
 
     public void setTexture(String texturePath) {
@@ -89,7 +90,7 @@ public abstract class Weapon {
         }
     }
 
-    public void checkHitboxCollisions(ArrayList<Enemy> ENTITIES) {
+    public void checkHitboxCollisions(ArrayList<Enemy> ENTITIES, MapManaging currentMap) {
 
     }
 

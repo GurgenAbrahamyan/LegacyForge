@@ -1,4 +1,5 @@
 1room.txt
+1roomHitbox.txt
 Tiles/tileset_floor.png
 com/badlogic/gdx/utils/lsans-15.fnt
 com/badlogic/gdx/utils/lsans-15.png
