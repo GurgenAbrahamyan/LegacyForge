@@ -3,6 +3,7 @@ package com.gamb1t.legacyforge.Enviroments;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
+import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 
 public class Layout {
 
@@ -12,16 +13,20 @@ public class Layout {
     private boolean initialized = false;
     private int tilesInHeight, tilesInWidth;
 
-    Layout(String textureFile, int tilesInWidth, int tilesInHeight) {
+    Layout(String textureFile) {
         this.textureFile = textureFile;
-        this.sprites = new TextureRegion[tilesInHeight * tilesInWidth];
-        this.tilesInHeight = tilesInHeight;
-        this.tilesInWidth = tilesInWidth;
+
+        initialize();
     }
 
     private void initialize() {
         if (!initialized) {
             texture = new Texture(textureFile);
+            tilesInHeight = texture.getHeight()/ GameConstants.Sprite.DEFAULT_SIZE;
+            System.out.println(tilesInHeight);
+            tilesInWidth = texture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE;
+            System.out.println(tilesInWidth);
+            this.sprites = new TextureRegion[tilesInHeight * tilesInWidth];
 
             for (int j = 0; j < tilesInHeight; j++) {
                 for (int i = 0; i < tilesInWidth; i++) {
@@ -38,12 +43,12 @@ public class Layout {
     }
 
     public TextureRegion getSprite(int id) {
-        initialize();
         if (id < 0 || id >= sprites.length) {
             throw new IllegalArgumentException("Invalid sprite ID: " + id);
         }
         return sprites[id];
     }
+
 
     public void dispose() {
         if (initialized) {

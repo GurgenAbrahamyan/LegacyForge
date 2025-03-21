@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 import com.gamb1t.legacyforge.Weapons.Weapon;
@@ -25,6 +26,8 @@ public class Player extends GameCharacters {
     private int money;
     private float hpMultiplyer = 10;
     private float mana, maxMana;
+
+    private Vector2 respPoint;
 
     private int unusedPoints;
     private int meleePoints;
@@ -184,8 +187,8 @@ public class Player extends GameCharacters {
             movePlayer = false;
 
 
-            cameraX = gameScreen.playerX - GameConstants.Sprite.SIZE / 2;
-            cameraY = gameScreen.playerY - GameConstants.Sprite.SIZE / 2;
+            cameraX = gameScreen.playerX-respPoint.x - GameConstants.Sprite.SIZE / 2;
+            cameraY = gameScreen.playerY-respPoint.y - GameConstants.Sprite.SIZE / 2;
 
             setHitboxPosition();
 
@@ -329,6 +332,10 @@ public class Player extends GameCharacters {
     public void addMoney(int money){
         this. money += money;
 
+    }
+
+    public void setRespPoint(Vector2 respPoint){
+        this.respPoint = respPoint;
     }
 
 

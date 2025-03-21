@@ -9,10 +9,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Vector;
 
 public class Enemy extends GameCharacters {
 
@@ -20,6 +23,7 @@ public class Enemy extends GameCharacters {
     private int damage = 10;
     private float playerPosX, playerPosY;
     Player player ;
+    private ArrayList<Vector2> respPos = new ArrayList<>();
 
 
     GameScreen gameScreen;
@@ -47,6 +51,8 @@ public class Enemy extends GameCharacters {
     }
     public void updateMove(double delta) {
 
+        boolean tileColided =false;
+
         speed = (float) (delta * 300);
         float deltaX = 0, deltaY = 0; // Define deltaX and deltaY
 
@@ -61,7 +67,7 @@ public class Enemy extends GameCharacters {
         float dirY = playerPosY - entityPos.y;
 
         if (distanceBtwPlayer > GameConstants.Sprite.SIZE * 4) {
-            // Wandering behavior
+
             switch (getFaceDir()) {
                 case GameConstants.Face_Dir.DOWN:
                     deltaY = speed;
@@ -104,7 +110,12 @@ public class Enemy extends GameCharacters {
         if(!gameScreen.mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX, hitbox.getY() + deltaY)){
 
         entityPos.x += deltaX;
-        entityPos.y += deltaY;}
+        entityPos.y += deltaY;
+         tileColided = false;
+        }
+        else {
+            tileColided = true;
+        }
         setHitboxPosition();
     }
 
@@ -146,9 +157,10 @@ public class Enemy extends GameCharacters {
     }
 
     public void die(){
+        Vector2 currentResp = respPos.get(gameScreen.getRandom(respPos.size()));
+        entityPos.x = currentResp.x;
 
-        entityPos.x = gameScreen.getRandom(21*GameConstants.Sprite.SIZE);
-        entityPos.y = 21*GameConstants.Sprite.SIZE;
+        entityPos.y = currentResp.y;
 
         hp = maxHp;
 
@@ -174,6 +186,10 @@ public class Enemy extends GameCharacters {
 
     public void addMoney(Player player){
         player.addMoney(hp/10);
+    }
+
+    public void setRespPos(ArrayList<Vector2> respPos){
+        this.respPos = respPos;
     }
 
 }

@@ -32,6 +32,7 @@ public class RangedWeapon extends Weapon {
     private float animationTimer = 0;
     private float frameDuration = 0.1f;
 
+    MapManaging currentMap;
 
     float minSpeed = 10;
     float maxSpeed = 50;
@@ -94,11 +95,11 @@ public class RangedWeapon extends Weapon {
 
 
 
-
-
+        float deltaX= (float) Math.cos(Math.toRadians(rotationAngle))*maxSpeed;
+        float deltaY = (float) Math.sin(Math.toRadians(rotationAngle))*maxSpeed;
         Vector2 direction = new Vector2((float) Math.cos(Math.toRadians(rotationAngle)), (float) Math.sin(Math.toRadians(rotationAngle)));
 
-        projectiles.add(new Projectile(GameConstants.GET_WIDTH/2-  player.cameraX , GameConstants.GET_HEIGHT/2- player.cameraY , direction, 50, projectilePath));
+        projectiles.add(new Projectile(GameConstants.GET_WIDTH/2-  player.cameraX , GameConstants.GET_HEIGHT/2- player.cameraY ,deltaX, deltaY, projectilePath, currentMap));
 
     }
 
@@ -181,7 +182,7 @@ public class RangedWeapon extends Weapon {
     }
 
 
-    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging currentMap) {
+    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging map) {
         for (Projectile proj : projectiles) {
             if (proj != null) {
                 for (Enemy enemy : enemies) {
@@ -193,12 +194,16 @@ public class RangedWeapon extends Weapon {
                             proj.setDestroyed(true);
                             System.out.println("colided");
                         }
+                        currentMap = map;
 
                     } else if (currentMap.checkNearbyWallCollision(proj.getHitbox(),  proj.getHitbox().getX() + proj.getVelocity().x, proj.getHitbox().getY() + proj.getVelocity().y)) {
                         proj.setDestroyed(true);
                     }
                 }
             }
+        }
+        if(currentMap == null){
+            currentMap = map;
         }
     }
 
@@ -229,6 +234,5 @@ public class RangedWeapon extends Weapon {
         getPlayerCamY = y;
 
     }
-
 }
 

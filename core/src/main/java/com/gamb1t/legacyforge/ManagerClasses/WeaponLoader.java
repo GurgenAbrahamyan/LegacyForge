@@ -18,7 +18,6 @@ public class WeaponLoader {
     private final ArrayList<Weapon> weaponList = new ArrayList<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Map weapon type to their corresponding class
     private static final Map<String, Class<? extends Weapon>> weaponTypeMap = new HashMap<>();
 
     static {

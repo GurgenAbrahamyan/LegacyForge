@@ -34,7 +34,7 @@ public class GameScreen implements Screen {
 
     private static ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
 
-    private static WeaponLoader weaponLoader = new WeaponLoader("ranged.json");
+    private static WeaponLoader weaponLoader = new WeaponLoader("weapons.json");
 
     private ArrayList<Weapon> weapon = weaponLoader.getWeaponList();
 
@@ -45,9 +45,12 @@ public class GameScreen implements Screen {
     private GameUI gameUI;
     public GameScreen() {
 
-        mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/tileset_floor.png", 30, 30);
+        mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
 
         batch = new SpriteBatch();
+
+        PLAYER.setRespPoint(mapManager.getRespPlayer());
+
 
 
         PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
@@ -58,6 +61,7 @@ public class GameScreen implements Screen {
 
         for (Enemy enemy : Enemies) {
             enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
+            enemy.setRespPos(mapManager.getRespEenemy());
         }
 
 

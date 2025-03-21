@@ -9,12 +9,13 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.gamb1t.legacyforge.Entity.Enemy;
+import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class MapManaging {
 
@@ -22,12 +23,14 @@ public class MapManaging {
     private GameMap hitboxes;
     private float cameraX, cameraY;
     private Polygon[][] hitbox;
-    Layout OUTSIDE;
+    private Layout OUTSIDE;
+    private ArrayList<Vector2> respEenemy = new ArrayList<>();
+    private Vector2 respPlayer = new Vector2();
 
     public MapManaging(String mapName, String hitboxesFile, String tilesSpritesheet, int mapWidth, int mapLength) {
         currentMap = LoadFile(mapName, mapWidth, mapLength);
         hitboxes = LoadFile(hitboxesFile, mapWidth, mapLength);
-        OUTSIDE = new Layout(tilesSpritesheet, mapWidth, mapLength);
+        OUTSIDE = new Layout(tilesSpritesheet);
         createHitboxes();
 
     }
@@ -124,19 +127,38 @@ public class MapManaging {
         int[][] spriteIds = new int[mapLengthInTiles][mapHeightInTiles];
 
         FileHandle handle = Gdx.files.internal(mapName);
-        int row = mapHeightInTiles - 1; // Start from the bottom row
-
+        int row = mapHeightInTiles-1;
         for (String line : handle.readString().split("\n")) {
-            if (row < 0) break; // Stop when all rows are filled
+            if (row < 0) break;
 
             String[] numbers = line.split(" ");
             for (int col = 0; col < Math.min(numbers.length, mapLengthInTiles); col++) {
+                if(Integer.parseInt(numbers[col]) == -1){
+                    respPlayer.set(col*GameConstants.Sprite.SIZE, row*GameConstants.Sprite.SIZE);
+                    continue;
+
+                }
+                if(Integer.parseInt(numbers[col]) == -2){
+                    respEenemy.add(new Vector2(col*GameConstants.Sprite.SIZE, row*GameConstants.Sprite.SIZE));
+                continue;
+
+                }
+
+
+
                 spriteIds[col][row] = Integer.parseInt(numbers[col]);
             }
-            row--; // Move to the next row above
+            row--;
         }
 
         return new GameMap(spriteIds);
+    }
+
+    public Vector2 getRespPlayer(){
+        return respPlayer;
+    }
+    public ArrayList<Vector2> getRespEenemy(){
+        return respEenemy;
     }
 
 }
