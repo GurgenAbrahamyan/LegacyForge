@@ -5,17 +5,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
-import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
-import com.gamb1t.legacyforge.ManagerClasses.Joystick;
 import com.gamb1t.legacyforge.ManagerClasses.TouchManager;
 
 import java.util.ArrayList;
@@ -26,6 +21,7 @@ public abstract class Weapon {
     protected long lastAttackTime = System.currentTimeMillis();
     protected boolean isAttacking;
     protected float rotationAngle = 0;
+    protected  int price;
 
     @JsonIgnore
     protected Texture loadedSprite;
@@ -127,5 +123,12 @@ public abstract class Weapon {
         if (isAttacking) {
             isAttacking = false;
         }
+    }
+
+    public int getPrice() {
+        return  price;
+    }
+    public  void setPrice(int i){
+        price = i;
     }
 }

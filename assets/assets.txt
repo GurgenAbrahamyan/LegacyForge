@@ -9,6 +9,9 @@ joystick.png
 libgdx.png
 player_sprites/player_spritesheet.png
 ranged.json
+shops/basic_shop.png
+shops/selected_border.png
+shops/shop_panel_background.png
 ui/font-list.fnt
 ui/font-subtitle.fnt
 ui/font-window.fnt

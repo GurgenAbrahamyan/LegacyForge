@@ -27,6 +27,8 @@ public class MapManaging {
     private ArrayList<Vector2> respEenemy = new ArrayList<>();
     private Vector2 respPlayer = new Vector2();
 
+    private Vector2 shopCoordinates = new Vector2();
+
     public MapManaging(String mapName, String hitboxesFile, String tilesSpritesheet, int mapWidth, int mapLength) {
         currentMap = LoadFile(mapName, mapWidth, mapLength);
         hitboxes = LoadFile(hitboxesFile, mapWidth, mapLength);
@@ -112,7 +114,7 @@ public class MapManaging {
         for (int row = startRow; row <= endRow; row++) {
             for (int col = startCol; col <= endCol; col++) {
                 if (hitbox[row][col] != null && Intersector.overlapConvexPolygons(predictPolyg, hitbox[row][col])) {
-                    System.out.println("colided");
+                    //System.out.println("colided");
                     return true;
                 }
             }
@@ -143,6 +145,9 @@ public class MapManaging {
                 continue;
 
                 }
+                if(Integer.parseInt(numbers[col]) == -5){
+                    shopCoordinates.set(col*GameConstants.Sprite.SIZE, row*GameConstants.Sprite.SIZE);
+                }
 
 
 
@@ -159,6 +164,9 @@ public class MapManaging {
     }
     public ArrayList<Vector2> getRespEenemy(){
         return respEenemy;
+    }
+    public Vector2 getShopCoordinates(){
+        return  shopCoordinates;
     }
 
 }

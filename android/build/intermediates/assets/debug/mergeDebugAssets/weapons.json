@@ -4,16 +4,17 @@
     "name": "Iron Sword",
     "damage": 12,
     "attackSpeed": 1.5,
-    "range": 2.0,
+    "range": 1.0,
     "knockbackInTiles": 1,
     "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
   },
   {
     "type": "melee",
-    "name": "Iron Sword",
+    "name": "Golden Sword",
     "damage": 20,
     "attackSpeed": 2.0,
-    "range": 1.3,
+    "price": 1500,
+    "range": 1.5,
     "knockbackInTiles": 1.4,
     "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
   }

@@ -20,7 +20,10 @@ import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
+
+import Structures.Shop;
 
 public class GameScreen implements Screen {
 
@@ -39,13 +42,20 @@ public class GameScreen implements Screen {
     private ArrayList<Weapon> weapon = weaponLoader.getWeaponList();
 
 
+    private Shop shop;
+
+
     Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
     public MapManaging mapManager;
 
     private GameUI gameUI;
     public GameScreen() {
 
+        weaponLoader = new WeaponLoader("ranged.json");
+        weapon.addAll(weaponLoader.getWeaponList());
+
         mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
+
 
         batch = new SpriteBatch();
 
@@ -71,7 +81,7 @@ public class GameScreen implements Screen {
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         PLAYER.setCurrentWeapon(weapon.get(0));
-        System.out.println(PLAYER.getCureentWeapon());
+
 
         gameUI = new GameUI();
         InputMultiplexer multiplexer = new InputMultiplexer();
@@ -79,6 +89,11 @@ public class GameScreen implements Screen {
         multiplexer.addProcessor(gameUI.getStage());
         multiplexer.addProcessor(touchEvents);
         Gdx.input.setInputProcessor(multiplexer);
+
+        shop = new Shop(mapManager.getShopCoordinates().x,  mapManager.getShopCoordinates().y,
+            GameConstants.Sprite.SIZE*4, GameConstants.Sprite.SIZE*3, "shops/basic_shop.png", weapon, PLAYER, touchEvents);
+
+
 
         for (Weapon w : weapon) {
 
@@ -113,6 +128,10 @@ public class GameScreen implements Screen {
         if (PLAYER.getMovePlayer()) {
             PLAYER.updateAnim();
         }
+        if(Gdx.input.isTouched()){
+            shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());
+        }
+
         if (PLAYER.getCureentWeapon().getAttacking()) {
 
 
@@ -135,6 +154,8 @@ public class GameScreen implements Screen {
             enemy.setPlayerPosX(playerX - GameConstants.Sprite.SIZE/2- PLAYER.cameraX);
             enemy.setPlayerPosY(playerY - GameConstants.Sprite.SIZE/2-PLAYER.cameraY);
         }
+
+        shop.update(PLAYER.hitbox);
     }
 
 
@@ -162,6 +183,11 @@ public class GameScreen implements Screen {
         batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2,
             GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
 
+        shop.draw(batch, PLAYER.cameraX, PLAYER.cameraY);
+
+
+
+
         for (Enemy enemy : Enemies) {
             batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX,
                 enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
@@ -170,6 +196,10 @@ public class GameScreen implements Screen {
 
             PLAYER.getCureentWeapon().draw(batch, playerX  - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2);
         }
+
+        shop.drawShopUi(batch);
+
+
 
         batch.end();
 
@@ -182,6 +212,7 @@ public class GameScreen implements Screen {
 
         touchEvents.draw(batch);
         gameUI.render();
+
 
 
     }

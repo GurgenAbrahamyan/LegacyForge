@@ -35,7 +35,7 @@ public class Projectile {
         });
         sprite.setPosition(positionSprite.x, positionSprite.y);
         hitbox.setPosition(positionHitbox.x, positionHitbox.y);
-       this.map = map;// Store game screen for collision detection
+       this.map = map;
     }
 
     public void update() {

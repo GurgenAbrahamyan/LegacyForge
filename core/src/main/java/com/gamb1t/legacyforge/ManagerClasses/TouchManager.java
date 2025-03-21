@@ -193,4 +193,8 @@ public class TouchManager implements InputProcessor {
     public boolean mouseMoved(int screenX, int screenY) { return false; }
     @Override
     public boolean scrolled(float amountX, float amountY) { return false; }
+
+    public void setWeapon(Weapon wp){
+        weapon = wp;
+    }
 }

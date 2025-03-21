@@ -75,7 +75,7 @@ public class Player extends GameCharacters {
 
         this.weapon = weapon;
 
-        money = 0;
+        money = 9999;
         entityPos = new GameScreen.PointF(x, y);
 
 
@@ -337,6 +337,8 @@ public class Player extends GameCharacters {
     public void setRespPoint(Vector2 respPoint){
         this.respPoint = respPoint;
     }
+
+    public int getMoney(){return money;}
 
 
 
