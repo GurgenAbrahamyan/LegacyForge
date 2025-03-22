@@ -2,7 +2,7 @@
   {
     "type": "magic",
     "name": "Wooden Staff",
-    "damage": 30.0,
+    "damage": 35.0,
     "attackSpeed": 1.5,
     "price": 5000,
     "knockbackInTiles": 2.0,

@@ -81,7 +81,7 @@ public class RangedWeapon extends Weapon {
         }
     }
     public void resetAnimation() {
-       currentFrame = 0;
+        currentFrame = 0;
     }
 
     public void releaseBow() {
@@ -136,20 +136,20 @@ public class RangedWeapon extends Weapon {
 
     public void updateCharge() {
 
-            chargeTime += Gdx.graphics.getDeltaTime();
-            if (chargeTime > maxChargeTime) {
-                chargeTime = maxChargeTime;
-            }
+        chargeTime += Gdx.graphics.getDeltaTime();
+        if (chargeTime > maxChargeTime) {
+            chargeTime = maxChargeTime;
+        }
 
 
-            float chargePercentage = Math.min(chargeTime / maxChargeTime, 1.0f);
+        float chargePercentage = Math.min(chargeTime / maxChargeTime, 1.0f);
 
-            currentFrame = (int) (chargePercentage * (changedSpritesheet[0].length - 1));
+        currentFrame = (int) (chargePercentage * (changedSpritesheet[0].length - 1));
 
-            float stretchFactor = 1.0f + chargePercentage * 0.5f;
-            changedSpritesheet[0][currentFrame].setScale(stretchFactor);
+        float stretchFactor = 1.0f + chargePercentage * 0.5f;
+        changedSpritesheet[0][currentFrame].setScale(stretchFactor);
 
-            System.out.println("Charging: " + chargeTime + "s, Charge Percentage: " + chargePercentage);
+        System.out.println("Charging: " + chargeTime + "s, Charge Percentage: " + chargePercentage);
 
     }
 
@@ -235,4 +235,3 @@ public class RangedWeapon extends Weapon {
 
     }
 }
-

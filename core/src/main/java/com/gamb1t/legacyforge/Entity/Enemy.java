@@ -28,16 +28,16 @@ public class Enemy extends GameCharacters {
 
     GameScreen gameScreen;
 
-    public Enemy(GameScreen gameScreen, Player player) {
+    public Enemy(GameScreen gameScreen, Player player, ArrayList<Vector2> respPos) {
 
 
         super(0 ,0, GameConstants.Sprite.SIZE ,  GameConstants.Sprite.SIZE);
 
 
         Random random = new Random();
-
-
-        entityPos = new GameScreen.PointF(random.nextInt(GET_WIDTH), random.nextInt(GET_HEIGHT/2) + GET_HEIGHT/2);
+        this.respPos = respPos;
+        Vector2 resp = respPos.get(random.nextInt(respPos.size()));
+        entityPos = new GameScreen.PointF(resp.x, resp.y);
 
 
 
@@ -150,7 +150,7 @@ public class Enemy extends GameCharacters {
     public void takeDamage(float amout){
         if(hp > 0){
         hp -= amout;}
-        else {
+        if (hp<=0 ){
             die();
         }
 

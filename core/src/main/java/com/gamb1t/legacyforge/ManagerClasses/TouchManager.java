@@ -6,6 +6,7 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Weapons.MagicWeapon;
 import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
@@ -80,6 +81,8 @@ public class TouchManager implements InputProcessor {
             else if(screenX > GET_WIDTH/2f) {
                 attackJoystick.touchUp();
                 touchDowns[1] = false;
+                rotationCalc();
+                weapon.setRotation(angle);
 
 
                 if (isAiming) {
@@ -89,13 +92,15 @@ public class TouchManager implements InputProcessor {
 
                     weapon.onJoystickRelease();
                     weapon.attack();
-                    rotationCalc();
-                    weapon.setRotation(angle);
+
 
 
                     weapon.setAttacking(true);
                     if(weapon instanceof  RangedWeapon){
                         ((RangedWeapon) weapon).setAnimOver(true);
+                    }
+                    if(weapon instanceof MagicWeapon){
+                        ((MagicWeapon) weapon).setAnimOver(true);
                     }
 
                     if(weapon instanceof RangedWeapon){

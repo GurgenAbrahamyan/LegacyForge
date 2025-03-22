@@ -27,6 +27,7 @@ public class Player extends GameCharacters {
     private float hpMultiplyer = 10;
     private float mana, maxMana;
 
+    private float manaRegenTimer = 0;
     private Vector2 respPoint;
 
     private int unusedPoints;
@@ -59,8 +60,8 @@ public class Player extends GameCharacters {
         this.hp = 100;
 
         this.maxHp = 100;
-        this.mana = 50;
-        this.maxMana = 50;
+        this.mana = 100;
+        this.maxMana = 100;
 
         this.meleePoints = 0;
         this.rangedPoints = 0;
@@ -75,14 +76,14 @@ public class Player extends GameCharacters {
 
         this.weapon = weapon;
 
-        money = 9999;
+        money = 0;
         entityPos = new GameScreen.PointF(x, y);
 
 
     }
 
 
-    public void regenerateMana(float amout){}
+
     public void addExperiance(float amout){
         experience += amout;
         if(experience >= level * 100){
@@ -189,6 +190,7 @@ public class Player extends GameCharacters {
 
             cameraX = gameScreen.playerX-respPoint.x - GameConstants.Sprite.SIZE / 2;
             cameraY = gameScreen.playerY-respPoint.y - GameConstants.Sprite.SIZE / 2;
+            mana = maxMana;
 
             setHitboxPosition();
 
@@ -259,9 +261,9 @@ public class Player extends GameCharacters {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.DARK_GRAY);
-        shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (float) GameConstants.GET_WIDTH /6, (float) GameConstants.GET_HEIGHT/5);
+        shapeRenderer.rect(GameConstants.Sprite.SIZE  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (float) GameConstants.GET_WIDTH /6, (float) GameConstants.GET_HEIGHT/5);
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(GameConstants.GET_WIDTH/10  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, GameConstants.GET_WIDTH /6 * hp / maxHp, GameConstants.GET_HEIGHT/5);
+        shapeRenderer.rect(GameConstants.Sprite.SIZE ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, GameConstants.GET_WIDTH /6 * hp / maxHp, GameConstants.GET_HEIGHT/5);
 
 
 
@@ -269,8 +271,9 @@ public class Player extends GameCharacters {
         batch.begin();
 
         font.getData().setScale(GameConstants.Sprite.SIZE/20);
-        font.draw(batch, "HP " + hp, GameConstants.GET_WIDTH / 9, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
-        font.draw(batch, "Money " + money, GameConstants.GET_WIDTH / 9 , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 3);
+        font.draw(batch, "HP " + hp, GameConstants.GET_WIDTH / 9-GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
+        font.draw(batch, "Money \n" + money, GameConstants.GET_WIDTH / 9- GameConstants.Sprite.SIZE , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 3);
+        font.draw(batch, "Manna \n" + mana, GameConstants.GET_WIDTH-GameConstants.GET_WIDTH / 5+ GameConstants.Sprite.SIZE , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
         batch.end();
     }
 
@@ -334,11 +337,27 @@ public class Player extends GameCharacters {
 
     }
 
+
     public void setRespPoint(Vector2 respPoint){
         this.respPoint = respPoint;
     }
 
     public int getMoney(){return money;}
+
+    public float getManna(){
+        return  mana;
+    }
+    public void addManna(float x){
+        this.mana += x;
+    }
+
+    public void regenerateMana(float delta) {
+        manaRegenTimer += delta;
+        if (manaRegenTimer >= 1) {
+            mana = Math.min(mana + 3, maxMana);
+            manaRegenTimer = 0;
+        }
+    }
 
 
 

@@ -10,20 +10,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Polygon;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.Weapons.MagicWeapon;
 import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
-import com.gamb1t.legacyforge.Weapons.Projectile;
 import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
-import Structures.Shop;
+import com.gamb1t.legacyforge.Structures.Shop;
 
 public class GameScreen implements Screen {
 
@@ -53,6 +51,8 @@ public class GameScreen implements Screen {
 
         weaponLoader = new WeaponLoader("ranged.json");
         weapon.addAll(weaponLoader.getWeaponList());
+        weaponLoader = new WeaponLoader("magic.json");
+        weapon.addAll(weaponLoader.getWeaponList());
 
         mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
 
@@ -66,7 +66,7 @@ public class GameScreen implements Screen {
         PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
 
       for (int i = 0; i < 10; i++) {
-            Enemies.add(new Enemy(this, PLAYER));
+            Enemies.add(new Enemy(this, PLAYER, mapManager.getRespEenemy()));
         }
 
         for (Enemy enemy : Enemies) {
@@ -101,6 +101,9 @@ public class GameScreen implements Screen {
             w.setTexture(w.getSprite());
             w.convertTxtRegToSprite();
             w.setPlayer(PLAYER);
+            if(w instanceof MagicWeapon){
+                ((MagicWeapon)  w).setCurrentMap(mapManager);
+            }
         }
     }
 
@@ -120,9 +123,13 @@ public class GameScreen implements Screen {
 
     public void update(float delta) {
         PLAYER.update(delta);
+        PLAYER.regenerateMana(delta);
         mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
         if(PLAYER.getCureentWeapon() instanceof RangedWeapon){
             ((RangedWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+        }
+        if(PLAYER.getCureentWeapon() instanceof MagicWeapon){
+         ((MagicWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
         }
 
         if (PLAYER.getMovePlayer()) {
@@ -140,10 +147,14 @@ public class GameScreen implements Screen {
 
 
 
-
-
         }
         if (PLAYER.getCureentWeapon().getAttacking()) {
+            if(PLAYER.getCureentWeapon() instanceof RangedWeapon || PLAYER.getCureentWeapon() instanceof MeleeWeapon){
+            PLAYER.getCureentWeapon().update(delta);
+            PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies, mapManager);}
+        }
+
+        if(PLAYER.getCureentWeapon() instanceof MagicWeapon){
             PLAYER.getCureentWeapon().update(delta);
             PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies, mapManager);
         }
@@ -192,12 +203,12 @@ public class GameScreen implements Screen {
             batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX,
                 enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
         }
-        if(PLAYER.getCureentWeapon().getAttacking()) {
+        //if(PLAYER.getCureentWeapon().getAttacking()) {
 
             PLAYER.getCureentWeapon().draw(batch, playerX  - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2);
-        }
+        //}
 
-        shop.drawShopUi(batch);
+
 
 
 
@@ -208,10 +219,12 @@ public class GameScreen implements Screen {
             enemy.drawBar(batch, shapeRenderer, font);
         }
 
+        shop.drawShopUi(batch);
+
         PLAYER.drawBar(batch, shapeRenderer, font);
 
         touchEvents.draw(batch);
-        gameUI.render();
+       // gameUI.render();
 
 
 

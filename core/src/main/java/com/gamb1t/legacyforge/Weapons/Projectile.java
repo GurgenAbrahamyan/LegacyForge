@@ -26,6 +26,7 @@ public class Projectile {
         this.deltaY = deltaY;
         this.velocity = new Vector2(deltaX, deltaY);
         this.sprite = new Sprite(new Texture(proj));
+        System.out.println(sprite);
         this.sprite.setSize(GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
         this.hitbox = new Polygon(new float[]{
             0, 0,

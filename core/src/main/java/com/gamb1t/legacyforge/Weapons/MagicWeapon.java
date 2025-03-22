@@ -11,92 +11,61 @@ import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
+
 import java.util.ArrayList;
 
 public class MagicWeapon extends Weapon {
     private long lastAttackTime;
     private final long attackCooldown = 500;
-    private boolean isCharging = false;
-    private boolean animOver = false;
-    private float chargeTime = 0;
+    private boolean animOver;
+
+    private float mannaUsage;
 
     private String projectilePath;
-    private final float maxChargeTime = 1.5f;
     private ArrayList<Projectile> projectiles = new ArrayList<>();
+
+    private MapManaging currentMap;
+
+    private float playerCamX, playerCamY;
     private float animationTimer = 0;
     private float frameDuration = 0.1f;
 
-    MapManaging currentMap;
-
-    float minSpeed = 10;
-    float maxSpeed = 50;
-
-    float chargePercentage = Math.min(chargeTime / maxChargeTime, 1.0f);
-    float arrowSpeed = minSpeed + chargePercentage * (maxSpeed - minSpeed);
-
-
-
-    float minDamage = damage/5;
-    float maxDamage = damage;
-    float projectileDamage = minDamage + chargePercentage * (maxDamage - minDamage);
-
-
-    private float playerCamX, getPlayerCamY;
 
     public MagicWeapon() {
-
     }
-
-
-
-
 
     @JsonSetter("projectilePath")
     public void setProjectiles(String s) {
-
         projectilePath = s;
+    }
+
+    @JsonSetter("mannaUsage")
+    public void setMannaUsage(int x) {
+        mannaUsage = x;
     }
 
     @Override
     public Polygon createHitbox(float x, float y) {
-
-        return  null;
+        return null;
     }
 
     @Override
     public void attack() {
-        if (isCharging) return;
         if (canAttack() && (System.currentTimeMillis() - lastAttackTime) >= attackCooldown) {
+            if(player.getManna() >= mannaUsage){
+                player.addManna(-mannaUsage);
             lastAttackTime = System.currentTimeMillis();
-            isCharging = true;
-            chargeTime = 0;
-            castMagic();
-
-        }
-    }
-    public void resetAnimation() {
-        currentFrame = 0;
-    }
-
-    public void castMagic() {
-        if (isCharging) {
-            isCharging = false;
-            shootProjectile();
+            isAttacking = true;
+            shootProjectile();}
         }
     }
 
     private void shootProjectile() {
-
-        if (canAttack() && (System.currentTimeMillis() - lastAttackTime) >= attackCooldown) {
-            lastAttackTime = System.currentTimeMillis();
-            float deltaX= (float) Math.cos(Math.toRadians(rotationAngle))*25;
-            float deltaY = (float) Math.sin(Math.toRadians(rotationAngle))*25;
-            projectiles.add(new Projectile(GameConstants.GET_WIDTH/2-  player.cameraX , GameConstants.GET_HEIGHT/2- player.cameraY ,deltaX, deltaY, projectilePath, currentMap));
-            isAttacking = true;
-        }
+        lastAttackTime = System.currentTimeMillis();
+        float deltaX = (float) Math.cos(Math.toRadians(rotationAngle)) * 15;
+        float deltaY = (float) Math.sin(Math.toRadians(rotationAngle)) * 15;
+        projectiles.add(new Projectile(GameConstants.GET_WIDTH / 2 - player.cameraX, GameConstants.GET_HEIGHT / 2 - player.cameraY, deltaX, deltaY, projectilePath, currentMap));
     }
-
-
 
     @Override
     public void update(float delta) {
@@ -104,39 +73,39 @@ public class MagicWeapon extends Weapon {
         for (Projectile proj : projectiles) {
             proj.update();
         }
-
-
         projectiles.removeIf(Projectile::isDestroyed);
-
         updateAnimation();
     }
 
     @Override
     public void draw(SpriteBatch batch, float x, float y) {
+        System.out.println(isAttacking);
         if (isAttacking) {
+
+
+
             Sprite spriteToDraw = changedSpritesheet[0][currentFrame];
-            spriteToDraw.setPosition(x - 1.5f * GameConstants.Sprite.SIZE, y - 1.5f * GameConstants.Sprite.SIZE);
+            spriteToDraw.setPosition(x - 1.5f * GameConstants.Sprite.SIZE, y - 2f * GameConstants.Sprite.SIZE);
             spriteToDraw.setOrigin(spriteToDraw.getWidth() / 2, spriteToDraw.getHeight() / 2);
             spriteToDraw.setRotation(rotationAngle);
             spriteToDraw.setSize(GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 4);
             spriteToDraw.draw(batch);
-            if (currentFrame == changedSpritesheet[0].length - 1) {
-                isAttacking = false;
-                if (joystick != null) joystick.setIsAiming(false);
-                resetAnimation();
-            }
+
         }
 
-        for (Projectile proj : projectiles) {
-            proj.draw(batch, playerCamX, getPlayerCamY);
-        }
+            for (Projectile proj : projectiles) {
+                proj.draw(batch, playerCamX, playerCamY);
+            }
 
 
     }
+    public void resetAnimation(){
 
-
-
+        currentFrame = 0;
+    }
     public void updateAnimation() {
+        frameDuration = attackSpeed/10 ;
+
         if (!isAttacking) return;
 
         animationTimer += Gdx.graphics.getDeltaTime();
@@ -150,34 +119,32 @@ public class MagicWeapon extends Weapon {
                 isAttacking = false;
                 resetAnimation();
             }
-        }
-        System.out.println("Current Frame: " + currentFrame + ", isCharging: " + isCharging + ", isAttacking: " + isAttacking);
-
+        }        System.out.println("Current Frame: " + currentFrame + ", isAttacking: " + isAttacking);
     }
 
+
+    public void setCurrentMap(MapManaging map) {
+        currentMap = map;
+    }
 
     public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging map) {
         for (Projectile proj : projectiles) {
             if (proj != null) {
                 for (Enemy enemy : enemies) {
-
                     if (enemy != null && proj.getHitbox() != null && enemy.hitbox != null) {
                         if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemy.getHitbox())) {
                             dealDamage(enemy);
                             applyKnockback(enemy);
                             proj.setDestroyed(true);
-                            System.out.println("colided");
+                            System.out.println("Projectile collided with enemy");
                         }
-                        currentMap = map;
-
-                    } else if (currentMap.checkNearbyWallCollision(proj.getHitbox(),  proj.getHitbox().getX() + proj.getVelocity().x, proj.getHitbox().getY() + proj.getVelocity().y)) {
-                        proj.setDestroyed(true);
                     }
                 }
+
+                if (currentMap.checkNearbyWallCollision(proj.getHitbox(), proj.getHitbox().getX() + proj.getVelocity().x, proj.getHitbox().getY() + proj.getVelocity().y)) {
+                    proj.setDestroyed(true);
+                }
             }
-        }
-        if(currentMap == null){
-            currentMap = map;
         }
     }
 
@@ -192,20 +159,19 @@ public class MagicWeapon extends Weapon {
             enemy.applyKnockback(enemy, this);
         }
     }
-    public void setIsCharging(boolean x){
-        isCharging= x;
-    }
+
 
 
     public ArrayList<Projectile> getProjectiles() {
         return projectiles;
     }
+
     public void setAnimOver(boolean b){
         animOver = b;
     }
-    public void setCameraValues(float x, float y){
-        playerCamX = x;
-        getPlayerCamY = y;
 
+    public void setCameraValues(float x, float y) {
+        playerCamX = x;
+        playerCamY = y;
     }
 }

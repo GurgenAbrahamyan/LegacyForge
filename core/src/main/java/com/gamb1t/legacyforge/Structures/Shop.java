@@ -74,9 +74,11 @@ public class Shop {
     }
 
     public void drawShopUi(SpriteBatch batch) {
+        batch.begin();
         if (isShopOpen) {
             openShopUI(batch);
         }
+        batch.end();
     }
 
     private void openShopUI(SpriteBatch batch) {
