@@ -51,7 +51,7 @@ public class Player extends GameCharacters {
 
     public Player(float x, float y, GameScreen gameScreen, Weapon weapon) {
 
-        super(x, y, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+        super(x, y, GameConstants.Sprite.SIZE*4/5, GameConstants.Sprite.SIZE*4/5);
 
         this.gameScreen = gameScreen;
 
@@ -76,7 +76,7 @@ public class Player extends GameCharacters {
 
         this.weapon = weapon;
 
-        money = 0;
+        money = 9999;
         entityPos = new GameScreen.PointF(x, y);
 
 
@@ -252,7 +252,7 @@ public class Player extends GameCharacters {
 
     @Override
     public void setHitboxPosition() {
-        hitbox.setPosition(  gameScreen.playerX - cameraX - GameConstants.Sprite.SIZE/2 , gameScreen.playerY - cameraY - GameConstants.Sprite.SIZE/2);
+        hitbox.setPosition(  gameScreen.playerX - cameraX - GameConstants.Sprite.SIZE/2+GameConstants.Sprite.SIZE/8 , gameScreen.playerY - cameraY - GameConstants.Sprite.SIZE/2);
     }
 
     @Override

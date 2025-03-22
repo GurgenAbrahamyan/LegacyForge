@@ -31,7 +31,7 @@ public class Enemy extends GameCharacters {
     public Enemy(GameScreen gameScreen, Player player, ArrayList<Vector2> respPos) {
 
 
-        super(0 ,0, GameConstants.Sprite.SIZE ,  GameConstants.Sprite.SIZE);
+        super(0 ,0, GameConstants.Sprite.SIZE *4/5,  GameConstants.Sprite.SIZE * 4/5);
 
 
         Random random = new Random();
@@ -123,7 +123,7 @@ public class Enemy extends GameCharacters {
 
     @Override
     public void setHitboxPosition() {
-        hitbox.setPosition(entityPos.x, entityPos.y);
+        hitbox.setPosition(entityPos.x+GameConstants.Sprite.SIZE/8, entityPos.y);
     }
 
     @Override

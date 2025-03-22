@@ -2,7 +2,7 @@
   {
     "type": "melee",
     "name": "Iron Sword",
-    "damage": 12,
+    "damage": 4,
     "attackSpeed": 1.5,
     "range": 1.0,
     "knockbackInTiles": 1,
@@ -11,7 +11,7 @@
   {
     "type": "melee",
     "name": "Golden Sword",
-    "damage": 20,
+    "damage": 7,
     "attackSpeed": 2.0,
     "price": 1500,
     "range": 1.5,
