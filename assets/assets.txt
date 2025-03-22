@@ -7,6 +7,7 @@ com/badlogic/gdx/utils/lsans-15.png
 enemies_spritesheet/skeleton_spritesheet.png
 joystick.png
 libgdx.png
+magic.json
 player_sprites/player_spritesheet.png
 ranged.json
 shops/basic_shop.png
@@ -20,6 +21,8 @@ ui/uiskin.atlas
 ui/uiskin.json
 ui/uiskin.png
 weapons.json
+weapons_spritesheet/magic_spritesheet/fire_projectile.png
+weapons_spritesheet/magic_spritesheet/wooden_staff.png
 weapons_spritesheet/ranged_spritesheet/regular_bow.png
 weapons_spritesheet/ranged_spritesheet/wooden_arrow.aseprite
 weapons_spritesheet/ranged_spritesheet/wooden_arrow.png

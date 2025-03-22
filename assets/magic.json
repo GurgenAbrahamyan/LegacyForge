@@ -1,0 +1,13 @@
+[
+  {
+    "type": "magic",
+    "name": "Wooden Staff",
+    "damage": 30.0,
+    "attackSpeed": 1.5,
+    "price": 5000,
+    "knockbackInTiles": 2.0,
+    "mannaUsage": 10,
+    "sprite": "weapons_spritesheet/magic_spritesheet/wooden_staff.png",
+    "projectilePath": "weapons_spritesheet/magic_spritesheet/fire_projectile.png"
+  }
+]
