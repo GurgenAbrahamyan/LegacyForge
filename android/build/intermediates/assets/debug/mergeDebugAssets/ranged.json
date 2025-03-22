@@ -2,7 +2,7 @@
 {
   "type": "ranged",
   "name": "Bow",
-  "damage": 25.0,
+  "damage": 18.0,
   "attackSpeed": 1.5,
   "range": 50.0,
   "price": 500,
