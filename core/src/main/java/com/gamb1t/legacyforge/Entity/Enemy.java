@@ -3,14 +3,16 @@ package com.gamb1t.legacyforge.Entity;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 import com.gamb1t.legacyforge.Weapons.MagicWeapon;
@@ -56,13 +58,24 @@ public class Enemy extends GameCharacters {
 
 
     }
+
+    @JsonSetter("spriteSheet")
+    public void setTexture(String recourceName){
+
+        Texture entitiesTexture = new Texture(recourceName);
+
+        SpriteSheet = new TextureRegion[entitiesTexture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE][entitiesTexture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE];
+
+        SpriteSheet = TextureRegion.split(entitiesTexture, GameConstants.Sprite.DEFAULT_SIZE, GameConstants.Sprite.DEFAULT_SIZE);
+
+    }
     public void updateMove(double delta) {
 
         distanceBtwPlayer = (float) Math.hypot(playerPosX - entityPos.x+GameConstants.Sprite.SIZE/2 , playerPosY - entityPos.y+GameConstants.Sprite.SIZE/2);
 
 
 
-        speed = (float) (delta * 300);
+        float deltaSpeed = (float) (delta * speed);
         float deltaX = 0, deltaY = 0;
 
         if (System.currentTimeMillis() - lastDirChange >= 3000) {
@@ -79,22 +92,22 @@ public class Enemy extends GameCharacters {
 
             switch (getFaceDir()) {
                 case GameConstants.Face_Dir.DOWN:
-                    deltaY = speed;
+                    deltaY = deltaSpeed;
                     if (entityPos.y + deltaY >= GET_HEIGHT) setFaceDir(GameConstants.Face_Dir.UP);
                     break;
 
                 case GameConstants.Face_Dir.UP:
-                    deltaY = -speed;
+                    deltaY = -deltaSpeed;
                     if (entityPos.y + deltaY <= 0) setFaceDir(GameConstants.Face_Dir.DOWN);
                     break;
 
                 case GameConstants.Face_Dir.RIGHT:
-                    deltaX = speed;
+                    deltaX = deltaSpeed;
                     if (entityPos.x + deltaX >= GET_WIDTH) setFaceDir(GameConstants.Face_Dir.LEFT);
                     break;
 
                 case GameConstants.Face_Dir.LEFT:
-                    deltaX = -speed;
+                    deltaX = -deltaSpeed;
                     if (entityPos.x + deltaX <= 0) setFaceDir(GameConstants.Face_Dir.RIGHT);
                     break;
             }
@@ -106,8 +119,8 @@ public class Enemy extends GameCharacters {
                 dirY /= length;
             }
 
-            deltaX = dirX * speed;
-            deltaY = dirY * speed;
+            deltaX = dirX * deltaSpeed;
+            deltaY = dirY * deltaSpeed;
 
 
             if (Math.abs(dirX) > Math.abs(dirY)) {
@@ -298,5 +311,22 @@ public class Enemy extends GameCharacters {
     public Weapon getWeapon(){
         return  weapon;
     }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
 
 }

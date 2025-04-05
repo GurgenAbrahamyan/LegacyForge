@@ -277,7 +277,7 @@ public class Player extends GameCharacters {
         font.getData().setScale(GameConstants.Sprite.SIZE/20);
         font.draw(batch, "HP " + hp, GameConstants.GET_WIDTH / 9-GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
         font.draw(batch, "Money \n" + money, GameConstants.GET_WIDTH / 9- GameConstants.Sprite.SIZE , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 3);
-        if(weapon instanceof MagicWeapon) {
+        if(currentWeapon instanceof MagicWeapon) {
             font.draw(batch, "Manna \n" + mana, GameConstants.GET_WIDTH - GameConstants.GET_WIDTH / 5 + GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
         }batch.end();
     }

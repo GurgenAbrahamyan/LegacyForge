@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 import com.gamb1t.legacyforge.Weapons.Weapon;
@@ -79,11 +80,12 @@ public abstract class GameCharacters {
         return SpriteSheet;
     }
 
-    public void setTexture(String recourceName, int spritesheetLength, int spritesheetWidth){
+
+    public void setTexture(String recourceName){
 
         Texture entitiesTexture = new Texture(recourceName);
 
-        SpriteSheet = new TextureRegion[spritesheetWidth][spritesheetLength];
+        SpriteSheet = new TextureRegion[entitiesTexture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE][entitiesTexture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE];
 
         SpriteSheet = TextureRegion.split(entitiesTexture, GameConstants.Sprite.DEFAULT_SIZE, GameConstants.Sprite.DEFAULT_SIZE);
 

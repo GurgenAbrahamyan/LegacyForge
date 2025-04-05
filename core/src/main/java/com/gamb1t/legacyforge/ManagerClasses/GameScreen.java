@@ -3,6 +3,7 @@ package com.gamb1t.legacyforge.ManagerClasses;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -35,14 +36,13 @@ public class GameScreen implements Screen {
 
     private static ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
 
-    private static WeaponLoader weaponLoader = new WeaponLoader("weapons.json");
+    private  WeaponLoader weaponLoader = new WeaponLoader("weapons.json");
 
-    private static WeaponLoader weaponLoader2 = new WeaponLoader("magic.json");
+    private  WeaponLoader weaponLoader2 = new WeaponLoader("weapons.json");
 
     private static ArrayList<Player> PLAYERS = new ArrayList<Player>();
 
-
-
+    private EnemyLoader enemyLoader;
 
     private ArrayList<Weapon> weapon = weaponLoader.getWeaponList();
     private ArrayList<Weapon> enemyWeapon = weaponLoader2.getWeaponList();
@@ -58,6 +58,8 @@ public class GameScreen implements Screen {
     private GameUI gameUI;
     public GameScreen() {
 
+
+
         PLAYERS.add(PLAYER);
 
         weaponLoader = new WeaponLoader("ranged.json");
@@ -65,8 +67,15 @@ public class GameScreen implements Screen {
         weaponLoader = new WeaponLoader("magic.json");
         weapon.addAll(weaponLoader.getWeaponList());
 
+        weaponLoader2 = new WeaponLoader("ranged.json");
+        enemyWeapon.addAll(weaponLoader2.getWeaponList());
+        weaponLoader2 = new WeaponLoader("magic.json");
+        enemyWeapon.addAll(weaponLoader2.getWeaponList());
+
         mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
 
+
+        enemyLoader = new EnemyLoader(this,PLAYER,enemyWeapon, "enemies.json", mapManager.getRespEenemy());
 
         batch = new SpriteBatch();
 
@@ -74,17 +83,13 @@ public class GameScreen implements Screen {
 
 
 
-        PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
+        PLAYER.setTexture("player_sprites/player_spritesheet.png");
 
 
-
-        for (int i = 0; i < 1; i++) {
-            Enemies.add(new Enemy(this, PLAYER, mapManager.getRespEenemy(), enemyWeapon.get(rand.nextInt(enemyWeapon.size()))));
-
-        }
+        Enemies = enemyLoader.getEnemyList();
 
         for (Enemy enemy : Enemies) {
-            enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
+            enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png");
             enemy.setRespPos(mapManager.getRespEenemy());
             enemy.getWeapon().setEntity(enemy);
             if(enemy.getWeapon() instanceof RangedWeapon){
@@ -290,11 +295,7 @@ public class GameScreen implements Screen {
 
         touchEvents.draw(batch);
        // gameUI.render();
-
-
-
     }
-
 
     @Override
     public void resize(int width, int height) {
@@ -316,5 +317,9 @@ public class GameScreen implements Screen {
     public void dispose() {
         batch.dispose();
         shapeRenderer.dispose();
+    }
+
+    public Player getPLAYER(){
+        return PLAYER;
     }
 }
