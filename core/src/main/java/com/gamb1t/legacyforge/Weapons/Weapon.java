@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gamb1t.legacyforge.Entity.Enemy;
+import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
-import com.gamb1t.legacyforge.ManagerClasses.TouchManager;
 
 import java.util.ArrayList;
 
@@ -20,19 +20,22 @@ public abstract class Weapon {
     protected float damage, attackSpeed, range, knockbackInTiles;
     protected long lastAttackTime = System.currentTimeMillis();
     protected boolean isAttacking;
+    protected boolean isAiming;
     protected float rotationAngle = 0;
     protected  int price;
+
+    @JsonIgnore
+    protected float playerCamX, playerCamY;
 
     @JsonIgnore
     protected Texture loadedSprite;
     @JsonIgnore
     protected TextureRegion[][] spriteSheet;
 
-    protected TouchManager joystick;
     protected int aniTick, aniSpeed, animationFrameAmount, currentFrame;
     @JsonIgnore
     protected Sprite[][] changedSpritesheet;
-    protected  Player player;
+    protected GameCharacters enity;
 
     public Weapon(){
         this.aniSpeed = (int) (10 / attackSpeed);
@@ -86,7 +89,7 @@ public abstract class Weapon {
         }
     }
 
-    public void checkHitboxCollisions(ArrayList<Enemy> ENTITIES, MapManaging currentMap) {
+    public <T extends GameCharacters> void checkHitboxCollisions(ArrayList<T> ENEMIES, MapManaging currentMap) {
 
     }
 
@@ -106,13 +109,16 @@ public abstract class Weapon {
     public void setKnockbackInTiles(float knockbackInTiles) { this.knockbackInTiles = knockbackInTiles; }
     public String getSprite() { return sprite; }
     public void setSprite(String sprite) { this.sprite = sprite; }
-    public void setAttackJoystick(TouchManager joystick) { this.joystick = joystick; }
+    //public void setAttackJoystick(TouchManager joystick) { this.joystick = joystick; }
     public void setAttacking(boolean attacking) { isAttacking = attacking; }
     public void setRotation(float angle) {
         this.rotationAngle = angle;
     }
-    public void setPlayer(Player pl){
-        player=pl;
+    public void setAiming(boolean b){
+        isAiming = b;
+    }
+    public boolean getAiming(){
+        return  isAiming;
     }
 
     public float getRotation() {
@@ -130,5 +136,15 @@ public abstract class Weapon {
     }
     public  void setPrice(int i){
         price = i;
+    }
+
+    public void setCameraValues(float x, float y){
+        playerCamX = x;
+        playerCamY = y;
+
+    }
+    @JsonIgnore
+    public <T extends GameCharacters> void setEntity(T enity){
+        this.enity = enity;
     }
 }

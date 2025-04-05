@@ -7,6 +7,7 @@
     "price": 5000,
     "knockbackInTiles": 2.0,
     "mannaUsage": 7,
+    "range": 4,
     "sprite": "weapons_spritesheet/magic_spritesheet/wooden_staff.png",
     "projectilePath": "weapons_spritesheet/magic_spritesheet/fire_projectile.png"
   }

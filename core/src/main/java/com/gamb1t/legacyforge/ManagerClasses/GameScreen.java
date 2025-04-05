@@ -37,17 +37,28 @@ public class GameScreen implements Screen {
 
     private static WeaponLoader weaponLoader = new WeaponLoader("weapons.json");
 
+    private static WeaponLoader weaponLoader2 = new WeaponLoader("magic.json");
+
+    private static ArrayList<Player> PLAYERS = new ArrayList<Player>();
+
+
+
+
     private ArrayList<Weapon> weapon = weaponLoader.getWeaponList();
+    private ArrayList<Weapon> enemyWeapon = weaponLoader2.getWeaponList();
 
 
     private Shop shop;
 
-
     Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
+
+
     public MapManaging mapManager;
 
     private GameUI gameUI;
     public GameScreen() {
+
+        PLAYERS.add(PLAYER);
 
         weaponLoader = new WeaponLoader("ranged.json");
         weapon.addAll(weaponLoader.getWeaponList());
@@ -65,13 +76,19 @@ public class GameScreen implements Screen {
 
         PLAYER.setTexture("player_sprites/player_spritesheet.png", 4, 7);
 
-      for (int i = 0; i < 10; i++) {
-            Enemies.add(new Enemy(this, PLAYER, mapManager.getRespEenemy()));
+
+
+        for (int i = 0; i < 1; i++) {
+            Enemies.add(new Enemy(this, PLAYER, mapManager.getRespEenemy(), enemyWeapon.get(rand.nextInt(enemyWeapon.size()))));
+
         }
 
         for (Enemy enemy : Enemies) {
             enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png", 4, 7);
             enemy.setRespPos(mapManager.getRespEenemy());
+            enemy.getWeapon().setEntity(enemy);
+            if(enemy.getWeapon() instanceof RangedWeapon){
+            ((RangedWeapon) enemy.getWeapon()).setMap(mapManager);}
         }
 
 
@@ -97,10 +114,17 @@ public class GameScreen implements Screen {
 
         for (Weapon w : weapon) {
 
-            w.setAttackJoystick((TouchManager) multiplexer.getProcessors().get(1));
+           // w.setAttackJoystick((TouchManager) multiplexer.getProcessors().get(1));
             w.setTexture(w.getSprite());
             w.convertTxtRegToSprite();
-            w.setPlayer(PLAYER);
+            if(w instanceof MagicWeapon){
+                ((MagicWeapon)  w).setCurrentMap(mapManager);
+            }
+        }
+        for (Weapon w : enemyWeapon) {
+
+            w.setTexture(w.getSprite());
+            w.convertTxtRegToSprite();
             if(w instanceof MagicWeapon){
                 ((MagicWeapon)  w).setCurrentMap(mapManager);
             }
@@ -159,11 +183,53 @@ public class GameScreen implements Screen {
             PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies, mapManager);
         }
 
+
         for (Enemy enemy : Enemies) {
             enemy.updateMove(delta);
             enemy.updateAnimation();
+
             enemy.setPlayerPosX(playerX - GameConstants.Sprite.SIZE/2- PLAYER.cameraX);
             enemy.setPlayerPosY(playerY - GameConstants.Sprite.SIZE/2-PLAYER.cameraY);
+
+            enemy.attackPlayer();
+
+            if(enemy.getWeapon() instanceof MagicWeapon){
+                ((MagicWeapon) enemy.getWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            }
+            if(enemy.getWeapon() instanceof RangedWeapon){
+                ((RangedWeapon) enemy.getWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            }
+
+            if (enemy.getWeapon().getAttacking()) {
+
+
+
+                enemy.getWeapon().createHitbox(enemy.getEntityPos().x, enemy.getEntityPos().y);
+
+
+
+            }
+            if (enemy.getWeapon().getAttacking()) {
+                if(enemy.getWeapon() instanceof MeleeWeapon){
+                    for(Player player : PLAYERS){
+                    if(!player.isDead()){
+                    enemy.getWeapon().update(delta);
+                    enemy.getWeapon().checkHitboxCollisions(PLAYERS, mapManager);}}}
+            }
+                if(enemy.getWeapon() instanceof RangedWeapon){
+                enemy.getWeapon().update(delta);
+                enemy.getWeapon().checkHitboxCollisions(PLAYERS, mapManager);
+            }
+
+            if(enemy.getWeapon() instanceof MagicWeapon){
+                enemy.getWeapon().update(delta);
+                enemy.getWeapon().checkHitboxCollisions(PLAYERS, mapManager);
+            }
+
+
+
+
+
         }
 
         shop.update(PLAYER.hitbox);
@@ -200,13 +266,12 @@ public class GameScreen implements Screen {
 
 
         for (Enemy enemy : Enemies) {
-            batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX,
-                enemy.getEntityPos().y + PLAYER.cameraY, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+            batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX - GameConstants.Sprite.SIZE/2,
+                enemy.getEntityPos().y + PLAYER.cameraY- GameConstants.Sprite.SIZE/2, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+            enemy.getWeapon().draw(batch,enemy.getEntityPos().x+PLAYER.cameraX  -GameConstants.Sprite.SIZE/2, enemy.getEntityPos().y+PLAYER.cameraY  -GameConstants.Sprite.SIZE/2);
         }
-        //if(PLAYER.getCureentWeapon().getAttacking()) {
 
             PLAYER.getCureentWeapon().draw(batch, playerX  - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2);
-        //}
 
 
 

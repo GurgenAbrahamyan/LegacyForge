@@ -3,19 +3,22 @@ package com.gamb1t.legacyforge.Entity;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
+import com.gamb1t.legacyforge.Weapons.MagicWeapon;
+import com.gamb1t.legacyforge.Weapons.RangedWeapon;
+import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Vector;
 
 public class Enemy extends GameCharacters {
 
@@ -23,12 +26,14 @@ public class Enemy extends GameCharacters {
     private int damage = 10;
     private float playerPosX, playerPosY;
     Player player ;
+    Weapon weapon;
     private ArrayList<Vector2> respPos = new ArrayList<>();
+    float distanceBtwPlayer;
 
 
     GameScreen gameScreen;
 
-    public Enemy(GameScreen gameScreen, Player player, ArrayList<Vector2> respPos) {
+    public Enemy(GameScreen gameScreen, Player player, ArrayList<Vector2> respPos, Weapon weapon) {
 
 
         super(0 ,0, GameConstants.Sprite.SIZE *4/5,  GameConstants.Sprite.SIZE * 4/5);
@@ -38,6 +43,7 @@ public class Enemy extends GameCharacters {
         this.respPos = respPos;
         Vector2 resp = respPos.get(random.nextInt(respPos.size()));
         entityPos = new GameScreen.PointF(resp.x, resp.y);
+        this.weapon = weapon;
 
 
 
@@ -48,13 +54,16 @@ public class Enemy extends GameCharacters {
         this.player = player;
 
 
+
     }
     public void updateMove(double delta) {
 
-        boolean tileColided =false;
+        distanceBtwPlayer = (float) Math.hypot(playerPosX - entityPos.x+GameConstants.Sprite.SIZE/2 , playerPosY - entityPos.y+GameConstants.Sprite.SIZE/2);
+
+
 
         speed = (float) (delta * 300);
-        float deltaX = 0, deltaY = 0; // Define deltaX and deltaY
+        float deltaX = 0, deltaY = 0;
 
         if (System.currentTimeMillis() - lastDirChange >= 3000) {
             int randFaceDir = gameScreen.getRandom(4);
@@ -62,9 +71,9 @@ public class Enemy extends GameCharacters {
             lastDirChange = System.currentTimeMillis();
         }
 
-        float distanceBtwPlayer = (float) Math.hypot(playerPosX - entityPos.x, playerPosY - entityPos.y);
-        float dirX = playerPosX - entityPos.x;
-        float dirY = playerPosY - entityPos.y;
+
+        float dirX = playerPosX - entityPos.x + GameConstants.Sprite.SIZE/2;
+        float dirY = playerPosY - entityPos.y + GameConstants.Sprite.SIZE/2;
 
         if (distanceBtwPlayer > GameConstants.Sprite.SIZE * 4) {
 
@@ -111,19 +120,114 @@ public class Enemy extends GameCharacters {
 
         entityPos.x += deltaX;
         entityPos.y += deltaY;
-         tileColided = false;
-        }
-        else {
-            tileColided = true;
+
         }
         setHitboxPosition();
     }
+
+    private long lastAttackTime = 0;
+    float cooldownDuration =0;
+    float elapsedTime = -7;
+
+    public void attackPlayer() {
+        if (distanceBtwPlayer < weapon.getRange() * GameConstants.Sprite.SIZE) {
+            float dirX = playerPosX - entityPos.x + GameConstants.Sprite.SIZE / 2;
+            float dirY = playerPosY - entityPos.y + GameConstants.Sprite.SIZE / 2;
+            double angle = Math.atan2(dirY, dirX);
+
+            long currentTime = System.currentTimeMillis();
+            cooldownDuration = (weapon.getAttackSpeed() + 1);
+            if(elapsedTime == -7){
+                elapsedTime = cooldownDuration;
+                System.out.println(elapsedTime);
+                System.out.println(cooldownDuration);
+            }
+
+
+
+            if (weapon instanceof RangedWeapon) {
+                weapon.setRotation((float) Math.toDegrees(angle));
+                weapon.setAttacking(true);
+                ((RangedWeapon) weapon).setAnimOver(true);
+                weapon.setAiming(true);
+
+                elapsedTime -= Gdx.graphics.getDeltaTime();
+
+                System.out.println(Gdx.graphics.getDeltaTime());
+
+                if (elapsedTime <= 0) {
+
+                    elapsedTime=cooldownDuration;
+
+
+                    if (weapon.getAiming()) {
+
+
+                        weapon.attack();
+                        lastAttackTime = System.currentTimeMillis();
+
+
+
+                        weapon.setAttacking(true);
+
+                            ((RangedWeapon) weapon).setAnimOver(true);
+
+
+                            ((RangedWeapon) weapon).setIsCharging(false);
+
+                            weapon.resetAnimation();
+
+
+                    }
+
+
+
+                    lastAttackTime = currentTime;
+
+
+                }
+            } else {
+                if (currentTime - lastAttackTime > weapon.getAttackSpeed() * 1000) {
+                    weapon.setAiming(true);
+                    lastAttackTime = currentTime;
+
+
+                    if (weapon.getAiming()) {
+
+                        weapon.setRotation((float) Math.toDegrees(angle));
+
+
+
+
+
+                        weapon.attack();
+
+
+
+                        weapon.setAttacking(true);
+
+                        if(weapon instanceof MagicWeapon){
+                            ((MagicWeapon) weapon).setAnimOver(true);
+                        }
+                    }
+
+                    weapon.setAiming(false);
+
+                } else {
+                }
+            }
+        }
+        else {
+            weapon.setAiming(false);
+        }
+    }
+
 
 
 
     @Override
     public void setHitboxPosition() {
-        hitbox.setPosition(entityPos.x+GameConstants.Sprite.SIZE/8, entityPos.y);
+        hitbox.setPosition(entityPos.x+GameConstants.Sprite.SIZE/8-GameConstants.Sprite.SIZE/2, entityPos.y - GameConstants.Sprite.SIZE/2);
     }
 
     @Override
@@ -133,8 +237,8 @@ public class Enemy extends GameCharacters {
         float barWidth = GameConstants.Sprite.SIZE;
         float barHeight = (float) GameConstants.Sprite.SIZE / 4;
 
-        float barX = entityPos.x;
-        float barY = entityPos.y + GameConstants.Sprite.SIZE;
+        float barX = entityPos.x - GameConstants.Sprite.SIZE/2;
+        float barY = entityPos.y + GameConstants.Sprite.SIZE - GameConstants.Sprite.SIZE/2;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.DARK_GRAY);
@@ -190,6 +294,9 @@ public class Enemy extends GameCharacters {
 
     public void setRespPos(ArrayList<Vector2> respPos){
         this.respPos = respPos;
+    }
+    public Weapon getWeapon(){
+        return  weapon;
     }
 
 }

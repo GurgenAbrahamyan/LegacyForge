@@ -1,5 +1,6 @@
 package com.gamb1t.legacyforge.Weapons;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Intersector;
 import com.gamb1t.legacyforge.Entity.Enemy;
+import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
@@ -78,8 +80,7 @@ public class MeleeWeapon extends Weapon {
 
             if (currentFrame == changedSpritesheet[0].length - 1) {
                 isAttacking = false;
-                if (joystick != null) joystick.setIsAiming(false);
-                resetAnimation();
+                 resetAnimation();
             }
         }
     }
@@ -107,12 +108,13 @@ public class MeleeWeapon extends Weapon {
     }
 
     @Override
-    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging currentmap) {
+    public <T extends GameCharacters> void checkHitboxCollisions(ArrayList<T> enemies, MapManaging currentmap) {
         if (!isAttacking || hitbox == null) return;
 
-        for (Enemy enemy : enemies) {
+        for (GameCharacters enemy : enemies) {
             if (enemy != null && enemy.hitbox != null) {
                 if (Intersector.overlapConvexPolygons(hitbox, enemy.getHitbox())) {
+                    System.out.println("COLIDED");
                     dealDamage(enemy);
                     applyKnockback(enemy);
                 }
@@ -120,21 +122,23 @@ public class MeleeWeapon extends Weapon {
         }
     }
 
-    private void dealDamage(Enemy enemy) {
+    private void dealDamage(GameCharacters enemy) {
         if (enemy != null) {
             enemy.takeDamage(damage/5);
         }
     }
 
-    private void applyKnockback(Enemy enemy) {
-        if (enemy != null) {
+    private void applyKnockback(GameCharacters enemy) {
+        /*if (enemy != null) {
             enemy.applyKnockback(enemy, this);
-        }
+        }*/
     }
 
     public void onJoystickRelease() {
         isAttacking = false;
     }
+
+
 
     public long getAttackCooldown() {
         return attackCooldown;

@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
+import com.gamb1t.legacyforge.Weapons.MagicWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.awt.Font;
@@ -25,7 +26,7 @@ public class Player extends GameCharacters {
     private int experience;
     private int money;
     private float hpMultiplyer = 10;
-    private float mana, maxMana;
+
 
     private float manaRegenTimer = 0;
     private Vector2 respPoint;
@@ -169,6 +170,9 @@ public class Player extends GameCharacters {
             if(!gameScreen.mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX * -1, hitbox.getY() + deltaY * -1)){
                 cameraX += deltaX;
                 cameraY += deltaY;
+                entityPos.x = GameConstants.GET_WIDTH/2-cameraX;
+                entityPos.y = GameConstants.GET_HEIGHT/2- cameraY;
+
      }
 
 
@@ -252,7 +256,7 @@ public class Player extends GameCharacters {
 
     @Override
     public void setHitboxPosition() {
-        hitbox.setPosition(  gameScreen.playerX - cameraX - GameConstants.Sprite.SIZE/2+GameConstants.Sprite.SIZE/8 , gameScreen.playerY - cameraY - GameConstants.Sprite.SIZE/2);
+        hitbox.setPosition(  entityPos.x - GameConstants.Sprite.SIZE/2+GameConstants.Sprite.SIZE/8 , entityPos.y - GameConstants.Sprite.SIZE/2);
     }
 
     @Override
@@ -273,8 +277,9 @@ public class Player extends GameCharacters {
         font.getData().setScale(GameConstants.Sprite.SIZE/20);
         font.draw(batch, "HP " + hp, GameConstants.GET_WIDTH / 9-GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
         font.draw(batch, "Money \n" + money, GameConstants.GET_WIDTH / 9- GameConstants.Sprite.SIZE , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 3);
-        font.draw(batch, "Manna \n" + mana, GameConstants.GET_WIDTH-GameConstants.GET_WIDTH / 5+ GameConstants.Sprite.SIZE , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
-        batch.end();
+        if(weapon instanceof MagicWeapon) {
+            font.draw(batch, "Manna \n" + mana, GameConstants.GET_WIDTH - GameConstants.GET_WIDTH / 5 + GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
+        }batch.end();
     }
 
     public void setPlayerMoveTrue(GameScreen.PointF lastTouchDiff) {
@@ -343,13 +348,6 @@ public class Player extends GameCharacters {
     }
 
     public int getMoney(){return money;}
-
-    public float getManna(){
-        return  mana;
-    }
-    public void addManna(float x){
-        this.mana += x;
-    }
 
     public void regenerateMana(float delta) {
         manaRegenTimer += delta;

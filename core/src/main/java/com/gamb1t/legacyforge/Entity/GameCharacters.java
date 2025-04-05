@@ -24,6 +24,7 @@ public abstract class GameCharacters {
 
     protected float speed;
     protected int hp, maxHp;
+    protected float mana = 100, maxMana = 100;
     protected boolean isAlive;
     protected GameScreen.PointF entityPos;
     protected  float width;
@@ -34,11 +35,7 @@ public abstract class GameCharacters {
     protected GameScreen gameScreen;
     protected Weapon weapon;
 
-
     public float cameraX, cameraY;
-
-
-
 
     protected TextureRegion[][] SpriteSheet;
 
@@ -130,6 +127,23 @@ public abstract class GameCharacters {
     public GameScreen.PointF getEntityPos(){
         return entityPos;
     }
+
+    public void addManna(float x){
+        mana += x;
+    }
+
+    public float getManna(){
+        return  mana;
+    }
+
+    public Polygon getHitbox(){
+        return hitbox;
+    }
+    public void takeDamage(float x){
+        hp -= x;
+
+    }
+
 
 
 

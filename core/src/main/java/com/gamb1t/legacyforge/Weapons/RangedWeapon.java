@@ -1,21 +1,16 @@
 package com.gamb1t.legacyforge.Weapons;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.Entity.Enemy;
-import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
 
 import java.util.ArrayList;
 
@@ -47,7 +42,7 @@ public class RangedWeapon extends Weapon {
     float projectileDamage = minDamage + chargePercentage * (maxDamage - minDamage);
 
 
-    private float playerCamX, getPlayerCamY;
+
 
     public RangedWeapon() {
 
@@ -97,9 +92,8 @@ public class RangedWeapon extends Weapon {
 
         float deltaX= (float) Math.cos(Math.toRadians(rotationAngle))*maxSpeed;
         float deltaY = (float) Math.sin(Math.toRadians(rotationAngle))*maxSpeed;
-        Vector2 direction = new Vector2((float) Math.cos(Math.toRadians(rotationAngle)), (float) Math.sin(Math.toRadians(rotationAngle)));
 
-        projectiles.add(new Projectile(GameConstants.GET_WIDTH/2-  player.cameraX , GameConstants.GET_HEIGHT/2- player.cameraY ,deltaX, deltaY, projectilePath, currentMap));
+        projectiles.add(new Projectile(enity.getEntityPos().x , enity.getEntityPos().y,deltaX, deltaY, projectilePath, currentMap));
 
     }
 
@@ -109,7 +103,8 @@ public class RangedWeapon extends Weapon {
     public void update(float delta) {
 
         for (Projectile proj : projectiles) {
-            proj.update();
+            if(proj != null){
+            proj.update();}
         }
 
 
@@ -120,7 +115,7 @@ public class RangedWeapon extends Weapon {
 
     @Override
     public void draw(SpriteBatch batch, float x, float y) {
-        if (joystick.getIsAiming()) {
+        if (isAiming) {
             Sprite spriteToDraw = changedSpritesheet[0][currentFrame];
             spriteToDraw.setPosition(x - 1.5f * GameConstants.Sprite.SIZE, y - 1.5f * GameConstants.Sprite.SIZE);
             spriteToDraw.setOrigin(spriteToDraw.getWidth() / 2, spriteToDraw.getHeight() / 2);
@@ -130,7 +125,7 @@ public class RangedWeapon extends Weapon {
         }
 
         for (Projectile proj : projectiles) {
-            proj.draw(batch, playerCamX, getPlayerCamY);
+            proj.draw(batch, playerCamX, playerCamY);
         }
     }
 
@@ -166,7 +161,7 @@ public class RangedWeapon extends Weapon {
             if (currentFrame < changedSpritesheet[0].length - 1) {
                 currentFrame++;
             } else if(currentFrame == changedSpritesheet[0].length-1) {
-                if(joystick.getIsAiming()){
+                if(isAiming){
                     currentFrame = changedSpritesheet[0].length-1;}
                 else{
                     resetAnimation();
@@ -182,10 +177,13 @@ public class RangedWeapon extends Weapon {
     }
 
 
-    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging map) {
+    public <T extends GameCharacters> void checkHitboxCollisions(ArrayList<T> enemies, MapManaging map) {
+        if(currentMap == null){
+            currentMap = map;
+        }
         for (Projectile proj : projectiles) {
             if (proj != null) {
-                for (Enemy enemy : enemies) {
+                for (GameCharacters enemy : enemies) {
 
                     if (enemy != null && proj.getHitbox() != null && enemy.hitbox != null) {
                         if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemy.getHitbox())) {
@@ -202,21 +200,21 @@ public class RangedWeapon extends Weapon {
                 }
             }
         }
-        if(currentMap == null){
-            currentMap = map;
-        }
+
     }
 
-    private void dealDamage(Enemy enemy) {
+
+
+    private void dealDamage(GameCharacters enemy) {
         if (enemy != null) {
             enemy.takeDamage(damage);
         }
     }
 
-    private void applyKnockback(Enemy enemy) {
-        if (enemy != null) {
+    private void applyKnockback(GameCharacters enemy) {
+      /*  if (enemy != null) {
             enemy.applyKnockback(enemy, this);
-        }
+        */
     }
     public void setIsCharging(boolean x){
         isCharging= x;
@@ -229,9 +227,14 @@ public class RangedWeapon extends Weapon {
     public void setAnimOver(boolean b){
         animOver = b;
     }
-    public void setCameraValues(float x, float y){
-        playerCamX = x;
-        getPlayerCamY = y;
 
+
+    public void setMap (MapManaging map){
+        currentMap = map;
     }
+
+    public boolean getAiming(){
+        return  isAiming;
+    }
+
 }

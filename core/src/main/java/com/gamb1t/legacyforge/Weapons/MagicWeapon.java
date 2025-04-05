@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.Entity.Enemy;
+import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
@@ -26,7 +27,6 @@ public class MagicWeapon extends Weapon {
 
     private MapManaging currentMap;
 
-    private float playerCamX, playerCamY;
     private float animationTimer = 0;
     private float frameDuration = 0.1f;
 
@@ -52,8 +52,8 @@ public class MagicWeapon extends Weapon {
     @Override
     public void attack() {
         if (canAttack() && (System.currentTimeMillis() - lastAttackTime) >= attackCooldown) {
-            if(player.getManna() >= mannaUsage){
-                player.addManna(-mannaUsage);
+            if(enity.getManna() >= mannaUsage){
+               enity.addManna(-mannaUsage);
             lastAttackTime = System.currentTimeMillis();
             isAttacking = true;
             shootProjectile();}
@@ -64,7 +64,7 @@ public class MagicWeapon extends Weapon {
         lastAttackTime = System.currentTimeMillis();
         float deltaX = (float) Math.cos(Math.toRadians(rotationAngle)) * 15;
         float deltaY = (float) Math.sin(Math.toRadians(rotationAngle)) * 15;
-        projectiles.add(new Projectile(GameConstants.GET_WIDTH / 2 - player.cameraX, GameConstants.GET_HEIGHT / 2 - player.cameraY, deltaX, deltaY, projectilePath, currentMap));
+        projectiles.add(new Projectile(enity.getEntityPos().x, enity.getEntityPos().y, deltaX, deltaY, projectilePath, currentMap));
     }
 
     @Override
@@ -79,7 +79,6 @@ public class MagicWeapon extends Weapon {
 
     @Override
     public void draw(SpriteBatch batch, float x, float y) {
-        System.out.println(isAttacking);
         if (isAttacking) {
 
 
@@ -127,10 +126,10 @@ public class MagicWeapon extends Weapon {
         currentMap = map;
     }
 
-    public void checkHitboxCollisions(ArrayList<Enemy> enemies, MapManaging map) {
+    public <T extends GameCharacters> void checkHitboxCollisions(ArrayList<T> enemies, MapManaging map) {
         for (Projectile proj : projectiles) {
             if (proj != null) {
-                for (Enemy enemy : enemies) {
+                for (GameCharacters enemy : enemies) {
                     if (enemy != null && proj.getHitbox() != null && enemy.hitbox != null) {
                         if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemy.getHitbox())) {
                             dealDamage(enemy);
@@ -148,16 +147,16 @@ public class MagicWeapon extends Weapon {
         }
     }
 
-    private void dealDamage(Enemy enemy) {
+    private void dealDamage(GameCharacters enemy) {
         if (enemy != null) {
             enemy.takeDamage(damage);
         }
     }
 
-    private void applyKnockback(Enemy enemy) {
-        if (enemy != null) {
+    private void applyKnockback(GameCharacters enemy) {
+      /*  if (enemy != null) {
             enemy.applyKnockback(enemy, this);
-        }
+        }*/
     }
 
 
@@ -170,8 +169,5 @@ public class MagicWeapon extends Weapon {
         animOver = b;
     }
 
-    public void setCameraValues(float x, float y) {
-        playerCamX = x;
-        playerCamY = y;
-    }
+
 }

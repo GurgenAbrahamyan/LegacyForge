@@ -55,6 +55,7 @@ public class TouchManager implements InputProcessor {
                         weapon.setAttacking(true);
                         ((RangedWeapon) weapon).setAnimOver(true);
                         setIsAiming(true);
+                        weapon.setAiming(isAiming);
                     }
 
 
@@ -90,7 +91,7 @@ public class TouchManager implements InputProcessor {
 
 
 
-                    weapon.onJoystickRelease();
+
                     weapon.attack();
 
 
@@ -110,6 +111,7 @@ public class TouchManager implements InputProcessor {
 
 
                 isAiming = false;
+                weapon.setAiming(isAiming);
 
 
             }
@@ -160,6 +162,7 @@ public class TouchManager implements InputProcessor {
                 attackJoystick.touchDragged(x, y);
 
                 isAiming = true;
+                weapon.setAiming(isAiming);
 
 
 
@@ -202,4 +205,6 @@ public class TouchManager implements InputProcessor {
     public void setWeapon(Weapon wp){
         weapon = wp;
     }
+
+
 }
