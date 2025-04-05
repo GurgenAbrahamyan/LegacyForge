@@ -4,7 +4,9 @@ Tiles/Dungeon_Tileset.png
 Tiles/tileset_floor.png
 com/badlogic/gdx/utils/lsans-15.fnt
 com/badlogic/gdx/utils/lsans-15.png
+enemies.json
 enemies_spritesheet/skeleton_spritesheet.png
+enemyWeapons.json
 joystick.png
 libgdx.png
 magic.json

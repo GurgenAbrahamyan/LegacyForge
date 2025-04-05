@@ -1,0 +1,45 @@
+[
+  {
+    "type": "melee",
+    "name": "Iron Sword",
+    "damage": 2,
+    "attackSpeed": 1.5,
+    "range": 1.0,
+    "knockbackInTiles": 1,
+    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+  },
+  {
+    "type": "melee",
+    "name": "Golden Sword",
+    "damage": 4,
+    "attackSpeed": 3.0,
+    "price": 1500,
+    "range": 1.5,
+    "knockbackInTiles": 1.4,
+    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+  },
+  {
+    "type": "magic",
+    "name": "Wooden Staff",
+    "damage": 15.0,
+    "attackSpeed": 2,
+    "price": 5000,
+    "knockbackInTiles": 2.0,
+    "mannaUsage": 10,
+    "range": 5,
+    "sprite": "weapons_spritesheet/magic_spritesheet/wooden_staff.png",
+    "projectilePath": "weapons_spritesheet/magic_spritesheet/fire_projectile.png"
+  },
+  {
+    "type": "ranged",
+    "name": "Bow",
+    "damage": 9.0,
+    "attackSpeed": 2,
+    "range": 5.0,
+    "price": 500,
+    "knockbackInTiles": 2.0,
+    "sprite": "weapons_spritesheet/ranged_spritesheet/regular_bow.png",
+    "projectilePath": "weapons_spritesheet/ranged_spritesheet/wooden_arrow.png"
+  }
+
+]
