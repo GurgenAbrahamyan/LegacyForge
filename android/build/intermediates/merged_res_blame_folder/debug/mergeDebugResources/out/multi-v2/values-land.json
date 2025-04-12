@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.gamb1t.legacyforge.android-mergeDebugResources-18:/values-land/values-land.xml",
+            "outputFile": "com.gamb1t.legacyforge.android-mergeDebugResources-34:/values-land/values-land.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Gurgen\\.gradle\\caches\\8.12\\transforms\\9c5a7cedcbc05b215cb8d6936fed8224\\transformed\\appcompat-1.2.0\\res\\values-land\\values-land.xml",
+                    "source": "C:\\Users\\Gurgen\\.gradle\\caches\\8.12\\transforms\\94a6554e25cead0b24730377843777db\\transformed\\appcompat-1.7.0\\res\\values-land\\values-land.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",

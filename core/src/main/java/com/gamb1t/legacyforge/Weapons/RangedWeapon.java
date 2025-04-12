@@ -30,7 +30,7 @@ public class RangedWeapon extends Weapon {
     MapManaging currentMap;
 
     float minSpeed = 10;
-    float maxSpeed = 50;
+    float maxSpeed = GameConstants.Sprite.SIZE/4;
 
     float chargePercentage = Math.min(chargeTime / maxChargeTime, 1.0f);
     float arrowSpeed = minSpeed + chargePercentage * (maxSpeed - minSpeed);

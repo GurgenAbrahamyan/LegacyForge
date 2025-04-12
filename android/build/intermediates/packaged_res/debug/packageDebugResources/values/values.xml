@@ -2,6 +2,12 @@
 <resources>
     <color name="ic_background_color">#F5A623FF</color>
     <string name="app_name">LegacyForge</string>
+    <string name="gcm_defaultSenderId" translatable="false">747720770510</string>
+    <string name="google_api_key" translatable="false">AIzaSyCGSz8xodsC68sf7QJ9lXmQvIMytT75f10</string>
+    <string name="google_app_id" translatable="false">1:747720770510:android:c7f27f3c09b2a0c72fa19f</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCGSz8xodsC68sf7QJ9lXmQvIMytT75f10</string>
+    <string name="google_storage_bucket" translatable="false">legacy-forge.firebasestorage.app</string>
+    <string name="project_id" translatable="false">legacy-forge</string>
     <style name="GdxTheme" parent="android:Theme">
     <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>

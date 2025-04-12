@@ -91,6 +91,8 @@ public abstract class GameCharacters {
 
     }
 
+
+
     public TextureRegion getSprite(int yPos, int xPos) {
         return SpriteSheet[yPos][xPos];
     }

@@ -62,8 +62,8 @@ public class MagicWeapon extends Weapon {
 
     private void shootProjectile() {
         lastAttackTime = System.currentTimeMillis();
-        float deltaX = (float) Math.cos(Math.toRadians(rotationAngle)) * 15;
-        float deltaY = (float) Math.sin(Math.toRadians(rotationAngle)) * 15;
+        float deltaX = (float) Math.cos(Math.toRadians(rotationAngle)) * GameConstants.Sprite.SIZE/10;
+        float deltaY = (float) Math.sin(Math.toRadians(rotationAngle)) * GameConstants.Sprite.SIZE/10;
         projectiles.add(new Projectile(enity.getEntityPos().x, enity.getEntityPos().y, deltaX, deltaY, projectilePath, currentMap));
     }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "747720770510",
+    "project_id": "legacy-forge",
+    "storage_bucket": "legacy-forge.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747720770510:android:c7f27f3c09b2a0c72fa19f",
+        "android_client_info": {
+          "package_name": "com.gamb1t.legacyforge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGSz8xodsC68sf7QJ9lXmQvIMytT75f10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

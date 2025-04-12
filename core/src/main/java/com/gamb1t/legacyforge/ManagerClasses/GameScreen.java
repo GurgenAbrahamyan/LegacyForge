@@ -38,7 +38,7 @@ public class GameScreen implements Screen {
 
     private  WeaponLoader weaponLoader = new WeaponLoader("weapons.json");
 
-    private  WeaponLoader weaponLoader2 = new WeaponLoader("weapons.json");
+    private  WeaponLoader weaponLoader2 = new WeaponLoader("enemyWeapons.json");
 
     private static ArrayList<Player> PLAYERS = new ArrayList<Player>();
 
@@ -50,13 +50,16 @@ public class GameScreen implements Screen {
 
     private Shop shop;
 
-    Player PLAYER = new Player(playerX, playerY, this, weapon.get(0));
+    Player PLAYER;
 
 
     public MapManaging mapManager;
 
+
     private GameUI gameUI;
-    public GameScreen() {
+    public GameScreen(String nickname, float experience, int level, int money) {
+
+        PLAYER= new Player(nickname,  level, experience, money, playerX, playerY, this, weapon.get(0));
 
 
 
@@ -67,10 +70,6 @@ public class GameScreen implements Screen {
         weaponLoader = new WeaponLoader("magic.json");
         weapon.addAll(weaponLoader.getWeaponList());
 
-        weaponLoader2 = new WeaponLoader("ranged.json");
-        enemyWeapon.addAll(weaponLoader2.getWeaponList());
-        weaponLoader2 = new WeaponLoader("magic.json");
-        enemyWeapon.addAll(weaponLoader2.getWeaponList());
 
         mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
 
@@ -153,6 +152,7 @@ public class GameScreen implements Screen {
     public void update(float delta) {
         PLAYER.update(delta);
         PLAYER.regenerateMana(delta);
+        PLAYER.regenerateHP(delta);
         mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
         if(PLAYER.getCureentWeapon() instanceof RangedWeapon){
             ((RangedWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
@@ -214,6 +214,7 @@ public class GameScreen implements Screen {
 
 
             }
+
             if (enemy.getWeapon().getAttacking()) {
                 if(enemy.getWeapon() instanceof MeleeWeapon){
                     for(Player player : PLAYERS){
@@ -317,6 +318,10 @@ public class GameScreen implements Screen {
     public void dispose() {
         batch.dispose();
         shapeRenderer.dispose();
+    }
+
+    public int getPlayerMoney(){
+        return PLAYER.getMoney();
     }
 
     public Player getPLAYER(){

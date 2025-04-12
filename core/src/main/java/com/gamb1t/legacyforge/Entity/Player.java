@@ -18,15 +18,18 @@ import java.awt.Font;
 
 public class Player extends GameCharacters {
 
+
     private boolean movePlayer;
     private GameScreen.PointF lastTouchDiff;
     private int DEATH_COOLDOWN_TIME = 5000;
 
     private int level;
-    private int experience;
+    private float experience;
     private int money;
+
     private float hpMultiplyer = 10;
 
+    private String name;
 
     private float manaRegenTimer = 0;
     private Vector2 respPoint;
@@ -48,16 +51,31 @@ public class Player extends GameCharacters {
     private long deathCooldown = System.currentTimeMillis();
 
 
+    private float lastSyncedExp = -1;
+    private int lastSyncedMoney = -1;
+
+    public boolean needsDatabaseSync() {
+        return experience != lastSyncedExp || money != lastSyncedMoney;
+    }
+
+    public void markSynced() {
+        lastSyncedExp = experience;
+        lastSyncedMoney = money;
+    }
 
 
-    public Player(float x, float y, GameScreen gameScreen, Weapon weapon) {
+
+    public Player(String name, int level, float experience, int money, float x, float y, GameScreen gameScreen, Weapon weapon ) {
 
         super(x, y, GameConstants.Sprite.SIZE*4/5, GameConstants.Sprite.SIZE*4/5);
 
+        this.name= name;
+
+
         this.gameScreen = gameScreen;
 
-        this.level = 1;
-        this.experience = 0;
+        this.level = level;
+        this.experience = experience;
         this.hp = 100;
 
         this.maxHp = 100;
@@ -77,7 +95,7 @@ public class Player extends GameCharacters {
 
         this.weapon = weapon;
 
-        money = 9999;
+        this.money = money;
         entityPos = new GameScreen.PointF(x, y);
 
 
@@ -296,6 +314,17 @@ public class Player extends GameCharacters {
         return  movePlayer;
 
     }
+    public void regenerateHP(float delta){
+
+        float hpRegenTimer =0;
+
+        hpRegenTimer += delta;
+        if (hpRegenTimer >= 1) {
+            mana = Math.min(hp + 5, maxHp);
+            hpRegenTimer = 0;
+        }
+
+    }
 
     public float getHp() {
         return hp;
@@ -313,7 +342,7 @@ public class Player extends GameCharacters {
         this.level = lvl;
     }
 
-    public int getExperience() {
+    public float getExperience() {
         return experience;
     }
 
@@ -340,6 +369,8 @@ public class Player extends GameCharacters {
     public void addMoney(int money){
         this. money += money;
 
+
+
     }
 
 
@@ -356,6 +387,8 @@ public class Player extends GameCharacters {
             manaRegenTimer = 0;
         }
     }
+
+
 
 
 

@@ -32,6 +32,8 @@ public class Enemy extends GameCharacters {
     private ArrayList<Vector2> respPos = new ArrayList<>();
     float distanceBtwPlayer;
 
+    private float manaRegenTimer = 0;
+
 
     GameScreen gameScreen;
 
@@ -69,7 +71,17 @@ public class Enemy extends GameCharacters {
         SpriteSheet = TextureRegion.split(entitiesTexture, GameConstants.Sprite.DEFAULT_SIZE, GameConstants.Sprite.DEFAULT_SIZE);
 
     }
+
+    public void regenerateMana(float delta) {
+        manaRegenTimer += delta;
+        if (manaRegenTimer >= 1) {
+            mana = Math.min(mana + 3, maxMana);
+            manaRegenTimer = 0;
+        }
+    }
     public void updateMove(double delta) {
+
+        regenerateMana((float) delta);
 
         distanceBtwPlayer = (float) Math.hypot(playerPosX - entityPos.x+GameConstants.Sprite.SIZE/2 , playerPosY - entityPos.y+GameConstants.Sprite.SIZE/2);
 
@@ -200,7 +212,7 @@ public class Enemy extends GameCharacters {
 
                 }
             } else {
-                if (currentTime - lastAttackTime > weapon.getAttackSpeed() * 1000) {
+                if (currentTime - lastAttackTime >= weapon.getAttackSpeed() * 1000) {
                     weapon.setAiming(true);
                     lastAttackTime = currentTime;
 
@@ -227,6 +239,7 @@ public class Enemy extends GameCharacters {
                     weapon.setAiming(false);
 
                 } else {
+
                 }
             }
         }
