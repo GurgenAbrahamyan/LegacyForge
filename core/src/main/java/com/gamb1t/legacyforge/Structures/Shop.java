@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.TouchManager;
+import com.gamb1t.legacyforge.ManagerClasses.WeaponLoader;
+import com.gamb1t.legacyforge.Weapons.MagicWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
@@ -31,6 +33,10 @@ public class Shop {
     private Sprite boarderTexture;
     private TouchManager touchManager;
 
+    private String shopTexture;
+    private  String weaponPath;
+
+
     float btnWidth = GameConstants.Sprite.SIZE * 2;
     float btnHeight = GameConstants.Sprite.SIZE;
 
@@ -39,7 +45,7 @@ public class Shop {
     private Rectangle openShopButtonBounds;
     private Sprite openShopButtonSprite;
 
-    public Shop(float shopX, float shopY, float shopWidth, float shopHeight, String shopTexture, ArrayList<Weapon> weapons, Player player, TouchManager touchManager) {
+    public Shop(float shopX, float shopY, float shopWidth, float shopHeight, String shopTexture, WeaponLoader wp, Player player, TouchManager touchManager) {
         this.shopX = shopX;
         this.shopY = shopY;
         this.shopWidth = shopWidth;
@@ -51,21 +57,37 @@ public class Shop {
             shopX + shopWidth - 2 * GameConstants.Sprite.SIZE, shopY + GameConstants.Sprite.SIZE,
             shopX, shopY + shopHeight
         });
+        this.shopTexture = shopTexture;
+
+        this.weaponList = wp.getWeaponList();
+
+
+
+        this.player = player;
+
+        this.touchManager = touchManager;
+
+        this.weaponPath = wp.getRecourcePath();
+
+
+
+    }
+    public void initializeRendeingObjects(){
+
         this.shopSprite = new Sprite(new Texture(shopTexture));
         this.shopSprite.setSize(shopWidth, shopHeight);
-        this.weaponList = weapons;
-        this.font = new BitmapFont();
-        this.player = player;
+
         this.panelTexture = new Sprite(new Texture("shops/shop_panel_background.png"));
         this.boarderTexture = new Sprite(new Texture("shops/selected_border.png"));
-        this.touchManager = touchManager;
+
+        this.font = new BitmapFont();
 
         showPannelX = (float) (GameConstants.GET_WIDTH / 6);
         showPannelY = 0;
         panelWidth = (float) (GameConstants.GET_WIDTH / 1.5);
         panelHeight = GameConstants.GET_HEIGHT;
 
-        openShopButtonSprite = new Sprite(new Texture("shops/open_shop_button.png")); // <- use your button texture
+        openShopButtonSprite = new Sprite(new Texture("shops/open_shop_button.png"));
 
 
     }
@@ -193,6 +215,33 @@ public class Shop {
         selectedWeapon = weapon;
         touchManager.setWeapon(selectedWeapon);
         player.setCurrentWeapon(selectedWeapon);
+    }
+
+    public float getShopX() {
+        return shopX;
+    }
+
+    public float getShopY() {
+        return shopY;
+    }
+
+    public float getShopHeight() {
+        return shopHeight;
+    }
+
+    public float getShopWidth() {
+        return shopWidth;
+    }
+    public ArrayList<Weapon> getWeaponList(){
+        return weaponList;
+    }
+
+    public String getWeaponPath() {
+        return weaponPath;
+    }
+
+    public String getShopTexture() {
+        return shopTexture;
     }
 
     public Polygon getShopHitbox() {

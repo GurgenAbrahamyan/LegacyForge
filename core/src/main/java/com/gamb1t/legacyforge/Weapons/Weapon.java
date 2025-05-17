@@ -2,16 +2,20 @@ package com.gamb1t.legacyforge.Weapons;
 
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Polygon;
+import com.esotericsoftware.kryonet.Server;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
+import com.gamb1t.legacyforge.Networking.Network;
 
 import java.util.ArrayList;
 
@@ -23,6 +27,8 @@ public abstract class Weapon {
     protected boolean isAiming;
     protected float rotationAngle = 0;
     protected  int price;
+    protected int frameAmountX, frameAmountY;
+    protected float delta;
 
     @JsonIgnore
     protected float playerCamX, playerCamY;
@@ -36,6 +42,10 @@ public abstract class Weapon {
     @JsonIgnore
     protected Sprite[][] changedSpritesheet;
     protected GameCharacters enity;
+    protected boolean isClient;
+
+    @JsonIgnore
+    protected Server server;
 
     public Weapon(){
         this.aniSpeed = (int) (10 / attackSpeed);
@@ -45,6 +55,11 @@ public abstract class Weapon {
 
 
 
+
+    public void setIsClient(boolean isClient){
+        this.isClient = isClient;
+    }
+
     public abstract void attack();
     public abstract void update(float delta);
     public abstract void draw(SpriteBatch batch, float x, float y);
@@ -53,14 +68,26 @@ public abstract class Weapon {
         if (loadedSprite == null) {
             loadedSprite = new Texture(texturePath);
         }
-        spriteSheet = TextureRegion.split(loadedSprite, GameConstants.Sprite.DEFAULT_SIZE*3, GameConstants.Sprite.DEFAULT_SIZE*3);
-
+        TextureRegion textureRegion = new TextureRegion(loadedSprite);
+        spriteSheet = textureRegion.split(loadedSprite.getWidth()/frameAmountX, loadedSprite.getHeight()/frameAmountY);
         System.out.println("Rows: " + spriteSheet.length + ", Columns: " + spriteSheet[0].length);
         animationFrameAmount = spriteSheet[0].length;
     }
 
     public void updateAnimation() {
 
+    }
+
+    public void setDelta(float delta) {
+        this.delta = delta;
+    }
+
+    public void setFrameAmountX(int x){
+        this.frameAmountX = x;
+    }
+
+    public void setFrameAmountY(int y){
+        this.frameAmountY = y;
     }
 
     public boolean canAttack() {
@@ -93,7 +120,8 @@ public abstract class Weapon {
 
     }
 
-
+    public abstract  <T extends GameCharacters> void checkHitboxCollisionsEntity(ArrayList<T> enemies);
+    public abstract void checkHitboxCollisionsMap(MapManaging map);
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -109,7 +137,6 @@ public abstract class Weapon {
     public void setKnockbackInTiles(float knockbackInTiles) { this.knockbackInTiles = knockbackInTiles; }
     public String getSprite() { return sprite; }
     public void setSprite(String sprite) { this.sprite = sprite; }
-    //public void setAttackJoystick(TouchManager joystick) { this.joystick = joystick; }
     public void setAttacking(boolean attacking) { isAttacking = attacking; }
     public void setRotation(float angle) {
         this.rotationAngle = angle;
@@ -143,6 +170,12 @@ public abstract class Weapon {
         playerCamY = y;
 
     }
+
+    @JsonIgnore
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
     @JsonIgnore
     public <T extends GameCharacters> void setEntity(T enity){
         this.enity = enity;

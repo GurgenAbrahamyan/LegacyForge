@@ -6,7 +6,9 @@
     "attackSpeed": 1.5,
     "range": 1.0,
     "knockbackInTiles": 1,
-    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png",
+    "frameAmountX": 4,
+    "frameAmountY": 1
   },
   {
     "type": "melee",
@@ -16,7 +18,22 @@
     "price": 1500,
     "range": 1.5,
     "knockbackInTiles": 1.4,
-    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png",
+    "frameAmountX": 4,
+    "frameAmountY": 1
+  },
+  {
+    "type": "ranged",
+    "name": "Bow",
+    "damage": 9.0,
+    "attackSpeed": 2,
+    "range": 5.0,
+    "price": 500,
+    "knockbackInTiles": 2.0,
+    "sprite": "weapons_spritesheet/ranged_spritesheet/regular_bow.png",
+    "projectilePath": "weapons_spritesheet/ranged_spritesheet/wooden_arrow.png",
+    "frameAmountX": 4,
+    "frameAmountY": 1
   },
   {
     "type": "magic",
@@ -28,18 +45,8 @@
     "mannaUsage": 10,
     "range": 5,
     "sprite": "weapons_spritesheet/magic_spritesheet/wooden_staff.png",
-    "projectilePath": "weapons_spritesheet/magic_spritesheet/fire_projectile.png"
-  },
-  {
-    "type": "ranged",
-    "name": "Bow",
-    "damage": 9.0,
-    "attackSpeed": 2,
-    "range": 5.0,
-    "price": 500,
-    "knockbackInTiles": 2.0,
-    "sprite": "weapons_spritesheet/ranged_spritesheet/regular_bow.png",
-    "projectilePath": "weapons_spritesheet/ranged_spritesheet/wooden_arrow.png"
+    "projectilePath": "weapons_spritesheet/magic_spritesheet/fire_projectile.png",
+    "frameAmountX": 4,
+    "frameAmountY": 1
   }
-
 ]

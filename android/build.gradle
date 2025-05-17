@@ -11,7 +11,7 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
   namespace "com.gamb1t.legacyforge"
-  compileSdk 34
+  compileSdk 35
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -68,14 +68,14 @@ dependencies {
   implementation 'com.google.firebase:firebase-auth:21.0.1'
   implementation 'com.google.firebase:firebase-database:20.3.0'
 
-  implementation project(':core')
-
-
   implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
   implementation 'androidx.appcompat:appcompat:1.7.0'
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.activity:activity:1.10.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   implementation project(':core')
+  implementation project(':clientSide')
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"

@@ -15,11 +15,9 @@ public class Layout {
 
     Layout(String textureFile) {
         this.textureFile = textureFile;
-
-        initialize();
     }
 
-    private void initialize() {
+    public void initialize() {
         if (!initialized) {
             texture = new Texture(textureFile);
             tilesInHeight = texture.getHeight()/ GameConstants.Sprite.DEFAULT_SIZE;

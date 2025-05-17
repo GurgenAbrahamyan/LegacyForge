@@ -9,9 +9,7 @@ enemies_spritesheet/skeleton_spritesheet.png
 enemyWeapons.json
 joystick.png
 libgdx.png
-magic.json
 player_sprites/player_spritesheet.png
-ranged.json
 shops/basic_shop.png
 shops/open_shop_button.png
 shops/selected_border.png

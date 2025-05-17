@@ -1,17 +1,18 @@
 package com.gamb1t.legacyforge.Entity;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.esotericsoftware.kryonet.Server;
+import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
-import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
+import com.gamb1t.legacyforge.Networking.Network;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 public abstract class GameCharacters {
@@ -27,20 +28,22 @@ public abstract class GameCharacters {
     protected int hp, maxHp;
     protected float mana = 100, maxMana = 100;
     protected boolean isAlive;
-    protected GameScreen.PointF entityPos;
+    protected Vector2 entityPos;
     protected  float width;
     protected  float heigh;
+    protected Server server;
+    protected int id;
 
     public Polygon hitbox;
 
-    protected GameScreen gameScreen;
     protected Weapon weapon;
+    protected MapManaging mapManager;
 
     public float cameraX, cameraY;
 
     protected TextureRegion[][] SpriteSheet;
 
-    public GameCharacters(float x, float y, float width, float height) {
+    public GameCharacters(float x, float y, float width, float height, MapManaging mapManaging) {
         this.width = width;
         this.heigh = height;
 
@@ -52,6 +55,7 @@ public abstract class GameCharacters {
         };
         hitbox = new Polygon(vertices);
         hitbox.setPosition(x, y);
+        this.mapManager = mapManaging;
 
     }
 
@@ -61,6 +65,8 @@ public abstract class GameCharacters {
     public void setPosition(float x, float y){
         entityPos.x = x;
         entityPos.y = y;
+        cameraX = GameConstants.GET_WIDTH/2 - entityPos.x ;
+        cameraY = GameConstants.GET_HEIGHT/2 - entityPos.y;
         setHitboxPosition();
     }
 
@@ -76,6 +82,8 @@ public abstract class GameCharacters {
 
     }
 
+
+
     public TextureRegion[][] getSpriteSheet() {
         return SpriteSheet;
     }
@@ -83,13 +91,36 @@ public abstract class GameCharacters {
 
     public void setTexture(String recourceName){
 
-        Texture entitiesTexture = new Texture(recourceName);
+        Texture entitiesTexture = new Texture(Gdx.files.internal(recourceName));
 
         SpriteSheet = new TextureRegion[entitiesTexture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE][entitiesTexture.getWidth()/GameConstants.Sprite.DEFAULT_SIZE];
 
+
         SpriteSheet = TextureRegion.split(entitiesTexture, GameConstants.Sprite.DEFAULT_SIZE, GameConstants.Sprite.DEFAULT_SIZE);
 
+        System.out.println(SpriteSheet.length +" " +SpriteSheet[0].length);
     }
+
+    public void setTextureArray(TextureRegion[][] textureArray){
+        this.SpriteSheet = textureArray;
+    }
+
+    public TextureRegion[][] getTextureArray(){
+        return SpriteSheet;
+    }
+
+
+    public void sendHp(GameCharacters attackedEnemy){
+        if(server != null){
+            Network.CurentHp dealedDamage = new Network.CurentHp();
+            dealedDamage.isEnemy = attackedEnemy instanceof Enemy;
+            dealedDamage.idOfEnemy = id;
+            dealedDamage.curHp = hp;
+            System.out.println("sent hp!");
+            server.sendToAllTCP(dealedDamage);
+        }
+    }
+
 
 
 
@@ -116,6 +147,12 @@ public abstract class GameCharacters {
         currentFrame = 0;
     }
 
+    public void setServer(Server server){
+        this.server = server;
+    }
+
+
+
     public int getAniIndex() {
         return currentFrame;
     }
@@ -128,7 +165,7 @@ public abstract class GameCharacters {
         this.FaceDirection = faceDir;
     }
 
-    public GameScreen.PointF getEntityPos(){
+    public Vector2 getEntityPos(){
         return entityPos;
     }
 
@@ -143,10 +180,19 @@ public abstract class GameCharacters {
     public Polygon getHitbox(){
         return hitbox;
     }
-    public void takeDamage(float x){
-        hp -= x;
+
+
+
+    public abstract  void takeDamage(float x, GameCharacters gameCharacters);
+
+    public float getHp(){
+
+        return  hp;
+
 
     }
+
+    public int getID(){return id;}
 
 
 

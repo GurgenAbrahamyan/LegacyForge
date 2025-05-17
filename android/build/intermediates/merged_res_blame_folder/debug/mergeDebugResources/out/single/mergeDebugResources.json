@@ -1,34 +1,38 @@
 [
     {
-        "merged": "com.gamb1t.legacyforge.android-debug-36:/layout_register_activity.xml.flat",
-        "source": "com.gamb1t.legacyforge.android-android-37:/layout/register_activity.xml"
+        "merged": "com.gamb1t.legacyforge.android-debug-44:/layout_activity_game_mode_choosing.xml.flat",
+        "source": "com.gamb1t.legacyforge.android-android-45:/layout/activity_game_mode_choosing.xml"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\drawable-hdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\drawable-hdpi\\ic_launcher.png"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-hdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-hdpi\\ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\layout_register_activity.xml.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\layout\\register_activity.xml"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-xxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\layout_login_activity.xml.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\layout\\login_activity.xml"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-xhdpi\\ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\drawable-xxxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\drawable-xxxhdpi\\ic_launcher.png"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\layout_login_activity.xml.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\layout\\login_activity.xml"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\drawable-xxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\drawable-xxhdpi\\ic_launcher.png"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\layout_activity_game_mode_choosing.xml.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\layout\\activity_game_mode_choosing.xml"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\drawable-mdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\drawable-mdpi\\ic_launcher.png"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-xxxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-xxxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-36:\\drawable-xhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-37:\\drawable-xhdpi\\ic_launcher.png"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\layout_register_activity.xml.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\layout\\register_activity.xml"
+    },
+    {
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-mdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-mdpi\\ic_launcher.png"
     }
 ]

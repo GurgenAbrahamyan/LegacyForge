@@ -1,0 +1,32 @@
+
+apply plugin: 'java-library'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-client'
+
+
+group = 'org.example'
+version = 'unspecified'
+
+
+
+repositories {
+  mavenCentral()
+}
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+  implementation 'com.github.crykn:kryonet:2.22.0-RC1'
+  implementation project(':core')
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+  main {
+    java.srcDirs = ['src/main/java']
+  }
+}

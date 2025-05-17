@@ -3,6 +3,7 @@ package com.gamb1t.legacyforge.Entity;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_HEIGHT;
 import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,10 +13,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.esotericsoftware.kryonet.Server;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
-import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
+import com.gamb1t.legacyforge.Networking.Network;
 import com.gamb1t.legacyforge.Weapons.MagicWeapon;
+import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
 import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
@@ -24,41 +28,51 @@ import java.util.Random;
 
 public class Enemy extends GameCharacters {
 
+
+
     private long lastDirChange = System.currentTimeMillis();
     private int damage = 10;
     private float playerPosX, playerPosY;
-    Player player ;
-    Weapon weapon;
-    private ArrayList<Vector2> respPos = new ArrayList<>();
+    private ArrayList<Player> players ;
+    private Player player;
+    private Weapon weapon;
+    private ArrayList<Vector2> respPos;
     float distanceBtwPlayer;
 
+    private float dirX =0;
+    private  float dirY =0;
+
+
     private float manaRegenTimer = 0;
+    private  Random random;
 
 
-    GameScreen gameScreen;
 
-    public Enemy(GameScreen gameScreen, Player player, ArrayList<Vector2> respPos, Weapon weapon) {
+    public Enemy(ArrayList<Player> player,Vector2 currentPos, Weapon weapon, MapManaging mapManager) {
 
-
-        super(0 ,0, GameConstants.Sprite.SIZE *4/5,  GameConstants.Sprite.SIZE * 4/5);
+        super(0 ,0, GameConstants.Sprite.SIZE *4/5,  GameConstants.Sprite.SIZE * 4/5, mapManager);
 
 
-        Random random = new Random();
-        this.respPos = respPos;
-        Vector2 resp = respPos.get(random.nextInt(respPos.size()));
-        entityPos = new GameScreen.PointF(resp.x, resp.y);
+
+        this.mapManager = mapManager;
+
+
+        random = new Random();
+        entityPos = new Vector2(currentPos.x, currentPos.y);
         this.weapon = weapon;
 
 
 
-        this.gameScreen = gameScreen;
-
         maxHp = 100;
         hp = maxHp;
-        this.player = player;
+        this.players = player;
 
 
 
+    }
+
+    public void setRespPos( ArrayList<Vector2> respPos) {
+        this.respPos = respPos;
     }
 
     @JsonSetter("spriteSheet")
@@ -79,7 +93,39 @@ public class Enemy extends GameCharacters {
             manaRegenTimer = 0;
         }
     }
+
+    private void updateClosestPlayer() {
+        float minDistance = Float.MAX_VALUE;
+        Player closest = null;
+
+        for (Player p : players) {
+            float dx = p.entityPos.x - entityPos.x;
+            float dy = p.entityPos.y - entityPos.y;
+            float dist = dx * dx + dy * dy;
+
+            if (dist < minDistance) {
+                minDistance = dist;
+                closest = p;
+            }
+        }
+
+        if (closest != null) {
+            playerPosX = closest.entityPos.x-GameConstants.Sprite.SIZE/2;
+            playerPosY = closest.entityPos.y-GameConstants.Sprite.SIZE/2;
+        }
+        else {
+            playerPosX =0;
+            playerPosY = 0;
+        }
+    }
+
+    public void setPlayer(Player player){
+
+        this.player = player;
+    }
     public void updateMove(double delta) {
+
+        updateClosestPlayer();
 
         regenerateMana((float) delta);
 
@@ -91,14 +137,14 @@ public class Enemy extends GameCharacters {
         float deltaX = 0, deltaY = 0;
 
         if (System.currentTimeMillis() - lastDirChange >= 3000) {
-            int randFaceDir = gameScreen.getRandom(4);
+            int randFaceDir = random.nextInt(4);
             setFaceDir(randFaceDir);
             lastDirChange = System.currentTimeMillis();
         }
 
 
-        float dirX = playerPosX - entityPos.x + GameConstants.Sprite.SIZE/2;
-        float dirY = playerPosY - entityPos.y + GameConstants.Sprite.SIZE/2;
+         dirX = playerPosX - entityPos.x + GameConstants.Sprite.SIZE/2;
+         dirY = playerPosY - entityPos.y + GameConstants.Sprite.SIZE/2;
 
         if (distanceBtwPlayer > GameConstants.Sprite.SIZE * 4) {
 
@@ -141,112 +187,189 @@ public class Enemy extends GameCharacters {
                 setFaceDir(dirY > 0 ? GameConstants.Face_Dir.DOWN : GameConstants.Face_Dir.UP);
             }
         }
-        if(!gameScreen.mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX, hitbox.getY() + deltaY)){
+        if(!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX, hitbox.getY() + deltaY)){
 
-        entityPos.x += deltaX;
-        entityPos.y += deltaY;
+            entityPos.x += deltaX;
+            entityPos.y += deltaY;
 
         }
         setHitboxPosition();
+    }
+
+
+
+
+    public void sendCoordinates(Server server){
+
+
+            server.sendToAllUDP(new Network.EnemyPos(entityPos.x/ GameConstants.Sprite.SIZE, entityPos.y/ GameConstants.Sprite.SIZE, id));
+
+
+    }
+
+    public void setDirection(float dirX, float dirY){
+        this. dirX = dirX;
+        this. dirY = dirY;
+        System.out.println(dirX);
+    }
+
+    float prevX = 0, prevY = 0;
+
+    public void noLogicMove() {
+        float moveX = entityPos.x - prevX;
+        float moveY = entityPos.y - prevY;
+
+        if (Math.abs(moveX) > Math.abs(moveY)) {
+            setFaceDir(moveX > 0 ? GameConstants.Face_Dir.RIGHT : GameConstants.Face_Dir.LEFT);
+        } else if (Math.abs(moveY) > 0) {
+            setFaceDir(moveY > 0 ? GameConstants.Face_Dir.DOWN : GameConstants.Face_Dir.UP);
+        }
+
+        if(entityPos.x != 0 && entityPos.y != 0){
+            prevX = entityPos.x;
+            prevY = entityPos.y;
+        }
+
     }
 
     private long lastAttackTime = 0;
     float cooldownDuration =0;
     float elapsedTime = -7;
 
+
+    public void attackStarted() {
+        if (!weapon.getAiming()) {
+            weapon.setAiming(true);
+            if (weapon instanceof RangedWeapon) {
+                ((RangedWeapon) weapon).setIsCharging(true);
+                ((RangedWeapon) weapon).setAnimOver(true);
+            }
+
+        }
+    }
+
+    public void attackDragged(float angle) {
+        if (weapon.getAiming()) {
+            weapon.setRotation((float) Math.toDegrees(angle));
+        }
+    }
+
+    public void attackReleased(float angle) {
+        if (weapon.getAiming()) {
+            weapon.setRotation((float) Math.toDegrees(angle));
+            if(weapon instanceof MeleeWeapon){
+                weapon.attack();}
+            if(weapon instanceof RangedWeapon){
+                ((RangedWeapon) weapon).attackNoProj();}
+            if(weapon instanceof MagicWeapon){
+                ((MagicWeapon) weapon).attackNoProj();
+            }
+            lastAttackTime = System.currentTimeMillis();
+            weapon.setAttacking(true);
+
+            if (weapon instanceof RangedWeapon) {
+                ((RangedWeapon) weapon).setAnimOver(false);
+                ((RangedWeapon) weapon).setIsCharging(false);
+
+            }
+            if (weapon instanceof MagicWeapon) {
+                ((MagicWeapon) weapon).setAnimOver(true);
+            }
+            weapon.setAiming(false);
+                          weapon.resetAnimation();
+                }
+    }
+
+    Network.AttackStartPacket attackStartPacket = null;
     public void attackPlayer() {
         if (distanceBtwPlayer < weapon.getRange() * GameConstants.Sprite.SIZE) {
+
+            if (server != null && attackStartPacket == null) {
+                attackStartPacket = new Network.AttackStartPacket(id, true);
+                server.sendToAllTCP(attackStartPacket);
+            }
+
             float dirX = playerPosX - entityPos.x + GameConstants.Sprite.SIZE / 2;
             float dirY = playerPosY - entityPos.y + GameConstants.Sprite.SIZE / 2;
             double angle = Math.atan2(dirY, dirX);
 
-            long currentTime = System.currentTimeMillis();
-            cooldownDuration = (weapon.getAttackSpeed() + 1);
-            if(elapsedTime == -7){
-                elapsedTime = cooldownDuration;
-                System.out.println(elapsedTime);
-                System.out.println(cooldownDuration);
+
+            if (!weapon.getAiming()) {
+                weapon.setAiming(true);
+                if (weapon instanceof RangedWeapon) {
+                    elapsedTime = weapon.getAttackSpeed();
+                }
+
             }
 
-
+            long currentTime = System.currentTimeMillis();
 
             if (weapon instanceof RangedWeapon) {
                 weapon.setRotation((float) Math.toDegrees(angle));
                 weapon.setAttacking(true);
                 ((RangedWeapon) weapon).setAnimOver(true);
-                weapon.setAiming(true);
 
                 elapsedTime -= Gdx.graphics.getDeltaTime();
 
-                System.out.println(Gdx.graphics.getDeltaTime());
+                if (server != null) {
+                    server.sendToAllTCP(new Network.AttackDragged((float) angle, id, true));
+                }
 
                 if (elapsedTime <= 0) {
-
-                    elapsedTime=cooldownDuration;
-
-
+                    elapsedTime = weapon.getAttackSpeed();
                     if (weapon.getAiming()) {
-
-
                         weapon.attack();
+                        if (server != null) {
+                            server.sendToAllTCP(new Network.AttackReleasePacket((float) angle, id, true));
+                        }
+                        ((RangedWeapon) weapon).setAnimOver(true);
+                        ((RangedWeapon) weapon).setIsCharging(false);
+                        weapon.resetAnimation();
                         lastAttackTime = System.currentTimeMillis();
+                        attackStartPacket = null;
+                    }
+                }
+            }
+            else {
+                if (currentTime - lastAttackTime >= weapon.getAttackSpeed() * 1000) {
 
-
-
-                        weapon.setAttacking(true);
-
-                            ((RangedWeapon) weapon).setAnimOver(true);
-
-
-                            ((RangedWeapon) weapon).setIsCharging(false);
-
-                            weapon.resetAnimation();
-
-
+                    if (server != null) {
+                        server.sendToAllTCP(new Network.AttackStartPacket(id, true));
                     }
 
-
-
-                    lastAttackTime = currentTime;
-
-
-                }
-            } else {
-                if (currentTime - lastAttackTime >= weapon.getAttackSpeed() * 1000) {
                     weapon.setAiming(true);
-                    lastAttackTime = currentTime;
-
-
+                    if (server != null) {
+                        server.sendToAllTCP(new Network.AttackDragged((float) angle, id, true));
+                    }
                     if (weapon.getAiming()) {
-
                         weapon.setRotation((float) Math.toDegrees(angle));
-
-
-
-
-
                         weapon.attack();
-
-
-
                         weapon.setAttacking(true);
-
-                        if(weapon instanceof MagicWeapon){
+                        if (server != null) {
+                            server.sendToAllTCP(new Network.AttackReleasePacket((float) angle, id, true));
+                        }
+                        if (weapon instanceof MagicWeapon) {
                             ((MagicWeapon) weapon).setAnimOver(true);
                         }
+                        lastAttackTime = System.currentTimeMillis();
                     }
-
                     weapon.setAiming(false);
-
-                } else {
-
+                }
+            }
+        } else {
+            if (weapon.getAiming()) {
+                weapon.setAiming(false);
+                attackStartPacket = null;
+                if(server != null){
+                    Network.AttackCanceled canceled = new Network.AttackCanceled();
+                    canceled.enemyId = id;
+                    canceled.isEnemy = true;
+                    server.sendToAllTCP(canceled);
                 }
             }
         }
-        else {
-            weapon.setAiming(false);
-        }
     }
+
 
 
 
@@ -277,28 +400,39 @@ public class Enemy extends GameCharacters {
         shapeRenderer.end();
     }
 
-    public void takeDamage(float amout){
+
+
+    public void takeDamage(float amout, GameCharacters player){
         if(hp > 0){
-        hp -= amout;}
-        if (hp<=0 ){
-            die();
+            hp -= amout;
         }
+        if (hp<=0 ){
+            die(player);
+        }
+
+        sendHp(this);
 
     }
 
-    public void die(){
-        Vector2 currentResp = respPos.get(gameScreen.getRandom(respPos.size()));
+    public void die(GameCharacters gameCharacters){
+        Vector2 currentResp = respPos.get(random.nextInt(respPos.size()));
         entityPos.x = currentResp.x;
 
         entityPos.y = currentResp.y;
 
         hp = maxHp;
 
-        addMoney(player);
+
+
+
+        if(gameCharacters instanceof Player && gameCharacters != null){
+        addMoney((Player) gameCharacters);
+        }
 
 
 
     }
+
 
     public int getDamage(){
         return damage;
@@ -315,12 +449,10 @@ public class Enemy extends GameCharacters {
     }
 
     public void addMoney(Player player){
-        player.addMoney(hp/10);
+        player.addMoney((int) (hp/10));
     }
 
-    public void setRespPos(ArrayList<Vector2> respPos){
-        this.respPos = respPos;
-    }
+
     public Weapon getWeapon(){
         return  weapon;
     }
@@ -341,5 +473,23 @@ public class Enemy extends GameCharacters {
         this.speed = speed;
     }
 
+    public void setId(int id){
+        this.id =id;
+    }
 
+    public int getId() {
+        return id;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public float getDirX() {
+        return dirX;
+    }
+
+    public float getDirY() {
+        return dirY;
+    }
 }

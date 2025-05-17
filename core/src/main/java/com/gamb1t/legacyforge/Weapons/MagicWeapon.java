@@ -1,6 +1,7 @@
 package com.gamb1t.legacyforge.Weapons;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
@@ -9,26 +10,35 @@ import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.GameCharacters;
+import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
+import com.gamb1t.legacyforge.Networking.Network;
 
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.LockSupport;
 
 public class MagicWeapon extends Weapon {
     private long lastAttackTime;
     private final long attackCooldown = 500;
     private boolean animOver;
-
+    private float delta;
     private float mannaUsage;
 
+    private Texture projectile;
     private String projectilePath;
-    private ArrayList<Projectile> projectiles = new ArrayList<>();
+    private List<Projectile> projectiles = new CopyOnWriteArrayList<>();
 
     private MapManaging currentMap;
 
+    private  int projId = 0;
     private float animationTimer = 0;
     private float frameDuration = 0.1f;
+
+    private boolean isCLient;
 
 
     public MagicWeapon() {
@@ -60,21 +70,81 @@ public class MagicWeapon extends Weapon {
         }
     }
 
+    public void attackNoProj() {
+        if (canAttack() && (System.currentTimeMillis() - lastAttackTime) >= attackCooldown) {
+            if(enity.getManna() >= mannaUsage) {
+                enity.addManna(-mannaUsage);
+                lastAttackTime = System.currentTimeMillis();
+                isAttacking = true;
+            }
+        }
+    }
+
     private void shootProjectile() {
-        lastAttackTime = System.currentTimeMillis();
+
         float deltaX = (float) Math.cos(Math.toRadians(rotationAngle)) * GameConstants.Sprite.SIZE/10;
         float deltaY = (float) Math.sin(Math.toRadians(rotationAngle)) * GameConstants.Sprite.SIZE/10;
-        projectiles.add(new Projectile(enity.getEntityPos().x, enity.getEntityPos().y, deltaX, deltaY, projectilePath, currentMap));
+
+        projectiles.add(new Projectile(enity.getEntityPos().x, enity.getEntityPos().y, deltaX, deltaY, projectile, currentMap, isClient,projId ));
+        if(server != null){
+            Network.CreateProjectileMessage proj = new Network.CreateProjectileMessage();
+            proj.dx = deltaX/GameConstants.Sprite.SIZE/10;
+            proj.dy = deltaY/GameConstants.Sprite.SIZE/10;
+            proj.x = enity.getEntityPos().x/GameConstants.Sprite.SIZE;
+            proj.y = enity.getEntityPos().y/GameConstants.Sprite.SIZE;
+            proj.enemyId = enity.getID();
+            proj.projectileId = projId;
+            proj.isEnemy = enity instanceof Enemy;
+            server.sendToAllTCP(proj);
+        }
+        projId ++;
+    }
+
+    public void shootProjectile(Network.CreateProjectileMessage projectileMessage){
+
+        projectiles.add(new Projectile(projectileMessage.x*GameConstants.Sprite.SIZE,
+            projectileMessage.y*GameConstants.Sprite.SIZE,
+            projectileMessage.dx* GameConstants.Sprite.SIZE/10,
+            projectileMessage.dy *  GameConstants.Sprite.SIZE/10, projectile, currentMap, isClient, projectileMessage.projectileId));
+
+
     }
 
     @Override
     public void update(float delta) {
+        this.delta = delta;
 
         for (Projectile proj : projectiles) {
             proj.update();
+            if(server != null){
+                System.out.println(enity.getID() + " this is magic");
+                server.sendToAllTCP(new Network.SetProjectilePositionMessage(proj.getId(), enity.getID(), proj.getPositionHitbox().x/GameConstants.Sprite.SIZE, proj.getPositionHitbox().y/GameConstants.Sprite.SIZE, enity instanceof Enemy));
+            }
+            if(proj.isDestroyed()){
+                projectiles.remove(proj);
+                if (server != null) {
+                    Network.DestroyProjectileMessage projectileMessage = new Network.DestroyProjectileMessage();
+                    projectileMessage.enemyId = enity.getID();
+                    projectileMessage.projectileId = proj.getId();
+                    projectileMessage.isEnemy = enity instanceof Enemy;
+                    server.sendToAllTCP(projectileMessage);
+                }
+            }
         }
-        projectiles.removeIf(Projectile::isDestroyed);
+
+
+
         updateAnimation();
+    }
+
+
+    public void removeById(Network.DestroyProjectileMessage message) {
+        for (int i = 0; i < projectiles.size(); i++) {
+            if (projectiles.get(i).getId() == message.projectileId) {
+                projectiles.remove(i);
+                break;
+            }
+        }
     }
 
     @Override
@@ -112,7 +182,7 @@ public class MagicWeapon extends Weapon {
         if (animationTimer >= frameDuration) {
             animationTimer = 0;
 
-            if (currentFrame < changedSpritesheet[0].length - 1) {
+            if (currentFrame < frameAmountX - 1) {
                 currentFrame++;
             } else {
                 isAttacking = false;
@@ -127,6 +197,11 @@ public class MagicWeapon extends Weapon {
     }
 
     public <T extends GameCharacters> void checkHitboxCollisions(ArrayList<T> enemies, MapManaging map) {
+
+    }
+
+    @Override
+    public <T extends GameCharacters> void checkHitboxCollisionsEntity(ArrayList<T> enemies) {
         for (Projectile proj : projectiles) {
             if (proj != null) {
                 for (GameCharacters enemy : enemies) {
@@ -140,16 +215,29 @@ public class MagicWeapon extends Weapon {
                     }
                 }
 
-                if (currentMap.checkNearbyWallCollision(proj.getHitbox(), proj.getHitbox().getX() + proj.getVelocity().x, proj.getHitbox().getY() + proj.getVelocity().y)) {
-                    proj.setDestroyed(true);
-                }
+
             }
         }
+    }
+    public void initProj(){
+        projectile = new Texture(projectilePath);
+    }
+
+    @Override
+    public void checkHitboxCollisionsMap(MapManaging map) {
+        for(Projectile proj : projectiles){
+            if (currentMap.checkNearbyWallCollision(proj.getHitbox(), proj.getHitbox().getX() + proj.getVelocity().x, proj.getHitbox().getY() + proj.getVelocity().y)) {
+                proj.setDestroyed(true);
+            }
+        }
+
     }
 
     private void dealDamage(GameCharacters enemy) {
         if (enemy != null) {
-            enemy.takeDamage(damage);
+            enemy.takeDamage(damage, enity instanceof Player ? (Player) enity : enity);
+
+
         }
     }
 
@@ -161,7 +249,7 @@ public class MagicWeapon extends Weapon {
 
 
 
-    public ArrayList<Projectile> getProjectiles() {
+    public List<Projectile> getProjectiles() {
         return projectiles;
     }
 

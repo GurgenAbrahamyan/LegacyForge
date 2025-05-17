@@ -3,19 +3,12 @@ package com.gamb1t.legacyforge.Enviroments;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
-import com.gamb1t.legacyforge.Entity.Enemy;
-import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class MapManaging {
 
@@ -29,12 +22,28 @@ public class MapManaging {
 
     private Vector2 shopCoordinates = new Vector2();
 
-    public MapManaging(String mapName, String hitboxesFile, String tilesSpritesheet, int mapWidth, int mapLength) {
-        currentMap = LoadFile(mapName, mapWidth, mapLength);
-        hitboxes = LoadFile(hitboxesFile, mapWidth, mapLength);
-        OUTSIDE = new Layout(tilesSpritesheet);
+    private String mapName;
+    private String hitboxFile;
+    private String tilesSpritesheet;
+    private  int mapWidth;
+    private  int mapHeight;
+
+
+    public MapManaging(String mapName, String hitboxesFile, String tilesSpritesheet, int mapWidth, int mapHeight) {
+        this.mapName = mapName;
+        this.hitboxFile= hitboxesFile;
+        this.tilesSpritesheet = tilesSpritesheet;
+        this.mapWidth =mapWidth;
+        this.mapHeight = mapHeight;
+        currentMap = LoadFile(mapName, mapWidth, mapHeight);
+        hitboxes = LoadFile(hitboxesFile, mapWidth, mapHeight);
         createHitboxes();
 
+    }
+
+    public void initializeOutside(){
+        OUTSIDE =new Layout(tilesSpritesheet);
+        OUTSIDE.initialize();
     }
 
     public void setCameraValues(float cameraX, float cameraY) {
@@ -128,7 +137,8 @@ public class MapManaging {
     private GameMap LoadFile(String mapName, int mapLengthInTiles, int mapHeightInTiles) {
         int[][] spriteIds = new int[mapLengthInTiles][mapHeightInTiles];
 
-        FileHandle handle = Gdx.files.internal(mapName);
+        FileHandle handle =  Gdx.files.internal(mapName);
+        System.out.println(handle);
         int row = mapHeightInTiles-1;
         for (String line : handle.readString().split("\n")) {
             if (row < 0) break;
@@ -169,5 +179,24 @@ public class MapManaging {
         return  shopCoordinates;
     }
 
+    public int getMapHeight() {
+        return mapHeight;
+    }
+
+    public int getMapWidth() {
+        return mapWidth;
+    }
+
+    public String getMapName() {
+        return mapName;
+    }
+
+    public String getHitboxFile() {
+        return hitboxFile;
+    }
+
+    public String getTilesSpritesheet() {
+        return tilesSpritesheet;
+    }
 }
 

@@ -14,12 +14,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.Networking.LocalInputSender;
 import com.gamb1t.legacyforge.Weapons.MagicWeapon;
 import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
 import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.gamb1t.legacyforge.Structures.Shop;
@@ -34,47 +38,59 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
 
-    private static ArrayList<Enemy> Enemies = new ArrayList<Enemy>();
+    private static ArrayList<Enemy> Enemies = new ArrayList<>();
 
-    private  WeaponLoader weaponLoader = new WeaponLoader("weapons.json");
+    private  WeaponLoader weaponLoader;
 
-    private  WeaponLoader weaponLoader2 = new WeaponLoader("enemyWeapons.json");
+    private  WeaponLoader weaponLoader2;
 
     private static ArrayList<Player> PLAYERS = new ArrayList<Player>();
 
     private EnemyLoader enemyLoader;
 
-    private ArrayList<Weapon> weapon = weaponLoader.getWeaponList();
-    private ArrayList<Weapon> enemyWeapon = weaponLoader2.getWeaponList();
+    private ArrayList<Weapon> weapon;
+    private ArrayList<Weapon> enemyWeapon;
 
 
     private Shop shop;
 
     Player PLAYER;
 
+    private LocalInputSender localInputSender;
+
 
     public MapManaging mapManager;
 
 
     private GameUI gameUI;
+
+    private GameRendering gameRendering;
+    private GameUpdate gameUpdate;
+
     public GameScreen(String nickname, float experience, int level, int money) {
 
-        PLAYER= new Player(nickname,  level, experience, money, playerX, playerY, this, weapon.get(0));
-
-
-
-        PLAYERS.add(PLAYER);
-
-        weaponLoader = new WeaponLoader("ranged.json");
-        weapon.addAll(weaponLoader.getWeaponList());
-        weaponLoader = new WeaponLoader("magic.json");
-        weapon.addAll(weaponLoader.getWeaponList());
-
+        weaponLoader = new WeaponLoader("weapons.json", true);
+        weaponLoader2 = new WeaponLoader("enemyWeapons.json", true);
+        weapon = weaponLoader.getWeaponList();
 
         mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
 
+        mapManager.initializeOutside();
+        PLAYER= new Player(nickname,  level, experience, money, playerX, playerY, weapon.get(0), mapManager);
 
-        enemyLoader = new EnemyLoader(this,PLAYER,enemyWeapon, "enemies.json", mapManager.getRespEenemy());
+
+
+        weapon.get(0).setTexture(weapon.get(0).getSprite());
+        weapon.get(0).convertTxtRegToSprite();
+        PLAYER.getCureentWeapon().setEntity(PLAYER);
+        PLAYERS.add(PLAYER);
+
+
+
+        enemyWeapon = weaponLoader2.getWeaponList();
+
+
+        enemyLoader = new EnemyLoader(PLAYERS, enemyWeapon, "enemies.json", mapManager.getRespEenemy(), mapManager);
 
         batch = new SpriteBatch();
 
@@ -85,44 +101,63 @@ public class GameScreen implements Screen {
         PLAYER.setTexture("player_sprites/player_spritesheet.png");
 
 
-        Enemies = enemyLoader.getEnemyList();
+
+        Enemies= enemyLoader.getEnemyList();
 
         for (Enemy enemy : Enemies) {
-            enemy.setTexture("enemies_spritesheet/skeleton_spritesheet.png");
-            enemy.setRespPos(mapManager.getRespEenemy());
+            int id =0;
+            enemy.setTexture(enemyLoader.getSpritesheetPath().get(id));
             enemy.getWeapon().setEntity(enemy);
+            enemy.setPlayer(PLAYER);
+
             if(enemy.getWeapon() instanceof RangedWeapon){
-            ((RangedWeapon) enemy.getWeapon()).setMap(mapManager);}
+            ((RangedWeapon) enemy.getWeapon()).setMap(mapManager);
+
+            id++;
+            }
         }
 
+
+        localInputSender = new LocalInputSender(PLAYER, PLAYER.getCureentWeapon());
 
 
 
 
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
-        PLAYER.setCurrentWeapon(weapon.get(0));
 
 
         gameUI = new GameUI();
         InputMultiplexer multiplexer = new InputMultiplexer();
-        touchEvents = new TouchManager(PLAYER, PLAYER.getCureentWeapon());
+        touchEvents = new TouchManager(PLAYER, PLAYER.getCureentWeapon(), localInputSender);
         multiplexer.addProcessor(gameUI.getStage());
         multiplexer.addProcessor(touchEvents);
         Gdx.input.setInputProcessor(multiplexer);
 
         shop = new Shop(mapManager.getShopCoordinates().x,  mapManager.getShopCoordinates().y,
-            GameConstants.Sprite.SIZE*4, GameConstants.Sprite.SIZE*3, "shops/basic_shop.png", weapon, PLAYER, touchEvents);
+            GameConstants.Sprite.SIZE*4, GameConstants.Sprite.SIZE*3, "shops/basic_shop.png", weaponLoader, PLAYER, touchEvents);
 
+        shop.initializeRendeingObjects();
 
+        for (Weapon w : shop.getWeaponList()) {
 
-        for (Weapon w : weapon) {
-
-           // w.setAttackJoystick((TouchManager) multiplexer.getProcessors().get(1));
             w.setTexture(w.getSprite());
             w.convertTxtRegToSprite();
             if(w instanceof MagicWeapon){
                 ((MagicWeapon)  w).setCurrentMap(mapManager);
+            }
+        }
+
+        for (Weapon w : weapon) {
+
+            w.setTexture(w.getSprite());
+            w.convertTxtRegToSprite();
+            if(w instanceof MagicWeapon){
+                ((MagicWeapon)  w).setCurrentMap(mapManager);
+                ((MagicWeapon)  w).initProj();
+            }
+            if(w instanceof RangedWeapon){
+                ((RangedWeapon)  w).initProj();
             }
         }
         for (Weapon w : enemyWeapon) {
@@ -131,113 +166,26 @@ public class GameScreen implements Screen {
             w.convertTxtRegToSprite();
             if(w instanceof MagicWeapon){
                 ((MagicWeapon)  w).setCurrentMap(mapManager);
+                ((MagicWeapon)  w).initProj();
+            }
+            if(w instanceof RangedWeapon){
+                ((RangedWeapon)  w).initProj();
             }
         }
+
+        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, touchEvents);
+        gameUpdate = new GameUpdate(Enemies, PLAYERS, mapManager, shop);
+        shop.update(PLAYER.hitbox);
+
     }
 
     public int getRandom(int x) {
         return rand.nextInt(x);
     }
 
-    public static class PointF {
-        public float x;
-        public float y;
-
-        public PointF(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
 
     public void update(float delta) {
-        PLAYER.update(delta);
-        PLAYER.regenerateMana(delta);
-        PLAYER.regenerateHP(delta);
-        mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-        if(PLAYER.getCureentWeapon() instanceof RangedWeapon){
-            ((RangedWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-        }
-        if(PLAYER.getCureentWeapon() instanceof MagicWeapon){
-         ((MagicWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-        }
-
-        if (PLAYER.getMovePlayer()) {
-            PLAYER.updateAnim();
-        }
-        if(Gdx.input.isTouched()){
-            shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());
-        }
-
-        if (PLAYER.getCureentWeapon().getAttacking()) {
-
-
-
-            PLAYER.getCureentWeapon().createHitbox(playerX - PLAYER.cameraX, playerY - PLAYER.cameraY);
-
-
-
-        }
-        if (PLAYER.getCureentWeapon().getAttacking()) {
-            if(PLAYER.getCureentWeapon() instanceof RangedWeapon || PLAYER.getCureentWeapon() instanceof MeleeWeapon){
-            PLAYER.getCureentWeapon().update(delta);
-            PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies, mapManager);}
-        }
-
-        if(PLAYER.getCureentWeapon() instanceof MagicWeapon){
-            PLAYER.getCureentWeapon().update(delta);
-            PLAYER.getCureentWeapon().checkHitboxCollisions(Enemies, mapManager);
-        }
-
-
-        for (Enemy enemy : Enemies) {
-            enemy.updateMove(delta);
-            enemy.updateAnimation();
-
-            enemy.setPlayerPosX(playerX - GameConstants.Sprite.SIZE/2- PLAYER.cameraX);
-            enemy.setPlayerPosY(playerY - GameConstants.Sprite.SIZE/2-PLAYER.cameraY);
-
-            enemy.attackPlayer();
-
-            if(enemy.getWeapon() instanceof MagicWeapon){
-                ((MagicWeapon) enemy.getWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-            }
-            if(enemy.getWeapon() instanceof RangedWeapon){
-                ((RangedWeapon) enemy.getWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-            }
-
-            if (enemy.getWeapon().getAttacking()) {
-
-
-
-                enemy.getWeapon().createHitbox(enemy.getEntityPos().x, enemy.getEntityPos().y);
-
-
-
-            }
-
-            if (enemy.getWeapon().getAttacking()) {
-                if(enemy.getWeapon() instanceof MeleeWeapon){
-                    for(Player player : PLAYERS){
-                    if(!player.isDead()){
-                    enemy.getWeapon().update(delta);
-                    enemy.getWeapon().checkHitboxCollisions(PLAYERS, mapManager);}}}
-            }
-                if(enemy.getWeapon() instanceof RangedWeapon){
-                enemy.getWeapon().update(delta);
-                enemy.getWeapon().checkHitboxCollisions(PLAYERS, mapManager);
-            }
-
-            if(enemy.getWeapon() instanceof MagicWeapon){
-                enemy.getWeapon().update(delta);
-                enemy.getWeapon().checkHitboxCollisions(PLAYERS, mapManager);
-            }
-
-
-
-
-
-        }
-
+        gameUpdate.update(delta);
         shop.update(PLAYER.hitbox);
     }
 
@@ -250,52 +198,9 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         update(delta);
 
-        for (Enemy enemy : Enemies) {
-            if (PLAYER.getHit(enemy.hitbox)) {
-                System.out.println("Damaged: " + enemy.getDamage());
-              PLAYER.takeDamage(enemy.getDamage());
-            }
-        }
-
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        mapManager.draw(batch);
-
-        batch.begin();
-
-        batch.draw(PLAYER.getSprite(PLAYER.getAniIndex(), PLAYER.getFaceDir()), playerX - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2,
-            GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
-
-        shop.draw(batch, PLAYER.cameraX, PLAYER.cameraY);
 
 
-
-
-        for (Enemy enemy : Enemies) {
-            batch.draw(enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()), enemy.getEntityPos().x + PLAYER.cameraX - GameConstants.Sprite.SIZE/2,
-                enemy.getEntityPos().y + PLAYER.cameraY- GameConstants.Sprite.SIZE/2, GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
-            enemy.getWeapon().draw(batch,enemy.getEntityPos().x+PLAYER.cameraX  -GameConstants.Sprite.SIZE/2, enemy.getEntityPos().y+PLAYER.cameraY  -GameConstants.Sprite.SIZE/2);
-        }
-
-            PLAYER.getCureentWeapon().draw(batch, playerX  - GameConstants.Sprite.SIZE/2, playerY - GameConstants.Sprite.SIZE/2);
-
-
-
-
-
-        batch.end();
-
-
-        for (Enemy enemy : Enemies) {
-            enemy.drawBar(batch, shapeRenderer, font);
-        }
-
-        shop.drawShopUi(batch);
-
-        PLAYER.drawBar(batch, shapeRenderer, font);
-
-        touchEvents.draw(batch);
-       // gameUI.render();
+      gameRendering.render();
     }
 
     @Override

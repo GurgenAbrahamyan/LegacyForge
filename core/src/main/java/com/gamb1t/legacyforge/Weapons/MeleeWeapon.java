@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Intersector;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.GameCharacters;
+import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
@@ -60,6 +61,7 @@ public class MeleeWeapon extends Weapon {
         }
     }
 
+
     @Override
     public void update(float delta) {
         updateAnimation();
@@ -98,7 +100,7 @@ public class MeleeWeapon extends Weapon {
         if (animationTimer >= frameDuration) {
             animationTimer = 0;
 
-            if (currentFrame < changedSpritesheet[0].length - 1) {
+            if (currentFrame < frameAmountX - 1) {
                 currentFrame++;
             } else {
                 isAttacking = false;
@@ -109,12 +111,16 @@ public class MeleeWeapon extends Weapon {
 
     @Override
     public <T extends GameCharacters> void checkHitboxCollisions(ArrayList<T> enemies, MapManaging currentmap) {
+
+    }
+
+    @Override
+    public <T extends GameCharacters> void checkHitboxCollisionsEntity(ArrayList<T> enemies) {
         if (!isAttacking || hitbox == null) return;
 
         for (GameCharacters enemy : enemies) {
             if (enemy != null && enemy.hitbox != null) {
                 if (Intersector.overlapConvexPolygons(hitbox, enemy.getHitbox())) {
-                    System.out.println("COLIDED");
                     dealDamage(enemy);
                     applyKnockback(enemy);
                 }
@@ -122,9 +128,14 @@ public class MeleeWeapon extends Weapon {
         }
     }
 
+    @Override
+    public void checkHitboxCollisionsMap(MapManaging map) {
+        // TO DO
+    }
+
     private void dealDamage(GameCharacters enemy) {
         if (enemy != null) {
-            enemy.takeDamage(damage/5);
+            enemy.takeDamage(damage/5, (enity instanceof Player) ? ((Player) enity) :null);
         }
     }
 

@@ -17,6 +17,7 @@ import java.util.Map;
 public class WeaponLoader {
     private final ArrayList<Weapon> weaponList = new ArrayList<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private String recourcePath;
 
     private static final Map<String, Class<? extends Weapon>> weaponTypeMap = new HashMap<>();
 
@@ -26,11 +27,12 @@ public class WeaponLoader {
         weaponTypeMap.put("ranged", RangedWeapon.class);
     }
 
-    public WeaponLoader(String resourceName) {
-        loadWeapons(resourceName);
+    public WeaponLoader(String resourceName, boolean isClient) {
+        this.recourcePath = resourceName;
+        loadWeapons(resourceName, isClient);
     }
 
-    private void loadWeapons(String resourceName) {
+    private void loadWeapons(String resourceName, boolean isClient) {
         try {
             FileHandle fileHandle = Gdx.files.internal(resourceName);
             if (!fileHandle.exists()) {
@@ -59,6 +61,7 @@ public class WeaponLoader {
                 }
 
                 Weapon weapon = objectMapper.treeToValue(jsonNode, weaponClass);
+                weapon.setIsClient(isClient);
                 weaponList.add(weapon);
                 Gdx.app.log("WeaponLoader", "Loaded weapon: " + weapon.getName());
             }
@@ -70,5 +73,18 @@ public class WeaponLoader {
 
     public ArrayList<Weapon> getWeaponList() {
         return weaponList;
+    }
+
+    public Weapon getWeaponByName(String name){
+        for(Weapon weapon : weaponList){
+            if(weapon.getName().equalsIgnoreCase(name)){
+                return weapon;
+            }
+        }
+       return weaponList.get(1);
+    }
+
+    public String getRecourcePath() {
+        return recourcePath;
     }
 }

@@ -5,7 +5,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
-import  com.gamb1t.legacyforge.ManagerClasses.PlayerData;
 public class ServerSync {
     private String playerId;
     private DatabaseReference database;

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 import com.badlogic.gdx.math.Vector2;
 
@@ -19,19 +20,24 @@ import java.util.ArrayList;
 
 public class EnemyLoader {
 
-    private final GameScreen gameScreen;
-    private final Player player;
+    private final ArrayList<Player> player;
     private final ArrayList<Weapon> weapons;
     ArrayList<Enemy> enemies = new ArrayList<>();
     ArrayList<Vector2> respPos;
 
-    public EnemyLoader(GameScreen gameScreen, Player player, ArrayList<Weapon> weapons, String jsonPath, ArrayList<Vector2> respPos) {
-        this.gameScreen = gameScreen;
+    MapManaging mapManaging;
+
+   ArrayList <String> spritesheetPath = new ArrayList<>();
+
+    public EnemyLoader(ArrayList<Player> player, ArrayList<Weapon> weapons, String jsonPath, ArrayList<Vector2> respPos, MapManaging mapManaging) {
+
         this.player = player;
         this.weapons = weapons;
         this.respPos= respPos;
         System.out.println(respPos);
+        this.mapManaging = mapManaging;
         loadEnemies(jsonPath);
+
 
     }
 
@@ -41,35 +47,35 @@ public class EnemyLoader {
             JsonValue root = reader.parse(Gdx.files.internal(jsonPath));
 
             for (JsonValue enemyData : root) {
+                int id =0;
                 int hp = enemyData.getInt("hp", 100);
                 int maxHp = enemyData.getInt("maxHp", hp);
                 int damage = enemyData.getInt("damage", 10);
                 float speed = enemyData.getFloat("speed", 100f);
                 String weaponName = enemyData.getString("weapon");
-                String spriteSheetPath = enemyData.getString("spriteSheet");
+                spritesheetPath.add(enemyData.getString("spriteSheet"));
 
                 Weapon weapon = findWeaponByName(weaponName);
                 if (weapon == null) {
                     Gdx.app.error("EnemyLoader", "Weapon not found: " + weaponName);
                     continue;
                 }
-                System.out.println("works here");
 
-                Enemy enemy = new Enemy(gameScreen, player, respPos, weapon);
 
-                System.out.println( "works here???");
+                Enemy enemy = new Enemy(player, respPos.get(0), weapon, mapManaging);
+
                 enemy.setHp(hp);
                 enemy.setMaxHp(maxHp);
                 enemy.setDamage(damage);
                 enemy.setSpeed(speed);
-                enemy.setTexture(spriteSheetPath);
-
+                enemy.setId(id);
+                enemy.setRespPos(mapManaging.getRespEenemy());
 
                 enemies.add(enemy);
+                id++;
             }}
         catch (Exception e){
-            Gdx.app.error("EnemyLoader", "Failed to load enemies: " + e.getMessage());
-        }
+            e.printStackTrace();  }
 
 
 
@@ -87,4 +93,10 @@ public class EnemyLoader {
     public ArrayList<Enemy> getEnemyList(){
         return enemies;
     }
+
+    public ArrayList<String> getSpritesheetPath() {
+        return spritesheetPath;
+    }
+
+
 }

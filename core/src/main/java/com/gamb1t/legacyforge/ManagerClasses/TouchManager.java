@@ -5,28 +5,34 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Networking.InputSender;
 import com.gamb1t.legacyforge.Weapons.MagicWeapon;
+import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
 import com.gamb1t.legacyforge.Weapons.RangedWeapon;
 import com.gamb1t.legacyforge.Weapons.Weapon;
-
-import java.util.Random;
 
 public class TouchManager implements InputProcessor {
     private Player player;
     private Joystick movementJoystick;
     private Joystick attackJoystick;
     private Weapon weapon;
+    private InputSender inputSender;
+
 
     private float attackDirectionX, attackDirectionY;
     private boolean isAiming = false;
     float angle;
 
+    private boolean isMultiplayer = false;
+
     private boolean[] touchDowns = new boolean[2];
 
-    public TouchManager(Player player, Weapon weapon) {
+    public TouchManager(Player player, Weapon weapon, InputSender inputSender) {
         this.player = player;
         this.weapon = weapon;
+        this.inputSender= inputSender;
         movementJoystick = new Joystick(GET_WIDTH / 6f, GET_HEIGHT / 4f, GameConstants.Sprite.SIZE * 3);
         attackJoystick = new Joystick(GET_WIDTH - GET_WIDTH / 6f, GET_HEIGHT / 4f, GameConstants.Sprite.SIZE * 3);
 
@@ -51,9 +57,12 @@ public class TouchManager implements InputProcessor {
 
             } else if (x >= GET_WIDTH / 2f && !touchDowns[1] && attackJoystick.isTouched(x, y)) {
                 if (attackJoystick.isTouched(x, y)) {
+
                     if(weapon instanceof RangedWeapon ){
                         weapon.setAttacking(true);
+
                         ((RangedWeapon) weapon).setAnimOver(true);
+                        inputSender.attackStart(true);
                         setIsAiming(true);
                         weapon.setAiming(isAiming);
                     }
@@ -77,6 +86,8 @@ public class TouchManager implements InputProcessor {
                 movementJoystick.touchUp();
                 touchDowns[0] = false;
                 player.setPlayerMoveFalse();
+                inputSender.stopMove();
+
             }
 
             else if(screenX > GET_WIDTH/2f) {
@@ -91,12 +102,14 @@ public class TouchManager implements InputProcessor {
 
 
 
+                    if(weapon instanceof MeleeWeapon){
+                    weapon.attack();}
 
-                    weapon.attack();
 
 
 
                     weapon.setAttacking(true);
+                    inputSender.sendAttack(angle);
                     if(weapon instanceof  RangedWeapon){
                         ((RangedWeapon) weapon).setAnimOver(true);
                     }
@@ -147,6 +160,7 @@ public class TouchManager implements InputProcessor {
         if(weapon instanceof RangedWeapon){
             rotationCalc();
             weapon.setRotation(angle);}
+
         if(!player.isDead()){
             float x = screenX;
             float y = GET_HEIGHT - screenY;
@@ -154,7 +168,8 @@ public class TouchManager implements InputProcessor {
 
             if (x < GET_WIDTH / 2f && touchDowns[0]) {
                 movementJoystick.touchDragged(x, y);
-                player.setPlayerMoveTrue(new GameScreen.PointF(movementJoystick.getXDiff(), movementJoystick.getYDiff()));
+                player.setPlayerMoveTrue(new Vector2(movementJoystick.getXDiff(), movementJoystick.getYDiff()));
+                inputSender.sendMove(new Vector2(movementJoystick.getXDiff(), movementJoystick.getYDiff()));
             }
 
             else if (x > GET_WIDTH / 2f && touchDowns[1]){
@@ -163,6 +178,8 @@ public class TouchManager implements InputProcessor {
 
                 isAiming = true;
                 weapon.setAiming(isAiming);
+
+                inputSender.sendAttackDraged(angle);
 
 
 
@@ -206,5 +223,11 @@ public class TouchManager implements InputProcessor {
         weapon = wp;
     }
 
+    public void setIsMultiplayer(boolean b){
+        this.isMultiplayer = b;
+    }
 
+    public boolean getIsMultiplayer() {
+        return isMultiplayer;
+    }
 }

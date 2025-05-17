@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Polygon;
+import com.esotericsoftware.kryonet.Server;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
@@ -18,26 +19,36 @@ public class Projectile {
     private Polygon hitbox;
     private Vector2 velocity;
     private MapManaging map;
+    private boolean isClient;
+    private Server server;
+    private int id;
 
-    public Projectile(float x, float y, float deltaX, float deltaY, String proj, MapManaging map) {
+    public Projectile(float x, float y, float deltaX, float deltaY, Texture proj, MapManaging map, boolean isClient, int id) {
         this.positionHitbox = new Vector2(x, y);
         this.positionSprite = new Vector2(x - GameConstants.Sprite.SIZE / 2, y - GameConstants.Sprite.SIZE / 2);
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.velocity = new Vector2(deltaX, deltaY);
-        this.sprite = new Sprite(new Texture(proj));
-        System.out.println(sprite);
+        this.isClient = isClient;
+
+        if(isClient){
+        this.sprite = new Sprite(proj);
         this.sprite.setSize(GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
+        sprite.setPosition(positionSprite.x, positionSprite.y);}
+
         this.hitbox = new Polygon(new float[]{
             0, 0,
             GameConstants.Sprite.SIZE * 2 / 3, 0,
             GameConstants.Sprite.SIZE * 2 / 3, GameConstants.Sprite.SIZE / 4,
             0, GameConstants.Sprite.SIZE / 4,
         });
-        sprite.setPosition(positionSprite.x, positionSprite.y);
+
         hitbox.setPosition(positionHitbox.x, positionHitbox.y);
        this.map = map;
+       this.id = id;
     }
+
+
 
     public void update() {
         if (!destroyed) {
@@ -50,11 +61,24 @@ public class Projectile {
             }
 
             positionHitbox.set(nextX, nextY);
-            positionSprite.set(positionSprite.x + deltaX, positionSprite.y + deltaY);
-            sprite.setPosition(positionSprite.x, positionSprite.y);
+            if(isClient){
+            positionSprite.set(positionSprite.x+deltaX, positionSprite.y+deltaY);
+            sprite.setPosition(positionSprite.x, positionSprite.y);}
+
             hitbox.setPosition(positionHitbox.x, positionHitbox.y);
+
         }
     }
+    public void setPosition(float x, float y){
+        positionHitbox.set(x, y);
+        if(isClient){
+            positionSprite.set(x, y);
+            sprite.setPosition(positionSprite.x, positionSprite.y);}
+
+        hitbox.setPosition(positionHitbox.x, positionHitbox.y);
+    }
+
+
 
     public void draw(SpriteBatch batch, float camX, float camY) {
         if (!destroyed) {
@@ -76,6 +100,9 @@ public class Projectile {
 
     public Polygon getHitbox() {
         return hitbox;
+    }
+    public int getId(){
+        return  id;
     }
 
     public boolean isDestroyed() {

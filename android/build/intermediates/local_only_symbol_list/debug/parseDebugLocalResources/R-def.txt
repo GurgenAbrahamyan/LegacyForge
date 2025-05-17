@@ -8,8 +8,12 @@ id editTextName
 id editTextPassword
 id email
 id login_button
+id main
+id multi_player_button
 id password
 id register_button
+id single_player_button
+layout activity_game_mode_choosing
 layout login_activity
 layout register_activity
 string app_name
