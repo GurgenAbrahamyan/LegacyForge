@@ -1,0 +1,76 @@
+[
+  {
+    "name":            "Iron Helmet",
+    "type":          "helmet",
+    "damageMultiplier": 0.0,
+    "armorPoints":      10,
+    "hpBonus":          20,
+    "price":            400,
+    "spritePath":    "armor_sprites/melee_helmet.png"
+  },
+  {
+    "name":            "Assassin's Hat",
+    "type":          "helmet",
+    "damageMultiplier": 0.0,
+    "armorPoints":      10,
+    "hpBonus":          35,
+    "price":            800,
+    "spritePath":    "armor_sprites/assassin_helmet.png"
+  },
+  {
+    "name":            "Wizard's Hat",
+    "type":          "helmet",
+    "damageMultiplier": 0.1,
+    "armorPoints":      10,
+    "hpBonus":          50,
+    "price":            2000,
+    "spritePath":    "armor_sprites/wizard_hat.png"
+  },
+  {
+  "name":            "Champion's Hat",
+  "type":          "helmet",
+  "damageMultiplier": 0.3,
+  "armorPoints":      10,
+  "hpBonus":          10,
+  "price":            5000,
+  "spritePath":    "armor_sprites/champions_helmet.png"
+  },
+
+  {
+    "name":        "Steel Chestplate",
+    "type":      "chestplate",
+    "damageMultiplier": 0.0,
+    "armorPoints":      25,
+    "hpBonus":          50,
+    "price":           1000,
+    "spritePath": "armor_sprites/melee_chestplate.png"
+  },
+
+  {
+    "name":        "Assassin's Robe",
+    "type":      "chestplate",
+    "damageMultiplier": 0.0,
+    "armorPoints":      25,
+    "hpBonus":          80,
+    "price":           1800,
+    "spritePath": "armor_sprites/assassin_robe.png"
+  },
+  {
+    "name":        "Wizard's Robe",
+    "type":      "chestplate",
+    "damageMultiplier": 0.1,
+    "armorPoints":      25,
+    "hpBonus":          100,
+    "price":           1800,
+    "spritePath": "armor_sprites/wizard_robe.png"
+  },
+  {
+    "name":            "Champion's Chest",
+    "type":          "chestplate",
+    "damageMultiplier": 0.3,
+    "armorPoints":      10,
+    "hpBonus":          200,
+    "price":            10000,
+    "spritePath":    "armor_sprites/champions_helmet.png"
+  }
+]

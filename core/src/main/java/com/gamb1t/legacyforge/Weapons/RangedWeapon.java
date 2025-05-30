@@ -5,17 +5,18 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.Entity.Enemy;
+import com.gamb1t.legacyforge.Networking.ConnectionManager;
 import com.gamb1t.legacyforge.Networking.Network;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,6 +29,7 @@ public class RangedWeapon extends Weapon {
     public int projId = 0;
 
     private String projectilePath;
+    @JsonIgnore
     private Texture projectileTexture;
     private final float maxChargeTime = 1.5f;
     private List<Projectile> projectiles = new CopyOnWriteArrayList<>();
@@ -49,7 +51,6 @@ public class RangedWeapon extends Weapon {
     float minDamage = damage/5;
     float maxDamage = damage;
     float projectileDamage = minDamage + chargePercentage * (maxDamage - minDamage);
-
 
 
 
@@ -124,6 +125,8 @@ public class RangedWeapon extends Weapon {
         projectiles.add(new Projectile(enity.getEntityPos().x , enity.getEntityPos().y,deltaX, deltaY, projectileTexture, currentMap, isClient, projId));
 
         if(server != null){
+            boolean b= enity instanceof Player;
+            System.out.println("SENDING PROJECTILE FROM PLAYER:" + b);
             Network.CreateProjectileMessage proj = new Network.CreateProjectileMessage();
             proj.dx = deltaX/maxSpeed;
             proj.dy = deltaY/maxSpeed;
@@ -132,7 +135,7 @@ public class RangedWeapon extends Weapon {
             proj.enemyId = enity.getID();
             proj.projectileId = projId;
             proj.isEnemy = enity instanceof Enemy;
-            server.sendToAllTCP(proj);
+            ConnectionManager.sendToConnections(roomName, roomId, proj);
         }
         projId++;
     }
@@ -141,8 +144,20 @@ public class RangedWeapon extends Weapon {
         projectiles.add(new Projectile(projectileMessage.x*GameConstants.Sprite.SIZE, projectileMessage.y*GameConstants.Sprite.SIZE, projectileMessage.dx*maxSpeed, projectileMessage.dy*maxSpeed, projectileTexture, currentMap, isClient, projectileMessage.projectileId));
     }
 
+    @JsonIgnore
     public void initProj(){
         projectileTexture = new Texture(projectilePath);
+    }
+
+    @JsonIgnore
+    public void setProj(Texture proj){
+        this.projectileTexture =proj;
+    }
+
+
+    @JsonIgnore
+    public Texture getProjectileTexture(){
+        return  projectileTexture;
     }
 
 
@@ -157,7 +172,7 @@ public class RangedWeapon extends Weapon {
             proj.update();
             if(server != null){
                 System.out.println(enity.getID());
-                server.sendToAllTCP(new Network.SetProjectilePositionMessage(proj.getId(), enity.getID(), proj.getPositionHitbox().x/GameConstants.Sprite.SIZE, proj.getPositionHitbox().y/GameConstants.Sprite.SIZE, enity instanceof Enemy));
+                ConnectionManager.sendToConnections(roomName, roomId, new Network.SetProjectilePositionMessage(proj.getId(), enity.getID(), proj.getPositionHitbox().x/GameConstants.Sprite.SIZE, proj.getPositionHitbox().y/GameConstants.Sprite.SIZE, enity instanceof Enemy));
             }
             if(proj.isDestroyed()){
 
@@ -166,7 +181,7 @@ public class RangedWeapon extends Weapon {
                     projectileMessage.enemyId = enity.getID();
                     projectileMessage.projectileId= proj.getId();
                     projectileMessage.isEnemy = enity instanceof Enemy;
-                    server.sendToAllTCP(projectileMessage);
+                    ConnectionManager.sendToConnections(roomName, roomId, projectileMessage);
                 }
 
                 projectiles.remove(proj);
@@ -196,7 +211,8 @@ public class RangedWeapon extends Weapon {
         }
 
         for (Projectile proj : projectiles) {
-            proj.draw(batch, playerCamX, playerCamY);
+                proj.draw(batch, playerCamX, playerCamY);
+
         }
     }
 
@@ -230,21 +246,25 @@ public class RangedWeapon extends Weapon {
     }
 
     @Override
-    public <T extends GameCharacters> void checkHitboxCollisionsEntity(ArrayList<T> enemies) {
+    public <T extends GameCharacters> void checkHitboxCollisionsEntity(List<T> enemies) {
 
         for (Projectile proj : projectiles) {
             if (proj != null) {
                 for (GameCharacters enemy : enemies) {
 
+                    if(enemy != enity){
                     if (enemy != null && proj.getHitbox() != null && enemy.hitbox != null) {
                         if (Intersector.overlapConvexPolygons(proj.getHitbox(), enemy.getHitbox())) {
+                            if(enemy.getIsAlive()){
                             dealDamage(enemy);
                             applyKnockback(enemy);
                             proj.setDestroyed(true);
-                            System.out.println("colided");
+                            System.out.println("colided");}
                         }
 
                     }
+                }
+
                 }
             }
         }
@@ -286,7 +306,7 @@ public class RangedWeapon extends Weapon {
         isCharging= x;
     }
 
-
+    @JsonIgnore
     public List<Projectile> getProjectiles() {
         return projectiles;
     }
@@ -301,6 +321,11 @@ public class RangedWeapon extends Weapon {
 
     public boolean getAiming(){
         return  isAiming;
+    }
+
+
+    public String getProjectilePath(){
+        return  projectilePath;
     }
 
 }

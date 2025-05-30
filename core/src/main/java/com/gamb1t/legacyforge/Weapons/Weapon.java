@@ -2,7 +2,6 @@ package com.gamb1t.legacyforge.Weapons;
 
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,12 +11,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.GameCharacters;
-import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
-import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
-import com.gamb1t.legacyforge.Networking.Network;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Weapon {
     protected String name, type, sprite;
@@ -29,6 +26,18 @@ public abstract class Weapon {
     protected  int price;
     protected int frameAmountX, frameAmountY;
     protected float delta;
+
+
+    @JsonIgnore
+    protected  int level;
+
+    @JsonIgnore
+    protected String roomName;
+    @JsonIgnore
+    protected int roomId;
+
+    @JsonIgnore
+    protected String firebaseId;
 
     @JsonIgnore
     protected float playerCamX, playerCamY;
@@ -64,6 +73,7 @@ public abstract class Weapon {
     public abstract void update(float delta);
     public abstract void draw(SpriteBatch batch, float x, float y);
 
+    @JsonSetter("sprite")
     public void setTexture(String texturePath) {
         if (loadedSprite == null) {
             loadedSprite = new Texture(texturePath);
@@ -103,7 +113,7 @@ public abstract class Weapon {
     private void applyKnockback(Enemy enemy) {
         enemy.applyKnockback(enemy, this);
     }
-     public void resetAnimation(){}
+    public void resetAnimation(){}
 
     public void convertTxtRegToSprite() {
         if (spriteSheet != null) {
@@ -120,7 +130,7 @@ public abstract class Weapon {
 
     }
 
-    public abstract  <T extends GameCharacters> void checkHitboxCollisionsEntity(ArrayList<T> enemies);
+    public abstract  <T extends GameCharacters> void checkHitboxCollisionsEntity(List<T> enemies);
     public abstract void checkHitboxCollisionsMap(MapManaging map);
 
     public String getName() { return name; }
@@ -172,12 +182,43 @@ public abstract class Weapon {
     }
 
     @JsonIgnore
-    public void setServer(Server server) {
+    public void setServer(Server server, String roomName, int roomId) {
         this.server = server;
+        this.roomName = roomName;
+        this.roomId = roomId;
+    }
+
+    @JsonIgnore
+    public void setLevel(int lvl){
+        this.level = lvl;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public String getFireBaseId() {
+        return firebaseId;
     }
 
     @JsonIgnore
     public <T extends GameCharacters> void setEntity(T enity){
         this.enity = enity;
+    }
+
+    @JsonIgnore
+    public void setFirebaseId(String firebaseId) {
+        this.firebaseId = firebaseId;
+    }
+    @JsonIgnore
+    public void setArray(TextureRegion[][] array){
+        this.spriteSheet = array;
+    }
+
+
+
+    @JsonIgnore
+    public TextureRegion[][] getArray(){
+        return  spriteSheet;
     }
 }

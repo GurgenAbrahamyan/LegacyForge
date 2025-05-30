@@ -6,8 +6,6 @@ import static com.gamb1t.legacyforge.ManagerClasses.GameConstants.GET_WIDTH;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,15 +13,22 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.ManagerClasses.ArmorLoader;
+import com.gamb1t.legacyforge.ManagerClasses.EnemyLoader;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 import com.gamb1t.legacyforge.ManagerClasses.GameRendering;
 import com.gamb1t.legacyforge.ManagerClasses.GameUI;
+import com.gamb1t.legacyforge.ManagerClasses.MultiplayerUi;
 import com.gamb1t.legacyforge.ManagerClasses.TouchManager;
 import com.gamb1t.legacyforge.ManagerClasses.WeaponLoader;
 import com.gamb1t.legacyforge.Networking.Network;
 import com.gamb1t.legacyforge.Networking.NetworkInputSender;
+import com.gamb1t.legacyforge.Networking.PlayerChangeListener;
+import com.gamb1t.legacyforge.Structures.ArmorShop;
 import com.gamb1t.legacyforge.Structures.Shop;
+import com.gamb1t.legacyforge.Weapons.Armor;
 import com.gamb1t.legacyforge.Weapons.MagicWeapon;
 import com.gamb1t.legacyforge.Weapons.MeleeWeapon;
 import com.gamb1t.legacyforge.Weapons.Projectile;
@@ -32,8 +37,10 @@ import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientGameScreen implements Screen {
     public float playerX = (float) GET_WIDTH / 2, playerY = (float) GET_HEIGHT / 2;
@@ -46,14 +53,16 @@ public class ClientGameScreen implements Screen {
 
 
 
-    private static ArrayList<Enemy> Enemies = new ArrayList<>();
-    private static Map<Integer, Enemy> EnemiesMap = new HashMap<>();
+
+    private ArrayList<Enemy> Enemies = new ArrayList<>();
+    private Map<Integer, Enemy> EnemiesMap = new HashMap<>();
 
     private  WeaponLoader weaponLoader;
 
     private  WeaponLoader weaponLoader2;
 
-    private static ArrayList<Player> PLAYERS = new ArrayList<>();
+    private List<Player> PLAYERS = new CopyOnWriteArrayList<>();
+
 
 
     private ArrayList<Weapon> weapon;
@@ -63,8 +72,17 @@ public class ClientGameScreen implements Screen {
 
     private Shop shop;
 
+    private MultiplayerUi multiplayerUi;
+
+    private ArmorShop armorShop;
+
+    private EnemyLoader enemyLoader;
+
     Player PLAYER;
-    private AssetManager assetManager;
+
+    public boolean isInHub;
+
+    private ArmorLoader armorLoader;
 
 
     public MapManaging mapManager;
@@ -78,10 +96,10 @@ public class ClientGameScreen implements Screen {
     private GameRendering gameRendering;
 
 
-    public ClientGameScreen(String name, int experience, int level, int money, Network.StateMessageOnConnection connection, Client client, AssetManager assetManager) {
+    public ClientGameScreen(User user, Network.StateMessageOnConnection connection, Client client, PlayerChangeListener changeListener) {
 
 
-        this.assetManager= assetManager;
+
 
 
         this.client = client;
@@ -93,20 +111,86 @@ public class ClientGameScreen implements Screen {
         weaponLoader = new WeaponLoader(connection.playerWeaponJson, true);
         weaponLoader2 = new WeaponLoader(connection.enemyWeaponJson, true);
 
+        for (Weapon w : weaponLoader.getWeaponList()) {
+
+            w.setTexture(w.getSprite());
+            w.convertTxtRegToSprite();
+            if(w instanceof MagicWeapon){
+                ((MagicWeapon)  w).setCurrentMap(mapManager);
+                ((MagicWeapon) w).initProj();
+            }
+            if(w instanceof RangedWeapon){
+
+                    ((RangedWeapon)  w).initProj();
+
+            }
+        }
+
+
+
+
 
         weapon=  weaponLoader.getWeaponList();
 
-        PLAYER= new Player(name,  level, experience, money, playerX, playerY, weaponLoader.getWeaponByName(connection.weaponName), mapManager);
+        PLAYER= new Player(user.nickname,  user.level, user.experience, user.money, connection.curX, connection.curY, null, mapManager);
+        PLAYER.setIsClient(true);
+        PLAYER.addChangeListener(changeListener);
+        PLAYER.setFirebaseId(user.firebaseId);
+
+        PLAYER.addInventoryWeapons(weaponLoader.getWeaponsFromMap(user.items.weapons));
+
+        PLAYER.setCurrentWeapon(PLAYER.getInventory().getWeaponByName(connection.weaponName));
+
+        Weapon w2 = PLAYER.getCurrentWeapon();
+
+        w2.setArray( weaponLoader.getWeaponByName(w2.getName()).getArray() );
+        w2.convertTxtRegToSprite();
+        if(w2 instanceof MagicWeapon){
+            ((MagicWeapon)  w2).setCurrentMap(mapManager);
+            ((MagicWeapon)  w2).setProj(((MagicWeapon) weaponLoader.getWeaponByName(w2.getName())).getProjectileTexture());
+        }
+
+        if(w2 instanceof RangedWeapon){
+            ((RangedWeapon)  w2).setProj(((RangedWeapon)weaponLoader.getWeaponByName(w2.getName())).getProjectileTexture());
+            System.out.println(((RangedWeapon) w2).getProjectileTexture());
+        }
+        armorLoader = new ArmorLoader("armor.json");
+
+        for(Armor armor: armorLoader.getArmorList()){
+            armor.loadTexture();
+        }
+
+
+        PLAYER.addInventoryArmors(
+            armorLoader.getArmorsFromMap(user.items.armor)
+        );
+        if(user.equippedArmorHelmet != null){
+            System.out.println("passed helmet "+connection.currentHelmet );
+        Armor helmet = PLAYER.getInventory().getArmorByName(connection.currentHelmet);
+        PLAYER.equipArmor(helmet);
+        }
+        if(user.equippedArmorChestPlate != null){
+            System.out.println("passed chest" +connection.currentChestplate);
+        Armor chest = PLAYER.getInventory().getArmorByName(connection.currentChestplate);
+        PLAYER.equipArmor(chest);
+        }
+
+
 
         PLAYER.setId(connection.newPlayerId);
 
-        PLAYER.getCureentWeapon().setEntity(PLAYER);
+        PLAYER.getCurrentWeapon().setEntity(PLAYER);
 
-        PLAYER.setPosition(playerX, playerY);
+        PLAYER.setClient(client);
 
         playersById.put((connection.newPlayerId), PLAYER);
 
         PLAYERS.add(PLAYER);
+        isInHub = connection.gameMode.equals("Hub");
+        if (isInHub) {
+            multiplayerUi = new MultiplayerUi(PLAYER, client);
+
+        }
 
 
 
@@ -117,12 +201,57 @@ public class ClientGameScreen implements Screen {
                     ps.name, ps.level, ps.experience, ps.money,
                     ps.x * GameConstants.Sprite.SIZE,
                     ps.y * GameConstants.Sprite.SIZE,
-                    weaponLoader.getWeaponByName(ps.weaponName),
+                    null,
                     mapManager
                 );
+                other.addWeapon(weaponLoader.deepCopyWeapon(ps.weaponName), 1);
+                other.setCurrentWeapon(other.getInventory().getWeaponByName(ps.weaponName));
+
+                Weapon w = other.getCurrentWeapon();
+                w.setArray(weaponLoader.getWeaponByName(ps.weaponName).getArray());
+                w.convertTxtRegToSprite();
+                if (w instanceof MagicWeapon) {
+                    ((MagicWeapon) w).setCurrentMap(mapManager);
+                    ((MagicWeapon) w).setProj(((MagicWeapon) weaponLoader.getWeaponByName(w.getName())).getProjectileTexture());
+                }
+                if (w instanceof RangedWeapon) {
+                    ((RangedWeapon) w).setProj(((RangedWeapon) weaponLoader.getWeaponByName(w.getName())).getProjectileTexture());
+                }
+
+
+                if(ps.currentHelmet != null){
+
+                    other.addArmor(armorLoader.deepCopyArmor(ps.currentHelmet), 1);
+                Armor helmetOtherPlayer = other.getInventory().getArmorByName(ps.currentHelmet);
+
+
+                if (helmetOtherPlayer != null) {
+                    helmetOtherPlayer.loadTexture();
+                    other.equipArmor(helmetOtherPlayer);
+                } }
+
+                else {
+                    System.err.println("Helmet not found for player " + ps.name + ": " + ps.currentHelmet);
+                }
+
+                if(ps.currentChestplate != null){
+                other.addArmor(armorLoader.deepCopyArmor(ps.currentChestplate), 1);
+                Armor chestOtherPlayer = other.getInventory().getArmorByName(ps.currentChestplate);
+                if (chestOtherPlayer != null) {
+                    chestOtherPlayer.loadTexture();
+                    other.equipArmor(chestOtherPlayer);
+                } else {
+                    System.err.println("Chestplate not found for player " + ps.name + ": " + ps.currentChestplate);
+                }
+
+                }
+
+
+                other.setHp(ps.hp);
                 other.setId(ps.id);
                 PLAYERS.add(other);
-                System.out.println(ps.id);
+
+
                 playersById.put(ps.id, other);
             }
         }
@@ -132,11 +261,14 @@ public class ClientGameScreen implements Screen {
             player.setTexture("player_sprites/player_spritesheet.png");
             player.setRespPoint(mapManager.getRespPlayer());
         }
-
-        networkInputSender = new NetworkInputSender(PLAYER, PLAYER.getCureentWeapon(), client);
-
-
         enemyWeapon = weaponLoader2.getWeaponList();
+
+        enemyLoader= new EnemyLoader(PLAYERS, enemyWeapon, connection.jsonPath, mapManager.getRespEnemy(), mapManager);
+
+        networkInputSender = new NetworkInputSender(PLAYER, PLAYER.getCurrentWeapon(), client);
+
+
+
 
 
 
@@ -155,6 +287,8 @@ public class ClientGameScreen implements Screen {
                 Enemy enemy = new Enemy(PLAYERS, new Vector2(es.x*GameConstants.Sprite.SIZE, es.y*GameConstants.Sprite.SIZE), enemyWeapon.get(i), mapManager);
                 enemy.setSpeed(es.speed);
                 enemy.setId(es.id);
+
+
                 Enemies.add(enemy);
 
                 EnemiesMap.put(es.id, enemy);
@@ -166,8 +300,7 @@ public class ClientGameScreen implements Screen {
 
 
             for (Enemy enemy1 : Enemies) {
-                enemy1.setTexture("enemies_spritesheet/skeleton_spritesheet.png");
-                enemy1.getWeapon().setEntity(enemy1);
+                enemy1.setTexture(enemyLoader.getSpritesheetPath().get(enemy1.getId()-1)); enemy1.getWeapon().setEntity(enemy1);
                 enemy1.setPlayer(PLAYER);
                 if (enemy1.getWeapon() instanceof RangedWeapon) {
                     ((RangedWeapon) enemy1.getWeapon()).setMap(mapManager);
@@ -184,44 +317,42 @@ public class ClientGameScreen implements Screen {
 
         gameUI = new GameUI();
         InputMultiplexer multiplexer = new InputMultiplexer();
-        touchEvents = new TouchManager(PLAYER, PLAYER.getCureentWeapon(), networkInputSender);
+        touchEvents = new TouchManager(PLAYER, PLAYER.getCurrentWeapon(), networkInputSender);
         multiplexer.addProcessor(gameUI.getStage());
         multiplexer.addProcessor(touchEvents);
         Gdx.input.setInputProcessor(multiplexer);
 
-       shop = new Shop(mapManager.getShopCoordinates().x,
-           mapManager.getShopCoordinates().y,
-            connection.shopInfo.width*GameConstants.Sprite.SIZE,
-           connection.shopInfo.height*GameConstants.Sprite.SIZE,
-           connection.shopInfo.renderPath, /*connection.shopInfo.weaponsJson*/ weaponLoader, PLAYER, touchEvents);
+        if(connection.shopInfo != null) {
+            shop = new Shop(mapManager.getShopCoordinates().x,
+                mapManager.getShopCoordinates().y,
+                connection.shopInfo.width * GameConstants.Sprite.SIZE,
+                connection.shopInfo.height * GameConstants.Sprite.SIZE,
+                connection.shopInfo.renderPath, /*connection.shopInfo.weaponsJson*/ weaponLoader, PLAYER, touchEvents);
+            shop.initializeRendeingObjects();
 
-       shop.initializeRendeingObjects();
+            for (Weapon w : shop.getWeaponList()) {
 
-        for (Weapon w : shop.getWeaponList()) {
-
-            w.setTexture(w.getSprite());
-            w.convertTxtRegToSprite();
-            if(w instanceof MagicWeapon){
-                ((MagicWeapon)  w).setCurrentMap(mapManager);
+                w.setTexture(w.getSprite());
+                w.convertTxtRegToSprite();
+                if(w instanceof MagicWeapon){
+                    ((MagicWeapon)  w).setCurrentMap(mapManager);
+                }
             }
         }
+        if(connection.armorShopInfo !=null) {
+            armorShop = new ArmorShop(mapManager.getArmorShopCoordinates().x,
+                mapManager.getArmorShopCoordinates().y,
+                connection.armorShopInfo.width * GameConstants.Sprite.SIZE,
+                connection.armorShopInfo.height * GameConstants.Sprite.SIZE,
+                connection.armorShopInfo.renderPath, armorLoader, PLAYER, touchEvents);
 
-        weapon.get(0).setTexture(weapon.get(0).getSprite());
-        for (Weapon w : weapon) {
-
-
-            w.setTexture(w.getSprite());
-            w.convertTxtRegToSprite();
-            if(w instanceof MagicWeapon){
-                ((MagicWeapon)  w).setCurrentMap(mapManager);
-                    ((MagicWeapon)  w).initProj();
-
-            }
-            if(w instanceof RangedWeapon){
-                ((RangedWeapon)  w).initProj();
-            }
-
+            armorShop.initializeRenderingObjects();
         }
+
+
+
+
+
         for (Weapon w : enemyWeapon) {
 
             w.setTexture(w.getSprite());
@@ -235,8 +366,7 @@ public class ClientGameScreen implements Screen {
             }
         }
 
-        touchEvents.setIsMultiplayer(true);
-        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, touchEvents);
+        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop, touchEvents);
     }
 
     public void createProjectile(Network.CreateProjectileMessage projectileMessage){
@@ -245,7 +375,7 @@ public class ClientGameScreen implements Screen {
             curWeapon = EnemiesMap.get(projectileMessage.enemyId).getWeapon();
         }
         else {
-            curWeapon = playersById.get(projectileMessage.enemyId).getCureentWeapon();
+            curWeapon = playersById.get(projectileMessage.enemyId).getCurrentWeapon();
         }
 
 
@@ -271,7 +401,7 @@ public class ClientGameScreen implements Screen {
         } else {
             Player p = playersById.get(msg.enemyId);
             if (p == null) return;
-            curWeapon = p.getCureentWeapon();
+            curWeapon = p.getCurrentWeapon();
         }
 
 
@@ -294,7 +424,7 @@ public class ClientGameScreen implements Screen {
         } else {
             Player p = playersById.get(msg.enemyId);
             if (p == null) return;
-            curWeapon = p.getCureentWeapon();
+            curWeapon = p.getCurrentWeapon();
         }
 
         if (curWeapon instanceof RangedWeapon) {
@@ -302,7 +432,7 @@ public class ClientGameScreen implements Screen {
             for (Projectile proj : rw.getProjectiles()) {
                 if (proj.getId() == msg.projectileId) {
                     System.out.println("enemy id for ranged" + msg.enemyId);
-                    proj.setPosition(msg.x*GameConstants.Sprite.SIZE, msg.y*GameConstants.Sprite.SIZE);
+                    proj.setPosition(msg.x*GameConstants.Sprite.SIZE-GameConstants.Sprite.SIZE/2, msg.y*GameConstants.Sprite.SIZE-GameConstants.Sprite.SIZE/2);
                     break;
                 }
             }
@@ -312,8 +442,7 @@ public class ClientGameScreen implements Screen {
             MagicWeapon mw = (MagicWeapon) curWeapon;
             for (Projectile proj : mw.getProjectiles()) {
                 if (proj.getId() == msg.projectileId) {
-                    System.out.println("enemy id for magic" + msg.enemyId);
-                    proj.setPosition(msg.x*GameConstants.Sprite.SIZE, msg.y*GameConstants.Sprite.SIZE);
+                    proj.setPosition(msg.x*GameConstants.Sprite.SIZE-GameConstants.Sprite.SIZE/2, msg.y*GameConstants.Sprite.SIZE -GameConstants.Sprite.SIZE/2);
                     break;
                 }
             }
@@ -321,6 +450,32 @@ public class ClientGameScreen implements Screen {
     }
 
 
+    public void setNewWeapon(Network.OnPlayerEquipWeapon equipWeapon){
+        Player p = playersById.get(equipWeapon.playerId);
+        if(p != null){
+            System.out.println("Player found ");
+            if(p.getInventory().containsWeaponByName(equipWeapon.weaponName)) {
+                p.setCurrentWeapon(p.getInventory().getWeaponByName(equipWeapon.weaponName));
+            }
+            else {
+                p.addWeapon(weaponLoader.deepCopyWeapon(equipWeapon.weaponName), 1);
+                p.setCurrentWeapon(p.getInventory().getWeaponByName(equipWeapon.weaponName));
+                Weapon w = p.getCurrentWeapon();
+
+                w.setArray(weaponLoader.getWeaponByName(equipWeapon.weaponName).getArray());
+                w.convertTxtRegToSprite();
+                if(w instanceof MagicWeapon){
+                    ((MagicWeapon)  w).setCurrentMap(mapManager);
+                    ((MagicWeapon)  w).setProj(((MagicWeapon) weaponLoader.getWeaponByName(w.getName())).getProjectileTexture());
+                }
+
+                if(w instanceof RangedWeapon){
+                    ((RangedWeapon)  w).setProj(((RangedWeapon)weaponLoader.getWeaponByName(w.getName())).getProjectileTexture());
+                }
+            }
+
+        }
+    }
     public void destroyProjectile(Network.DestroyProjectileMessage destroyProjectileMessage){
 
         Weapon curWeapon;
@@ -328,7 +483,7 @@ public class ClientGameScreen implements Screen {
             curWeapon = EnemiesMap.get(destroyProjectileMessage.enemyId).getWeapon();
         }
         else {
-            curWeapon = playersById.get(destroyProjectileMessage.enemyId).getCureentWeapon();
+            curWeapon = playersById.get(destroyProjectileMessage.enemyId).getCurrentWeapon();
         }
         if(curWeapon != null){
 
@@ -347,7 +502,7 @@ public class ClientGameScreen implements Screen {
         if(packet.isEnemy){
             EnemiesMap.get(packet.id).attackStarted();
             return;}
-        Weapon  currentWeapon =  playersById.get(packet.id).getCureentWeapon();
+        Weapon  currentWeapon =  playersById.get(packet.id).getCurrentWeapon();
 
         if(currentWeapon instanceof RangedWeapon ){
             currentWeapon.setAttacking(true);
@@ -361,27 +516,28 @@ public class ClientGameScreen implements Screen {
             EnemiesMap.get(packet.id).attackDragged(packet.angle);
             return;}
 
-        Weapon curWeapon =  playersById.get(packet.id).getCureentWeapon();
+        Weapon curWeapon =  playersById.get(packet.id).getCurrentWeapon();
 
         if(curWeapon instanceof RangedWeapon){
 
             curWeapon.setRotation(packet.angle);
 
         }
-        curWeapon.setAttacking(true);
+        curWeapon.setAiming(true);
     }
 
     public void endAttack(Network.AttackReleasePacket packet){
         if(packet.isEnemy){
             EnemiesMap.get(packet.id).attackReleased(packet.angle);
             return;}
-        Weapon curWeapon =  playersById.get(packet.id).getCureentWeapon();
+        Weapon curWeapon =  playersById.get(packet.id).getCurrentWeapon();
         curWeapon.setRotation(packet.angle);
         if(curWeapon.getAiming()){
 
 
             if(curWeapon instanceof MeleeWeapon){
             curWeapon.attack();}
+
             if(curWeapon instanceof RangedWeapon){
                 ((RangedWeapon) curWeapon).attackNoProj();}
             if(curWeapon instanceof MagicWeapon){
@@ -411,21 +567,47 @@ public class ClientGameScreen implements Screen {
     public void addPlayer(Network.PlayerState state) {
         if (playersById.containsKey(state.id)) return;
 
-        String skinPath = "player_sprites/player_spritesheet.png";
-
-        if (!assetManager.isLoaded(skinPath)) {
-            assetManager.load(skinPath, Texture.class);
-        }
-
-        Player newPlayer = new Player(
+            Player newPlayer = new Player(
             state.name,
             state.level,
             state.experience,
             state.money,
             state.x * GameConstants.Sprite.SIZE,
             state.y * GameConstants.Sprite.SIZE,
-            weaponLoader.getWeaponByName(state.weaponName), mapManager
+            null, mapManager
         );
+
+        newPlayer.addWeapon(weaponLoader.deepCopyWeapon(state.weaponName), 1);
+        newPlayer.setCurrentWeapon(newPlayer.getInventory().getWeaponByName(state.weaponName));
+
+        Weapon w = newPlayer.getCurrentWeapon();
+        w.setArray(weaponLoader.getWeaponByName(state.weaponName).getArray());
+        w.convertTxtRegToSprite();
+        if (w instanceof MagicWeapon) {
+            ((MagicWeapon) w).setCurrentMap(mapManager);
+            ((MagicWeapon) w).setProj(((MagicWeapon) weaponLoader.getWeaponByName(w.getName())).getProjectileTexture());
+        }
+        if (w instanceof RangedWeapon) {
+            ((RangedWeapon) w).setProj(((RangedWeapon) weaponLoader.getWeaponByName(w.getName())).getProjectileTexture());
+        }
+
+        if (state.currentChestplate != null) {
+        newPlayer.addArmor(armorLoader.deepCopyArmor(state.currentHelmet), 1);
+        Armor helmet = newPlayer.getInventory().getArmorByName(state.currentHelmet);
+
+            helmet.setTextureRegion(armorLoader.getArmorByName(helmet.getName()).getTextureRegion());
+            newPlayer.equipArmor(helmet);
+        } else {
+            System.err.println("Helmet not found for new player: " + state.currentHelmet);
+        }
+
+        if (state.currentChestplate != null) {
+        newPlayer.addArmor(armorLoader.deepCopyArmor(state.currentChestplate), 1);
+        Armor chest = newPlayer.getInventory().getArmorByName(state.currentChestplate);
+
+            chest.setTextureRegion(armorLoader.getArmorByName(chest.getName()).getTextureRegion());
+            newPlayer.equipArmor(chest);
+        }
 
         newPlayer.setId(state.id);
         newPlayer.setHp(state.hp);
@@ -436,10 +618,11 @@ public class ClientGameScreen implements Screen {
 
         newPlayer.setRespPoint(mapManager.getRespPlayer());
 
-        newPlayer.getCureentWeapon().setEntity(newPlayer);
+        newPlayer.getCurrentWeapon().setEntity(newPlayer);
 
         playersById.put(state.id, newPlayer);
         PLAYERS.add(newPlayer);
+        touchEvents.setISinglePlayer(false);
     }
 
     public void removePlayerById(int id){
@@ -455,8 +638,8 @@ public class ClientGameScreen implements Screen {
     }
 
 
-    public void dealDamge(Network.CurentHp dealedDamageToPlayer){
-        if(dealedDamageToPlayer.isEnemy == true){
+    public void dealDamge(Network.CurrentHp dealedDamageToPlayer){
+        if(dealedDamageToPlayer.isEnemy){
             EnemiesMap.get(dealedDamageToPlayer.idOfEnemy).setHp(dealedDamageToPlayer.curHp);
         }
         else {
@@ -470,38 +653,38 @@ public class ClientGameScreen implements Screen {
 
         for(Player player :PLAYERS){
             player.noLogicMove();
-            if (player.getCureentWeapon() instanceof RangedWeapon) {
-                ((RangedWeapon) player.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            if (player.getCurrentWeapon() instanceof RangedWeapon) {
+                ((RangedWeapon) player.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
-            if (player.getCureentWeapon() instanceof MagicWeapon) {
-                ((MagicWeapon) player.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            if (player.getCurrentWeapon() instanceof MagicWeapon) {
+                ((MagicWeapon) player.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
 
-            if (player.getCureentWeapon() instanceof RangedWeapon) {
-                ((RangedWeapon) player.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            if (player.getCurrentWeapon() instanceof RangedWeapon) {
+                ((RangedWeapon) player.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
-            if (player.getCureentWeapon() instanceof MagicWeapon) {
-                ((MagicWeapon) player.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            if (player.getCurrentWeapon() instanceof MagicWeapon) {
+                ((MagicWeapon) player.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
 
             if (player.getMovePlayer()) {
                 player.updateAnim();
             }
 
-            if (player.getCureentWeapon().getAttacking()) {
-                if ( player.getCureentWeapon() instanceof MeleeWeapon) {
-                    player.getCureentWeapon().update(delta);
-                    player.getCureentWeapon().checkHitboxCollisionsMap(mapManager);
+            if (player.getCurrentWeapon().getAttacking()) {
+                if ( player.getCurrentWeapon() instanceof MeleeWeapon) {
+                    player.getCurrentWeapon().update(delta);
+                    player.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
                 }
-                if (player.getCureentWeapon() instanceof RangedWeapon) {
-                    player.getCureentWeapon().updateAnimation();
-                    player.getCureentWeapon().checkHitboxCollisionsMap(mapManager);
+                if (player.getCurrentWeapon() instanceof RangedWeapon) {
+                    player.getCurrentWeapon().updateAnimation();
+                    player.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
                 }
             }
 
-            if (player.getCureentWeapon() instanceof MagicWeapon) {
-                player.getCureentWeapon().updateAnimation();
-                player.getCureentWeapon().checkHitboxCollisionsMap(mapManager);
+            if (player.getCurrentWeapon() instanceof MagicWeapon) {
+                player.getCurrentWeapon().updateAnimation();
+                player.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
             }
 
         }
@@ -511,7 +694,12 @@ public class ClientGameScreen implements Screen {
 
 
         if (Gdx.input.isTouched()) {
-            shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());
+            if(shop != null){
+            shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
+            if(armorShop != null){
+            armorShop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
+            if(multiplayerUi != null){
+            multiplayerUi.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
         }
 
 
@@ -551,7 +739,24 @@ public class ClientGameScreen implements Screen {
 
         }
 
-        shop.update(PLAYER.hitbox);
+        if(shop !=null){
+        shop.update(PLAYER.hitbox);}
+        if(armorShop != null) {
+            armorShop.update(PLAYER.hitbox);
+        }
+    }
+
+    public void equipArmor(Network.OnPlayerEquipArmor armor){
+        Player p = playersById.get(armor.playerId);
+        if( p !=null){
+            if(!p.getInventory().containsArmorByName(armor.armorName)){
+                Armor armor1 = armorLoader.deepCopyArmor(armor.armorName);
+                p.addArmor(armor1, 1);
+                armor1.setTextureRegion(armorLoader.getArmorByName(armor.armorName).getSpriteSheet());
+
+            }
+            p.equipArmor(p.getInventory().getArmorByName(armor.armorName));
+        }
     }
 
     public void setPlayerPos(Network.PlayerPos pp){
@@ -585,6 +790,9 @@ public class ClientGameScreen implements Screen {
     @Override
     public void render(float delta) {
         gameRendering.render();
+        if(isInHub){
+        multiplayerUi.render(batch);
+        }
         update(delta);
     }
 
@@ -608,6 +816,101 @@ public class ClientGameScreen implements Screen {
     public void dispose() {
         batch.dispose();
         shapeRenderer.dispose();
+        if (batch != null) {
+            batch.dispose();
+            batch = null;
+        }
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+            shapeRenderer = null;
+        }
+        if (font != null) {
+            font.dispose();
+            font = null;
+        }
+
+        if (gameUI != null) {
+            gameUI.dispose();
+            gameUI = null;
+        }
+        if (multiplayerUi != null) {
+            multiplayerUi.dispose();
+            multiplayerUi = null;
+        }
+
+        // Dispose shop and armor shop
+       /* if (shop != null) {
+            shop.dispose();
+            shop = null;
+        }
+        if (armorShop != null) {
+            armorShop.dispose();
+            armorShop = null;
+        }
+
+
+        if (mapManager != null) {
+            mapManager.dispose();
+            mapManager = null;
+        }
+
+        if (weaponLoader != null) {
+            weaponLoader.dispose(); // Implement if needed
+            weaponLoader = null;
+        }
+        if (weaponLoader2 != null) {
+            weaponLoader2.dispose(); // Implement if needed
+            weaponLoader2 = null;
+        }
+        if (armorLoader != null) {
+            armorLoader.dispose(); // Implement if needed
+            armorLoader = null;
+        }
+        if (enemyLoader != null) {
+            enemyLoader.dispose();
+            enemyLoader = null;
+        }
+
+        if (touchEvents != null) {
+            touchEvents.dispose();
+            touchEvents = null;
+        }*/
+        if (networkInputSender != null) {
+            networkInputSender = null;
+        }
+
+        if (Enemies != null) {
+            Enemies.clear();
+            Enemies = null;
+        }
+        if (EnemiesMap != null) {
+            EnemiesMap.clear();
+            EnemiesMap = null;
+        }
+        if (PLAYERS != null) {
+            PLAYERS.clear();
+            PLAYERS = null;
+        }
+        if (playersById != null) {
+            playersById.clear();
+            playersById = null;
+        }
+        if (weapon != null) {
+            weapon.clear();
+            weapon = null;
+        }
+        if (enemyWeapon != null) {
+            enemyWeapon.clear();
+            enemyWeapon = null;
+        }
+    }
+
+    public Map<Integer, Enemy> getEnemiesMap(){
+        return EnemiesMap;
+    }
+
+    public MapManaging getMapManager() {
+        return mapManager;
     }
 
     public int getPlayerMoney(){
@@ -616,5 +919,9 @@ public class ClientGameScreen implements Screen {
 
     public Player getPLAYER(){
         return PLAYER;
+    }
+
+    public MultiplayerUi getMultiplayerUi(){
+        return  multiplayerUi;
     }
 }

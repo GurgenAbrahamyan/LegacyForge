@@ -25,7 +25,7 @@ public class TouchManager implements InputProcessor {
     private boolean isAiming = false;
     float angle;
 
-    private boolean isMultiplayer = false;
+    private boolean isSinglePlayer = false;
 
     private boolean[] touchDowns = new boolean[2];
 
@@ -102,8 +102,15 @@ public class TouchManager implements InputProcessor {
 
 
 
-                    if(weapon instanceof MeleeWeapon){
-                    weapon.attack();}
+                    if(isSinglePlayer){
+
+                        weapon.attack();}
+                    else {
+                        if(weapon instanceof MeleeWeapon){
+                            weapon.attack();
+                        }
+                    }
+
 
 
 
@@ -223,11 +230,11 @@ public class TouchManager implements InputProcessor {
         weapon = wp;
     }
 
-    public void setIsMultiplayer(boolean b){
-        this.isMultiplayer = b;
+    public void setISinglePlayer(boolean b){
+        this.isSinglePlayer = b;
     }
 
     public boolean getIsMultiplayer() {
-        return isMultiplayer;
+        return isSinglePlayer;
     }
 }

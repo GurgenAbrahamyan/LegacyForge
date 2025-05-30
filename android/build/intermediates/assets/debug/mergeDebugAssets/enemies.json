@@ -5,7 +5,7 @@
     "damage": 10,
     "speed": 300,
     "weapon": "Golden Sword",
-    "spriteSheet": "enemies_spritesheet/skeleton_spritesheet.png"
+    "spriteSheet": "enemies_spritesheet/warrior_spritesheet.png"
   },
   {
     "hp": 100,
@@ -13,7 +13,7 @@
     "damage": 10,
     "speed": 300,
     "weapon": "Iron Sword",
-    "spriteSheet": "enemies_spritesheet/skeleton_spritesheet.png"
+    "spriteSheet": "enemies_spritesheet/warrior_spritesheet.png"
   },
   {
     "hp": 100,
@@ -21,7 +21,7 @@
     "damage": 10,
     "speed": 250,
     "weapon": "Bow",
-    "spriteSheet": "enemies_spritesheet/skeleton_spritesheet.png"
+    "spriteSheet": "enemies_spritesheet/assassin_enemy.png"
   },
   {
     "hp": 75,
@@ -29,6 +29,6 @@
     "damage": 20,
     "speed": 300,
     "weapon": "Wooden Staff",
-    "spriteSheet": "enemies_spritesheet/skeleton_spritesheet.png"
+    "spriteSheet": "enemies_spritesheet/wizard_spritesheet.png"
   }
 ]

@@ -14,6 +14,10 @@ public class GameMap {
         return Ids[xIndex][yIndex];
     }
 
+    public void setSpriteID(int xIndex, int yIndex, int i) {
+        Ids[xIndex][yIndex] = i;
+    }
+
     public int getArrayWidth() {
         return Ids[0].length;
     }

@@ -8,25 +8,24 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.ManagerClasses.GameScreen;
+import com.gamb1t.legacyforge.Networking.PlayerChangeListener;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
 
     public static AssetManager assets;
 
-    String nickname;
-    float exp;
-    int level;
-    int money;
+    User user;
     GameScreen gameScreen;
+    PlayerChangeListener playerChangeListener;
 
-    public Main (String nickname, float experience, int level, int money){
 
-        this.nickname=nickname;
-        this.exp= experience;
-        this.level = level;
-        this.money= money;
+    public Main (User user, PlayerChangeListener playerChangeListener){
+
+        this.user = user;
+        this.playerChangeListener = playerChangeListener;
 
 
     }
@@ -39,10 +38,7 @@ public class Main extends Game {
         assets = new AssetManager();
 
 
-        gameScreen = new GameScreen(nickname, exp, level, money);
-
-
-
+        gameScreen = new GameScreen(user, playerChangeListener);
 
         this.setScreen(gameScreen);
 

@@ -5,78 +5,90 @@ import com.esotericsoftware.kryonet.Server;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.Networking.ConnectionManager;
 import com.gamb1t.legacyforge.Networking.Network;
+import com.gamb1t.legacyforge.Structures.ArmorShop;
 import com.gamb1t.legacyforge.Structures.Shop;
 import com.gamb1t.legacyforge.Weapons.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameUpdate {
 
     private ArrayList<Enemy> enemies;
     private MapManaging mapManager;
     private Shop shop;
+    private  ArmorShop armorShop;
     private Server server;
+    private String roomName;
+    private int id;
+    private List<Player> PLAYERS;
 
-    private ArrayList<Player> PLAYERS;
-
-    public GameUpdate( ArrayList<Enemy> enemies, ArrayList<Player> allPlayers,
-                      MapManaging mapManager, Shop shop) {
+    public GameUpdate(ArrayList<Enemy> enemies, List<Player> allPlayers,
+                      MapManaging mapManager, Shop shop, ArmorShop armorShop) {
 
         this.enemies = enemies;
         this.mapManager = mapManager;
         this.shop = shop;
+        this.armorShop = armorShop;
         this.PLAYERS = allPlayers;
     }
 
-    public void setServ(Server server){
+    public void setServ(Server server, String roomName, int id){
         this.server= server;
+        this.roomName= roomName;
+        this.id = id;
     }
 
     public void update(float delta) {
 
         for(Player PLAYER : PLAYERS) {
             if(server != null){
-                server.sendToAllTCP(new Network.PlayerPos(PLAYER.getEntityPos().x/GameConstants.Sprite.SIZE, PLAYER.getEntityPos().y/GameConstants.Sprite.SIZE, PLAYER.getID()));
+                ConnectionManager.sendToConnections(roomName, id, new Network.PlayerPos(PLAYER.getEntityPos().x/GameConstants.Sprite.SIZE, PLAYER.getEntityPos().y/GameConstants.Sprite.SIZE, PLAYER.getID()));
+
             }
-            PLAYER.getCureentWeapon().setDelta(delta);
+            PLAYER.getCurrentWeapon().setDelta(delta);
             PLAYER.update(delta);
             PLAYER.regenerateMana(delta);
             PLAYER.regenerateHP(delta);
             mapManager.setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
-            if (PLAYER.getCureentWeapon() instanceof RangedWeapon) {
-                ((RangedWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            if (PLAYER.getCurrentWeapon() instanceof RangedWeapon) {
+                ((RangedWeapon) PLAYER.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
-            if (PLAYER.getCureentWeapon() instanceof MagicWeapon) {
-                ((MagicWeapon) PLAYER.getCureentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
+            if (PLAYER.getCurrentWeapon() instanceof MagicWeapon) {
+                ((MagicWeapon) PLAYER.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
 
             if (PLAYER.getMovePlayer()) {
                 PLAYER.updateAnim();
             }
             if (Gdx.input.isTouched()) {
-                shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());
+                if(shop != null){
+                shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
+                if(armorShop != null){
+                armorShop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
             }
 
-            if (PLAYER.getCureentWeapon().getAttacking()) {
+            if (PLAYER.getCurrentWeapon().getAttacking()) {
 
 
-                PLAYER.getCureentWeapon().createHitbox(PLAYER.getEntityPos().x, PLAYER.getEntityPos().y);
+                PLAYER.getCurrentWeapon().createHitbox(PLAYER.getEntityPos().x, PLAYER.getEntityPos().y);
 
 
             }
-            if (PLAYER.getCureentWeapon().getAttacking()) {
-                if (PLAYER.getCureentWeapon() instanceof RangedWeapon || PLAYER.getCureentWeapon() instanceof MeleeWeapon) {
-                    PLAYER.getCureentWeapon().update(delta);
-                    PLAYER.getCureentWeapon().checkHitboxCollisionsEntity(enemies);
-                    PLAYER.getCureentWeapon().checkHitboxCollisionsMap(mapManager);
+            if (PLAYER.getCurrentWeapon().getAttacking()) {
+                if (PLAYER.getCurrentWeapon() instanceof RangedWeapon || PLAYER.getCurrentWeapon() instanceof MeleeWeapon) {
+                    PLAYER.getCurrentWeapon().update(delta);
+                    PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);
+                    PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
                 }
             }
 
-            if (PLAYER.getCureentWeapon() instanceof MagicWeapon) {
-                PLAYER.getCureentWeapon().update(delta);
-                PLAYER.getCureentWeapon().checkHitboxCollisionsEntity(enemies);
-                PLAYER.getCureentWeapon().checkHitboxCollisionsMap(mapManager);
+            if (PLAYER.getCurrentWeapon() instanceof MagicWeapon) {
+                PLAYER.getCurrentWeapon().update(delta);
+                PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);
+                PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
             }
         }
 
@@ -85,23 +97,26 @@ public class GameUpdate {
             enemy.getWeapon().setDelta(delta);
             enemy.updateMove(delta);
 
-            if(server != null){
+            if(server != null && enemy.getIsAlive()){
                 enemy.sendCoordinates(server);
             }
             enemy.updateAnimation();
 
 
             Player closest = getClosestPlayer(enemy);
-            enemy.setPlayerPosX(GameConstants.GET_WIDTH/2 - GameConstants.Sprite.SIZE/2-closest.cameraX);
-            enemy.setPlayerPosY(GameConstants.GET_HEIGHT/2 - GameConstants.Sprite.SIZE/2-closest.cameraY);
+            if (closest != null && enemy.getIsAlive()) {
+                enemy.setPlayerPosX(GameConstants.GET_WIDTH / 2 - GameConstants.Sprite.SIZE / 2 - closest.cameraX);
+                enemy.setPlayerPosY(GameConstants.GET_HEIGHT / 2 - GameConstants.Sprite.SIZE / 2 - closest.cameraY);
 
             enemy.attackPlayer();
+
 
             if(enemy.getWeapon() instanceof MagicWeapon){
                 ((MagicWeapon) enemy.getWeapon()).setCameraValues(closest.cameraX, closest.cameraY);
             }
             if(enemy.getWeapon() instanceof RangedWeapon){
                 ((RangedWeapon) enemy.getWeapon()).setCameraValues(closest.cameraX, closest.cameraY);
+            }
             }
 
             if (enemy.getWeapon().getAttacking()) {

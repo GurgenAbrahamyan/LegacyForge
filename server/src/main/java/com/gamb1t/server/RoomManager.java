@@ -1,39 +1,270 @@
 package com.gamb1t.server;
 
 import com.esotericsoftware.kryonet.Connection;
-import java.util.*;
 import com.esotericsoftware.kryonet.Server;
+import com.gamb1t.legacyforge.Entity.Items;
+import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.Networking.Network;
+import com.gamb1t.legacyforge.Networking.ConnectionManager;
+import com.gamb1t.legacyforge.Weapons.Armor;
+import com.gamb1t.legacyforge.Weapons.Weapon;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RoomManager {
-
     private final Server server;
     private final List<Room> rooms = new ArrayList<>();
+    private final List<Dungeon> dungeons = new ArrayList<>();
+    private final List<OneVsOne> rooms1v1 = new ArrayList<>();
     private int nextId = 1;
-
+    private int dungeonNextId = 1;
+    private int oneVsOneNextId = 1;
     private final Map<Connection, Room> connectionToRoom = new HashMap<>();
+    private final Map<Connection, Dungeon> connectionDungeon = new HashMap<>();
+    private final Map<Connection, OneVsOne> connection1v1 = new HashMap<>();
+    private final List<QueueEntry> oneVsOneQueue = new ArrayList<>();
+    private final Map<Connection, QueueEntry> connectionToQueueEntry = new HashMap<>();
+    private volatile boolean running = true;
 
-    public RoomManager(Server s){ server = s;
+    private static class QueueEntry {
+        Connection connection;
+        User user;
+        long timestamp;
+
+        QueueEntry(Connection connection, User user) {
+            this.connection = connection;
+            this.user = user;
+            this.timestamp = System.currentTimeMillis();
+        }
     }
 
-    public synchronized Room assignToRoom(Connection c, Network.PlayerInitMessage initMessage){
+    public RoomManager(Server s) {
+        server = s;
+        startMatchmakingThread();
+    }
 
-        for(Room r:rooms){
-            if(!r.isFull()){
-                System.out.println("added connection");
-                r.addConnection(c, initMessage);
+    private void startMatchmakingThread() {
+        new Thread(() -> {
+            while (running) {
+                try {
+                    matchOneVsOnePlayers();
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    System.err.println("Matchmaking thread interrupted: " + e.getMessage());
+                    running = false;
+                }
+            }
+        }, "OneVsOneMatchmaker").start();
+        System.out.println("Started 1v1 matchmaking thread");
+    }
+
+    private synchronized void matchOneVsOnePlayers() {
+        if (oneVsOneQueue.size() < 2) {
+            return;
+        }
+
+        for (int i = 0; i < oneVsOneQueue.size(); i++) {
+            QueueEntry player1 = oneVsOneQueue.get(i);
+            for (int j = i + 1; j < oneVsOneQueue.size(); j++) {
+                QueueEntry player2 = oneVsOneQueue.get(j);
+
+                int ratingDiff = Math.abs(player1.user.rating - player2.user.rating);
+                int winDiff = Math.abs(player1.user.wins - player2.user.wins);
+
+                if (ratingDiff <= 15 && winDiff <= 50) {
+                    System.out.println("1v1 match found: Player ID " + player1.connection.getID() + " vs Player ID " + player2.connection.getID());
+                    List<Connection> connections = Arrays.asList(player1.connection, player2.connection);
+                    List<Player> players = Arrays.asList(
+                        convertUserToPlayer(player1.user, player1.connection),
+                        convertUserToPlayer(player2.user, player2.connection)
+                    );
+
+                    assignToOneVsOne(connections, players);
+
+                    oneVsOneQueue.remove(player1);
+                    oneVsOneQueue.remove(player2);
+                    connectionToQueueEntry.remove(player1.connection);
+                    connectionToQueueEntry.remove(player2.connection);
+                    return;
+                }
+            }
+        }
+        System.out.println("No suitable 1v1 matches found, " + oneVsOneQueue.size() + " players in queue");
+    }
+
+    public OneVsOne getRoomFor1vs1(Connection c){
+
+        return connection1v1.get(c);
+    }
+    private Player convertUserToPlayer(User user, Connection c) {
+        Room room = connectionToRoom.get(c);
+        if (room != null) {
+            for (Player p : room.getPlayer()) {
+                if (p.getFirebaseId() != null && p.getFirebaseId().equals(user.firebaseId)) {
+                    return p;
+                }
+            }
+        }
+        Player p = new Player(user.nickname, user.level, user.experience, user.money, 0, 0, null, null);
+        p.setId(c.getID());
+        p.setFirebaseId(user.firebaseId);
+        p.setWins(user.wins);
+        p.setLoses(user.losses);
+        p.setRating(user.rating);
+        return p;
+    }
+
+    public synchronized void assignToOneVsOne(List<Connection> connections, List<Player> players) {
+        OneVsOne oneVsOne = new OneVsOne(oneVsOneNextId++, "1v1", server, this);
+        rooms1v1.add(oneVsOne);
+        List<User> users = players.stream().map(this::convertPlayerToUser).collect(Collectors.toList());
+
+        for (Connection connection : connections) {
+            connection1v1.put(connection, oneVsOne);
+            ConnectionManager.addConnection("1v1", oneVsOne.getDungeonId(), connection);
+            System.out.println("Assigned connection " + connection.getID() + " to 1v1 " + oneVsOne.getDungeonId());
+        }
+        oneVsOne.addConnections(connections, users);
+        new Thread(oneVsOne).start();
+
+        for (Connection connection : connections) {
+            Room room = connectionToRoom.get(connection);
+            if (room != null) {
+                room.removeConnection(connection);
+                connectionToRoom.remove(connection);
+                ConnectionManager.removeConnection("Hub", room.getRoomId(), connection);
+                System.out.println("Sending PlayerDeleted packet for player ID: " + connection.getID() + " in room: " + room.getRoomId());
+                ConnectionManager.sendToConnectionsExcept("Hub", room.getRoomId(), connection.getID(),
+                    new Network.PlayerDeleted(connection.getID()));
+                if (room.getPlayer().isEmpty()) {
+                    ConnectionManager.deleteRoom("Hub", room.getRoomId());
+                    rooms.remove(room);
+                    System.out.println("Removed empty room " + room.getRoomId());
+                }
+            }
+        }
+    }
+
+    public synchronized Room assignToRoom(Connection c, User user) {
+        for (Room r : rooms) {
+            if (!r.isFull()) {
+                System.out.println("Added connection to existing room " + r.getRoomId());
+                r.addConnection(c, user);
                 connectionToRoom.put(c, r);
+                ConnectionManager.addConnection("Hub", r.getRoomId(), c);
                 return r;
             }
-
         }
-        Room r = new Room(nextId++, server);
+        Room r = new Room(nextId++, "Hub", server, this);
         rooms.add(r);
         connectionToRoom.put(c, r);
-        r.addConnection(c, initMessage);
+        ConnectionManager.addConnection("Hub", r.getRoomId(), c);
+        r.addConnection(c, user);
         new Thread(r).start();
-
+        System.out.println("Created new room " + r.getRoomId());
         return r;
+    }
+
+    public synchronized void assignToDungeon(List<Connection> connections, List<Player> players, Squad squad) {
+        Dungeon dungeon = new Dungeon(dungeonNextId++, "Dungeon", server, this);
+        dungeons.add(dungeon);
+        List<User> users = players.stream().map(this::convertPlayerToUser).collect(Collectors.toList());
+
+        for (Connection connection : connections) {
+            connectionDungeon.put(connection, dungeon);
+            ConnectionManager.addConnection("Dungeon", dungeon.getDungeonId(), connection);
+            System.out.println("Assigned connection " + connection.getID() + " to dungeon " + dungeon.getDungeonId());
+        }
+        dungeon.addConnections(connections, users);
+        new Thread(dungeon).start();
+        for (Connection connection : connections) {
+            Room room = connectionToRoom.get(connection);
+            if (room != null) {
+                room.removeConnection(connection);
+                connectionToRoom.remove(connection);
+                ConnectionManager.removeConnection("Hub", room.getRoomId(), connection);
+                System.out.println("Sending PlayerDeleted packet for player ID: " + connection.getID() + " in room: " + room.getRoomId());
+                ConnectionManager.sendToConnectionsExcept("Hub", room.getRoomId(), connection.getID(),
+                    new Network.PlayerDeleted(connection.getID()));
+                if (room.getPlayer().isEmpty()) {
+                    ConnectionManager.deleteRoom("Hub", room.getRoomId());
+                    rooms.remove(room);
+                    System.out.println("Removed empty room " + room.getRoomId());
+                }
+            }
+        }
+    }
+
+    public synchronized Room assignToRoomBatch(List<Connection> connections, List<User> users) {
+        if (connections.size() != users.size()) {
+            System.err.println("Error: Mismatched connections and users sizes in assignToRoomBatch: " + connections.size() + " vs " + users.size());
+            return null;
+        }
+        for (Room r : rooms) {
+            if (r.getPlayer().size() + connections.size() <= Room.MAX_PLAYERS) {
+                System.out.println("Adding " + connections.size() + " connections to existing room " + r.getRoomId());
+                r.addConnections(connections, users);
+                for (Connection c : connections) {
+                    connectionToRoom.put(c, r);
+                    ConnectionManager.addConnection("Hub", r.getRoomId(), c);
+                }
+                return r;
+            }
+        }
+        Room r = new Room(nextId++, "Hub", server, this);
+        rooms.add(r);
+        r.addConnections(connections, users);
+        for (Connection c : connections) {
+            connectionToRoom.put(c, r);
+            ConnectionManager.addConnection("Hub", r.getRoomId(), c);
+        }
+        new Thread(r).start();
+        System.out.println("Created new room " + r.getRoomId() + " for " + connections.size() + " players");
+        return r;
+    }
+
+    public synchronized void backToRoom(Connection connection, Player player) {
+        if (connection == null || player == null) {
+            System.err.println("Error: Invalid connection or player in backToRoom, connection=" + connection + ", player=" + player);
+            return;
+        }
+
+        Dungeon dungeon = connectionDungeon.get(connection);
+        if (dungeon != null) {
+            System.out.println("Returning player ID " + connection.getID() + " to hub from dungeon " + dungeon.getDungeonId());
+            dungeon.removeConnection(connection);
+            connectionDungeon.remove(connection);
+            ConnectionManager.removeConnection("Dungeon", dungeon.getDungeonId(), connection);
+            ConnectionManager.sendToConnectionsExcept("Dungeon", dungeon.getDungeonId(), connection.getID(), new Network.PlayerDeleted(connection.getID()));
+
+            if (dungeon.getPlayer().isEmpty()) {
+                ConnectionManager.deleteRoom("Dungeon", dungeon.getDungeonId());
+                dungeons.remove(dungeon);
+                System.out.println("Dungeon " + dungeon.getDungeonId() + " is empty, removed");
+            }
+        } else {
+            OneVsOne oneVsOne = connection1v1.get(connection);
+            if (oneVsOne != null) {
+                System.out.println("Returning player ID " + connection.getID() + " to hub from 1v1 " + oneVsOne.getDungeonId());
+                oneVsOne.removeConnection(connection);
+                connection1v1.remove(connection);
+                ConnectionManager.removeConnection("1v1", oneVsOne.getDungeonId(), connection);
+                ConnectionManager.sendToConnectionsExcept("1v1", oneVsOne.getDungeonId(), connection.getID(), new Network.PlayerDeleted(connection.getID()));
+                if (oneVsOne.getPlayer().isEmpty()) {
+                    ConnectionManager.deleteRoom("1v1", oneVsOne.getDungeonId());
+                    rooms1v1.remove(oneVsOne);
+                    System.out.println("1v1 " + oneVsOne.getDungeonId() + " is empty, removed");
+                }
+            } else {
+                System.out.println("Warning: No dungeon or 1v1 found for connection ID " + connection.getID());
+            }
+        }
+
+        User user = convertPlayerToUser(player);
+        Room room = assignToRoom(connection, user);
+        System.out.println("Player ID " + connection.getID() + " assigned to hub room " + room.getRoomId());
     }
 
     public void removeFromRoom(Connection c) {
@@ -41,17 +272,152 @@ public class RoomManager {
         if (room != null) {
             room.removeConnection(c);
             connectionToRoom.remove(c);
+            ConnectionManager.removeConnection("Hub", room.getRoomId(), c);
+            ConnectionManager.sendToConnectionsExcept("Hub", room.getRoomId(), c.getID(), new Network.PlayerDeleted(c.getID()));
+            if (room.getPlayer().isEmpty()) {
+                ConnectionManager.deleteRoom("Hub", room.getRoomId());
+                rooms.remove(room);
+                System.out.println("Removed empty room " + room.getRoomId());
+            }
         }
-        server.sendToAllExceptTCP(c.getID(), new Network.PlayerDeleted(c.getID()));
+    }
+
+    public void removeFromDungeon(Connection c) {
+        Dungeon dungeon = connectionDungeon.get(c);
+        if (dungeon != null) {
+            dungeon.removeConnection(c);
+            connectionDungeon.remove(c);
+            ConnectionManager.removeConnection("Dungeon", dungeon.getDungeonId(), c);
+            ConnectionManager.sendToConnectionsExcept("Dungeon", dungeon.getDungeonId(), c.getID(), new Network.PlayerDeleted(c.getID()));
+            if (dungeon.getPlayer().isEmpty()) {
+                System.out.println("Dungeon deleted");
+                ConnectionManager.deleteRoom("Dungeon", dungeon.getDungeonId());
+                dungeons.remove(dungeon);
+                System.out.println("Removed empty dungeon " + dungeon.getDungeonId());
+            }
+        }
+    }
+
+    public void removeFromQueue(Connection c) {
+        QueueEntry entry = connectionToQueueEntry.remove(c);
+        if (entry != null) {
+            oneVsOneQueue.remove(entry);
+            System.out.println("Removed connection " + c.getID() + " from 1v1 queue");
+        }
+    }
+
+    public void removeFrom1v1(Connection c) {
+        OneVsOne oneVsOne = connection1v1.get(c);
+        if (oneVsOne != null) {
+            oneVsOne.removeConnection(c);
+            connection1v1.remove(c);
+            ConnectionManager.removeConnection("1v1", oneVsOne.getDungeonId(), c);
+            ConnectionManager.sendToConnectionsExcept("1v1", oneVsOne.getDungeonId(), c.getID(), new Network.PlayerDeleted(c.getID()));
+            if (oneVsOne.getPlayer().isEmpty()) {
+                System.out.println("1v1 deleted");
+                ConnectionManager.deleteRoom("1v1", oneVsOne.getDungeonId());
+                rooms1v1.remove(oneVsOne);
+                System.out.println("Removed empty 1v1 " + oneVsOne.getDungeonId());
+            }
+        }
+    }
+
+    public User convertPlayerToUser(Player player) {
+        User user = new User();
+        user.nickname = player.getName();
+        user.level = player.getLevel();
+        user.experience = (int) player.getExperience();
+        user.money = player.getMoney();
+        user.firebaseId = player.getFirebaseId();
+        user.wins = player.getWins();
+        user.losses = player.getLoses();
+        user.rating = player.getRating();
+        user.items = new Items();
+        user.items.weapons = new HashMap<>();
+        user.items.armor = new HashMap<>();
+
+        for (Weapon weapon : player.getInventory().getWeapons()) {
+            Map<String, Object> weaponMap = new HashMap<>();
+            weaponMap.put("name", weapon.getName());
+            weaponMap.put("level", weapon.getLevel());
+            String firebaseId = weapon.getFireBaseId() != null ? weapon.getFireBaseId() : UUID.randomUUID().toString();
+            user.items.weapons.put(firebaseId, weaponMap);
+            if (player.getCurrentWeapon() != null && weapon.getName().equals(player.getCurrentWeapon().getName())) {
+                user.equippedWeapon = firebaseId;
+            }
+        }
+
+        for (Armor armor : player.getInventory().getArmors()) {
+            Map<String, Object> armorMap = new HashMap<>();
+            armorMap.put("name", armor.getName());
+            armorMap.put("level", armor.getLevel());
+            String firebaseId = armor.getFirebaseId() != null ? armor.getFirebaseId() : UUID.randomUUID().toString();
+            user.items.armor.put(firebaseId, armorMap);
+            if (player.getEquipment().getHelmet() != null && armor.getName().equals(player.getEquipment().getHelmet().getName())) {
+                user.equippedArmorHelmet = firebaseId;
+            }
+            if (player.getEquipment().getChestplate() != null && armor.getName().equals(player.getEquipment().getChestplate().getName())) {
+                user.equippedArmorChestPlate = firebaseId;
+            }
+        }
+
+        if (user.equippedWeapon == null) {
+            user.equippedWeapon = "";
+        }
+        if (user.equippedArmorHelmet == null) {
+            user.equippedArmorHelmet = "";
+        }
+        if (user.equippedArmorChestPlate == null) {
+            user.equippedArmorChestPlate = "";
+        }
+
+        return user;
+    }
+
+    public synchronized void queueForOneVsOne(Connection c, User user) {
+        if (user.firebaseId == null || user.firebaseId.isEmpty()) {
+            System.err.println("Invalid firebaseId for user: " + user.nickname);
+            return;
+        }
+        if (connectionToQueueEntry.containsKey(c)) {
+            System.out.println("Player ID " + c.getID() + " already in 1v1 queue");
+            return;
+        }
+        QueueEntry entry = new QueueEntry(c, user);
+        oneVsOneQueue.add(entry);
+        connectionToQueueEntry.put(c, entry);
+        System.out.println("Player ID " + c.getID() + " (rating: " + user.rating + ", wins: " + user.wins + ") added to 1v1 queue");
     }
 
     public Room getRoomFor(Connection c) {
         return connectionToRoom.get(c);
     }
 
+    public boolean containsInRoom(Connection c) {
+        return connectionToRoom.containsKey(c);
+    }
 
+    public boolean containsInDungeon(Connection c) {
+        return connectionDungeon.containsKey(c);
+    }
 
+    public boolean containsIn1v1(Connection c) {
+        return connection1v1.containsKey(c);
+    }
 
+    public List<Dungeon> getDungeons() {
+        return dungeons;
+    }
 
+    public Dungeon getDungeonFor(Connection c) {
+        return connectionDungeon.get(c);
+    }
+
+    public OneVsOne getRoomFor1v1(Connection c) {
+        return connection1v1.get(c);
+    }
+
+    public List<OneVsOne> get1v1Matches() {
+        return rooms1v1;
+    }
 }
-

@@ -31,6 +31,8 @@ public class Projectile {
         this.velocity = new Vector2(deltaX, deltaY);
         this.isClient = isClient;
 
+        System.out.println(isClient);
+        System.out.println(proj);
         if(isClient){
         this.sprite = new Sprite(proj);
         this.sprite.setSize(GameConstants.Sprite.SIZE, GameConstants.Sprite.SIZE);
@@ -83,6 +85,15 @@ public class Projectile {
     public void draw(SpriteBatch batch, float camX, float camY) {
         if (!destroyed) {
             sprite.setPosition(positionSprite.x + camX, positionSprite.y + camY);
+            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+            sprite.setRotation(velocity.angleDeg());
+            hitbox.setRotation(velocity.angleDeg());
+            sprite.draw(batch);
+        }
+    }
+    public void drawMultiplayer(SpriteBatch batch, float camX, float camY) {
+        if (!destroyed) {
+            sprite.setPosition(positionSprite.x + camX-GameConstants.Sprite.SIZE/2, positionSprite.y + camY-GameConstants.Sprite.SIZE/2);
             sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
             sprite.setRotation(velocity.angleDeg());
             hitbox.setRotation(velocity.angleDeg());

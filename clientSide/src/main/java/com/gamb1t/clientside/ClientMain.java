@@ -2,33 +2,30 @@ package com.gamb1t.clientside;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
+import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.Networking.Network;
+import com.gamb1t.legacyforge.Networking.PlayerChangeListener;
 
 import java.io.IOException;
 
 public class ClientMain extends Game {
 
-    public String name;
-    public int experience;
-    public int level;
-    public int hp;
-    public int money;
+   public User user;
+
 
     Client client;
     public ClientGameScreen gameScreen;
     public ClientListener clientListener;
     public static AssetManager assetManager;
+    public PlayerChangeListener playerChangeListener;
+    String serverIp;
 
-    public ClientMain(String name, int experience, int level, int hp, int money) {
+    public ClientMain(User user, PlayerChangeListener changeListener, String serverIp) {
 
-        this.name = name;
-        this.experience = experience;
-        this.level = level;
-        this.hp = hp;
-        this.money = money;
-
+        this.playerChangeListener = changeListener;
+      this.user = user;
+      this.serverIp = serverIp;
     }
 
     public boolean isInitialized() {
@@ -41,6 +38,7 @@ public class ClientMain extends Game {
 
 
 
+
     @Override
     public void create() {
         assetManager  = new AssetManager();
@@ -48,14 +46,15 @@ public class ClientMain extends Game {
         client = new Client();
         Network.register(client.getKryo());
 
-        clientListener = new ClientListener(this, name, experience, level, hp, money);
+        clientListener = new ClientListener(this, user);
         client.addListener(clientListener);
 
 
         client.start();
+        System.out.println(serverIp);
 
         try {
-            client.connect(100000, "192.168.10.139", Network.TCP_PORT, Network.UDP_PORT);
+            client.connect(100000, serverIp, Network.TCP_PORT, Network.UDP_PORT);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -77,12 +76,25 @@ public class ClientMain extends Game {
     }
 
     public void initGamescreen(Network.StateMessageOnConnection sm) {
-        gameScreen = new ClientGameScreen(name, experience, level, money, clientListener.getStateMessageOnConnection(), client, assetManager);
+        gameScreen = new ClientGameScreen(sm.user, clientListener.getStateMessageOnConnection(), client, playerChangeListener);
         setScreen(gameScreen);
+
+
     }
+
+    public void initGamescreenDungeon(Network.StateMessageOnConnection sm) {
+
+        gameScreen = null;
+        gameScreen = new ClientGameScreen(sm.user, clientListener.getStateMessageOnConnection(), client, playerChangeListener);
+        setScreen(gameScreen);
+
+    }
+
+
 
     public int getMoney() {
         return gameScreen.getPlayerMoney();
     }
+
 
 }

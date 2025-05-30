@@ -16,6 +16,7 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  implementation 'com.google.firebase:firebase-admin:9.2.0'
   implementation 'com.github.crykn:kryonet:2.22.0-RC1'
   implementation project(':core')
 }

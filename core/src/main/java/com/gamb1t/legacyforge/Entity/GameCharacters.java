@@ -12,7 +12,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Server;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
+import com.gamb1t.legacyforge.Networking.ConnectionManager;
 import com.gamb1t.legacyforge.Networking.Network;
+import com.gamb1t.legacyforge.Weapons.Armor;
 import com.gamb1t.legacyforge.Weapons.Weapon;
 
 public abstract class GameCharacters {
@@ -27,16 +29,19 @@ public abstract class GameCharacters {
     protected float speed;
     protected int hp, maxHp;
     protected float mana = 100, maxMana = 100;
-    protected boolean isAlive;
+    protected boolean isAlive = true;
     protected Vector2 entityPos;
     protected  float width;
     protected  float heigh;
     protected Server server;
     protected int id;
+    protected int roomId;
+    protected String roomName;
 
     public Polygon hitbox;
 
     protected Weapon weapon;
+    protected Armor armour;
     protected MapManaging mapManager;
 
     public float cameraX, cameraY;
@@ -57,6 +62,9 @@ public abstract class GameCharacters {
         hitbox.setPosition(x, y);
         this.mapManager = mapManaging;
 
+    }
+    public void setArmour(Armor armour){
+        this.armour = armour;
     }
 
 
@@ -81,6 +89,8 @@ public abstract class GameCharacters {
         enemy.setPosition(enemy.getEntityPos().x + knockbacks.x, enemy.getEntityPos().y + knockbacks.y);
 
     }
+
+
 
 
 
@@ -112,12 +122,12 @@ public abstract class GameCharacters {
 
     public void sendHp(GameCharacters attackedEnemy){
         if(server != null){
-            Network.CurentHp dealedDamage = new Network.CurentHp();
+            Network.CurrentHp dealedDamage = new Network.CurrentHp();
             dealedDamage.isEnemy = attackedEnemy instanceof Enemy;
             dealedDamage.idOfEnemy = id;
             dealedDamage.curHp = hp;
             System.out.println("sent hp!");
-            server.sendToAllTCP(dealedDamage);
+           ConnectionManager.sendToConnections(roomName, roomId, dealedDamage);
         }
     }
 
@@ -147,9 +157,12 @@ public abstract class GameCharacters {
         currentFrame = 0;
     }
 
-    public void setServer(Server server){
+    public void setServer(Server server, int roomId, String name){
         this.server = server;
+        this.roomId = roomId;
+        this.roomName= name;
     }
+
 
 
 
@@ -171,6 +184,15 @@ public abstract class GameCharacters {
 
     public void addManna(float x){
         mana += x;
+        onManaChange();
+    }
+
+    public void onManaChange(){
+        if(server != null &&  this instanceof Player){
+            Network.OnManaChange onManaChange = new Network.OnManaChange();
+            onManaChange.amount = mana;
+            server.sendToTCP(getID(), onManaChange);
+        }
     }
 
     public float getManna(){
@@ -190,6 +212,10 @@ public abstract class GameCharacters {
         return  hp;
 
 
+    }
+    public boolean getIsAlive(){return isAlive; }
+    public void setIsAlive(boolean b){
+        isAlive =b;
     }
 
     public int getID(){return id;}

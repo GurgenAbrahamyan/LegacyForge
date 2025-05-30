@@ -3021,6 +3021,8 @@ drawable abc_textfield_search_material
 drawable abc_vector_test
 drawable avd_hide_password
 drawable avd_show_password
+drawable background
+drawable board
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
@@ -3029,6 +3031,10 @@ drawable btn_radio_off_mtrl
 drawable btn_radio_off_to_on_mtrl_animation
 drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
+drawable button
+drawable button_background
+drawable button_pressed
+drawable chains
 drawable common_full_open_on_phone
 drawable common_google_signin_btn_icon_dark
 drawable common_google_signin_btn_icon_dark_focused
@@ -3053,6 +3059,7 @@ drawable design_ic_visibility
 drawable design_ic_visibility_off
 drawable design_password_eye
 drawable design_snackbar_background
+drawable edittext
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
 drawable ic_arrow_back_black_24
@@ -3150,9 +3157,12 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable papyrus
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
+font gothicbyte
+font pixel_font
 id ALT
 id BOTTOM_END
 id BOTTOM_START
@@ -3252,6 +3262,7 @@ id beginning
 id below
 id bestChoice
 id blocking
+id board_base
 id bottom
 id bounce
 id bounceBoth
@@ -3263,6 +3274,7 @@ id browser_actions_menu_item_text
 id browser_actions_menu_items
 id browser_actions_menu_view
 id buttonPanel
+id button_holder
 id cache_measures
 id callMeasure
 id cancel_button
@@ -3274,6 +3286,7 @@ id center_horizontal
 id center_vertical
 id chain
 id chain2
+id chain_layout
 id chains
 id checkbox
 id checked
@@ -3342,7 +3355,6 @@ id editTextPassword
 id edit_query
 id edit_text_id
 id elastic
-id email
 id embed
 id end
 id endToStart
@@ -3377,6 +3389,7 @@ id graph_wrap
 id group_divider
 id grouping
 id groups
+id guest
 id header_title
 id hide_ime_id
 id hideable
@@ -3413,7 +3426,7 @@ id line3
 id linear
 id listMode
 id list_item
-id login_button
+id login
 id m3_side_sheet
 id main
 id marquee
@@ -3515,12 +3528,12 @@ id outline
 id outward
 id overshoot
 id packed
+id papyrus_holder
 id parallax
 id parent
 id parentPanel
 id parentRelative
 id parent_matrix
-id password
 id password_toggle
 id path
 id pathRelative
@@ -3542,6 +3555,7 @@ id right
 id rightToLeft
 id right_icon
 id right_side
+id root
 id rounded
 id row_index_key
 id save_non_transition_alpha
@@ -3573,6 +3587,7 @@ id shortcut
 id showCustom
 id showHome
 id showTitle
+id signboard_container
 id sin
 id single_player_button
 id skipCollapsed

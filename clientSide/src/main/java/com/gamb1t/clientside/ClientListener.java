@@ -1,29 +1,27 @@
 package com.gamb1t.clientside;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.Networking.Network;
+
+import java.util.ArrayList;
 
 public class ClientListener implements Listener {
 
-    public String name;
-    public int experience;
-    public int level;
-    public int hp;
-    public int money;
-
+    public User user;
     private  Network.StateMessageOnConnection stateMessageOnConnection;
     ClientMain clientM;
 
-    public ClientListener(ClientMain clientMain, String name, int experience, int level, int hp, int money){
-        this.name = name;
-        this.experience = experience;
-        this.level = level;
-        this.hp = hp;
-        this.money = money;
+    public ClientListener(ClientMain clientMain, User user){
+
         this.clientM = clientMain;
+        this.user = user;
     }
+
+    ArrayList<Network.PlayerState> player = new ArrayList<>();
 
     @Override
     public void received(Connection connection, Object object) {
@@ -32,18 +30,45 @@ public class ClientListener implements Listener {
             System.out.println("RECIEVED!!!ԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱԱ");
             this.stateMessageOnConnection = (Network.StateMessageOnConnection) object;
             Gdx.app.postRunnable(() -> {
-                clientM.initGamescreen(stateMessageOnConnection);
-            });
+                if(stateMessageOnConnection.gameMode.equals("Hub")) {
+                    clientM.initGamescreen(stateMessageOnConnection);}
+
+                else if (stateMessageOnConnection.gameMode.equals("Dungeon")){
+                    System.out.println(connection.getID());
+                    clientM.initGamescreenDungeon(stateMessageOnConnection);
+                }
+
+                for(Network.PlayerState state : player){
+                    clientM.gameScreen.addPlayer(state);
+                }
+
+
+        });
 
         }
         if(clientM.gameScreen != null){
 
+            if (object instanceof Network.PvpMatchStart) {
+                Network.PvpMatchStart match = (Network.PvpMatchStart) object;
+                if (match.playerId.equals (clientM.gameScreen.getPLAYER().getFirebaseId())) {
+                    clientM.gameScreen.getMultiplayerUi().setPvpMatch(match.opponentName);
+                }
+            }
+
         if (object instanceof Network.PlayerState) {
 
-            System.out.println("NIGGA CONNECTED" + connection.getID());
+
             clientM.gameScreen.addPlayer((Network.PlayerState) object );
 
 
+        }
+        if (object instanceof Network.SquadUpdate) {
+                Network.SquadUpdate update = (Network.SquadUpdate) object;
+                clientM.gameScreen.getMultiplayerUi().setSquadStatus(update.inSquad, update.countdown, update.memberNames);
+        }
+
+        if(object instanceof Network.OnPlayerEquipWeapon){
+            clientM.gameScreen.setNewWeapon((Network.OnPlayerEquipWeapon) object);
         }
 
         if(object instanceof Network.PlayerDeleted){
@@ -80,9 +105,9 @@ public class ClientListener implements Listener {
 
         }
 
-        if(object instanceof Network.CurentHp){
+        if(object instanceof Network.CurrentHp){
 
-            clientM.gameScreen.dealDamge((Network.CurentHp) object);
+            clientM.gameScreen.dealDamge((Network.CurrentHp) object);
           //  System.out.println("recieved new hp!");
         }
 
@@ -104,6 +129,11 @@ public class ClientListener implements Listener {
             clientM.gameScreen.attackDragged((Network.AttackDragged) object);
         }
 
+            if(object instanceof  Network.DoorOpened){
+
+                clientM.gameScreen.getMapManager().openDoor(new Vector2(((Network.DoorOpened) object).x, ((Network.DoorOpened) object).y));
+            }
+
         if(object instanceof Network.CreateProjectileMessage) {
 
             clientM.gameScreen.createProjectile((Network.CreateProjectileMessage) object);
@@ -112,6 +142,33 @@ public class ClientListener implements Listener {
         if(object instanceof Network.DestroyProjectileMessage){
             clientM.gameScreen.destroyProjectile((Network.DestroyProjectileMessage) object);
         }
+
+        if(object instanceof Network.PlayerStatsAdded){
+            Network.PlayerStatsAdded message = (Network.PlayerStatsAdded) object;
+                clientM.gameScreen.getPLAYER().addWhenKilledEnemy(message.moneyAmountAdded, message.expAmountAdded);
+            }
+
+        if(object instanceof Network.OnManaChange){
+            clientM.gameScreen.getPLAYER().setMana(((Network.OnManaChange)object).amount);
+        }
+
+        if(object instanceof  Network.OnPlayerEquipArmor){
+            System.out.println("equiping");
+            clientM.gameScreen.equipArmor((Network.OnPlayerEquipArmor)object );
+        }
+        if(object instanceof Network.enemyDied){
+            clientM.gameScreen.getEnemiesMap().get(((Network.enemyDied)object).diedEnemyId).setIsAlive(false);
+        }
+
+        }
+        else {
+
+            if (object instanceof Network.PlayerState) {
+
+
+                player.add((Network.PlayerState) object);
+
+            }
         }
 
 
@@ -121,16 +178,9 @@ public class ClientListener implements Listener {
     @Override
     public void connected(Connection connection) {
 
-        Network.PlayerInitMessage initMessage = new Network.PlayerInitMessage();
-
-        initMessage.name = name;
-        initMessage.experience = experience;
-        initMessage.level = level;
-        initMessage.hp = hp;
-        initMessage.money = money;
 
         System.out.println("SENDING MESSEGE");
-        connection.sendTCP(initMessage);
+        connection.sendTCP(user);
 
     }
 

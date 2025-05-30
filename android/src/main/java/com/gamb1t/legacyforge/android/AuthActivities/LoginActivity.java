@@ -1,5 +1,6 @@
 package com.gamb1t.legacyforge.android.AuthActivities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.R;
 import com.gamb1t.legacyforge.android.GameModeChoosing;
 import com.google.firebase.FirebaseApp;
@@ -20,8 +22,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private EditText emailField, passwordField;
-    private Button loginButton, goToRegisterButton;
+    private Button loginButton, goToRegisterButton, guestButton;
 
+    private String tempAcc = "bopirep699@dlbazi.com";
+    private String tempAccPass = "123456789";
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
@@ -30,10 +36,11 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        emailField = findViewById(R.id.email);
-        passwordField = findViewById(R.id.password);
-        loginButton = findViewById(R.id.login_button);
+        emailField = findViewById(R.id.editTextEmail);
+        passwordField = findViewById(R.id.editTextPassword);
         goToRegisterButton = findViewById(R.id.register_button);
+        loginButton = findViewById(R.id.login);
+        guestButton = findViewById(R.id.guest);
 
         loginButton.setOnClickListener(v -> {
             String email = emailField.getText().toString().trim();
@@ -50,6 +57,29 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, RegisterActivity.class));
             finish();
         });
+
+        loginButton.setOnClickListener(v -> {
+            String email = emailField.getText().toString().trim();
+            String password = passwordField.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            } else {
+                loginUser(email, password);
+            }
+        });
+
+        guestButton.setOnClickListener(v -> {
+            String email = tempAcc;
+            String password = tempAccPass;
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            } else {
+                loginUser(email, password);
+            }
+        });
+
     }
 
     private void loginUser(String email, String password) {
@@ -64,23 +94,20 @@ public class LoginActivity extends AppCompatActivity {
 
                         userRef.get().addOnSuccessListener(snapshot -> {
                             if (snapshot.exists()) {
+                                User user = snapshot.getValue(User.class);
 
-                                String nickname = snapshot.child("nickname").getValue(String.class);
-                                int level = snapshot.child("level").getValue(Integer.class);
-                                int exp = snapshot.child("experience").getValue(Integer.class);
-                                int money = snapshot.child("money").getValue(Integer.class);
+                                if (user != null) {
+                                    System.out.println(user.equippedWeapon);
+                                    Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
 
-
-
-                                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
-
-                                Intent intent = new Intent(this, GameModeChoosing.class);
-                                intent.putExtra("nickname", nickname);
-                                intent.putExtra("money", money);
-
-                                intent.putExtra("playerId", mAuth.getCurrentUser().getUid());
-                                startActivity(intent);
-                                finish();
+                                    Intent intent = new Intent(this, GameModeChoosing.class);
+                                    intent.putExtra("user", user);
+                                    intent.putExtra("playerId", uid);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(this, "Error parsing user data.", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 Toast.makeText(this, "User data not found in database.", Toast.LENGTH_SHORT).show();
                             }
@@ -97,5 +124,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
     }
+
 
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Intersector;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Entity.Player;
@@ -14,8 +15,12 @@ import com.gamb1t.legacyforge.Enviroments.MapManaging;
 import com.gamb1t.legacyforge.ManagerClasses.GameConstants;
 
 import java.util.ArrayList;
+import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MeleeWeapon extends Weapon {
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private long lastAttackTime;
     private final long attackCooldown = 500;
     private Polygon hitbox;
@@ -115,14 +120,16 @@ public class MeleeWeapon extends Weapon {
     }
 
     @Override
-    public <T extends GameCharacters> void checkHitboxCollisionsEntity(ArrayList<T> enemies) {
+    public <T extends GameCharacters> void checkHitboxCollisionsEntity(List<T> enemies) {
         if (!isAttacking || hitbox == null) return;
 
         for (GameCharacters enemy : enemies) {
             if (enemy != null && enemy.hitbox != null) {
+                if(enemy != enity){
                 if (Intersector.overlapConvexPolygons(hitbox, enemy.getHitbox())) {
                     dealDamage(enemy);
                     applyKnockback(enemy);
+                }
                 }
             }
         }
