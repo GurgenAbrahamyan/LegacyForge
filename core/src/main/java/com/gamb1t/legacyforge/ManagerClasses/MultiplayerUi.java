@@ -92,7 +92,7 @@ public class MultiplayerUi {
         );
 
         closePanelButtonBounds = new Rectangle(
-            panelX + panelWidth - btnWidth,
+            panelX + panelWidth - btnWidth ,
             panelY + panelHeight - btnHeight,
             btnWidth,
             btnHeight
