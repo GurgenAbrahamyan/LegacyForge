@@ -13,6 +13,7 @@ import com.gamb1t.legacyforge.Entity.Enemy;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.Enviroments.MapManaging;
+import com.gamb1t.legacyforge.Main;
 import com.gamb1t.legacyforge.Networking.LocalInputSender;
 import com.gamb1t.legacyforge.Networking.PlayerChangeListener;
 import com.gamb1t.legacyforge.Structures.ArmorShop;
@@ -67,9 +68,139 @@ public class GameScreen implements Screen {
 
     private GameRendering gameRendering;
     private GameUpdate gameUpdate;
+    private Main main;
 
-    public GameScreen(User user, PlayerChangeListener playerChangeListener) {
+    public GameScreen(User user, PlayerChangeListener playerChangeListener, Main main) {
 
+        this.main = main;
+        weaponLoader = new WeaponLoader("weapons.json", true);
+        weaponLoader2 = new WeaponLoader("enemyWeapon.json", true);
+        weapon = weaponLoader.getWeaponList();
+
+        mapManager = new MapManaging("1room.txt", "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
+
+        mapManager.initializeOutside();
+
+        PLAYER= new Player(user.nickname,  user.level, user.experience, user.money, mapManager.getRespPlayer().x+GameConstants.Sprite.SIZE/2, mapManager.getRespPlayer().y+GameConstants.Sprite.SIZE/2,null, mapManager);
+        PLAYER.setIsClient(true);
+        PLAYERS.add(PLAYER);
+        PLAYER.addChangeListener(playerChangeListener);
+
+
+
+        PLAYER.addInventoryWeapons(weaponLoader.getWeaponsFromMap(user.items.weapons));
+
+        PLAYER.setCurrentWeapon(PLAYER.getInventory().getWeaponByName((String) user.items.weapons.get(user.equippedWeapon).get("name")));
+
+
+
+        enemyWeapon = weaponLoader2.getWeaponList();
+
+
+        enemyLoader = new EnemyLoader(PLAYERS, enemyWeapon, "enemies.json", mapManager.getRespEnemy(), mapManager);
+
+        batch = new SpriteBatch();
+
+        PLAYER.setRespPoint(mapManager.getRespPlayer());
+
+
+
+        PLAYER.setTexture("player_sprites/player_spritesheet.png");
+
+        ArmorLoader armorLoader = new ArmorLoader("armor.json");
+
+
+
+        PLAYER.addInventoryArmors(
+            armorLoader.getArmorsFromMap(user.items.armor)
+        );
+        Armor helmet = PLAYER.getInventory().getArmorByName((String) user.items.armor.get(user.equippedArmorHelmet).get("name"));
+        PLAYER.equipArmor(helmet);
+
+        Armor chest = PLAYER.getInventory().getArmorByName((String) user.items.armor.get(user.equippedArmorChestPlate).get("name"));
+        PLAYER.equipArmor(chest);
+
+
+        Enemies= enemyLoader.getEnemyList();
+
+        for (Enemy enemy : Enemies) {
+            enemy.setTexture(enemyLoader.getSpritesheetPath().get(enemy.getId()));
+            enemy.getWeapon().setEntity(enemy);
+            enemy.setPlayer(PLAYER);
+
+            if(enemy.getWeapon() instanceof RangedWeapon){
+            ((RangedWeapon) enemy.getWeapon()).setMap(mapManager);
+
+            }
+        }
+
+
+
+        localInputSender = new LocalInputSender(PLAYER, PLAYER.getCurrentWeapon());
+
+
+
+
+        shapeRenderer = new ShapeRenderer();
+        font = new BitmapFont();
+
+
+        gameUI = new GameUI(PLAYER,  PLAYERS);
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        touchEvents = new TouchManager(PLAYER, PLAYER.getCurrentWeapon(), localInputSender);
+        multiplexer.addProcessor(touchEvents);
+        Gdx.input.setInputProcessor(multiplexer);
+
+
+
+
+
+        if(mapManager.getShopCoordinates() != null) {
+            shop = new Shop(mapManager.getShopCoordinates().x, mapManager.getShopCoordinates().y,
+                GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 3, "shops/basic_shop.png", weaponLoader, PLAYER, touchEvents);
+
+            shop.initializeRendeingObjects();
+        }
+       if(mapManager.getArmorShopCoordinates()!=null) {
+           armorShop = new ArmorShop(mapManager.getArmorShopCoordinates().x, mapManager.getArmorShopCoordinates().y,
+               GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 3, "shops/armor_shop_sprite.png", armorLoader, PLAYER, touchEvents);
+
+           armorShop.initializeRenderingObjects();
+       }
+        for (Weapon w : enemyWeapon) {
+
+            w.setTexture(w.getSprite());
+            w.convertTxtRegToSprite();
+            if(w instanceof MagicWeapon){
+                ((MagicWeapon)  w).setCurrentMap(mapManager);
+                ((MagicWeapon)  w).initProj();
+            }
+            if(w instanceof RangedWeapon){
+                ((RangedWeapon)  w).initProj();
+            }
+        }
+
+        if(shop != null){
+        for (Weapon w : shop.getWeaponList()) {
+
+            w.setTexture(w.getSprite());
+            w.convertTxtRegToSprite();
+        }}
+
+        if(armorShop != null){
+        for(Armor armor : armorShop.getArmorList()){
+            armor.loadTexture();
+        }
+    }
+
+        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop,  touchEvents, gameUI);
+        gameUpdate = new GameUpdate(Enemies, PLAYERS, mapManager, shop, armorShop);
+        touchEvents.setISinglePlayer(true);
+    }
+
+    public GameScreen(User user, PlayerChangeListener playerChangeListener, Main main, int i) {
+
+        this.main = main;
         weaponLoader = new WeaponLoader("weapons.json", true);
         weaponLoader2 = new WeaponLoader("dungeonEnemyWeapon.json", true);
         weapon = weaponLoader.getWeaponList();
@@ -126,7 +257,7 @@ public class GameScreen implements Screen {
             enemy.setPlayer(PLAYER);
 
             if(enemy.getWeapon() instanceof RangedWeapon){
-            ((RangedWeapon) enemy.getWeapon()).setMap(mapManager);
+                ((RangedWeapon) enemy.getWeapon()).setMap(mapManager);
 
             }
         }
@@ -142,10 +273,9 @@ public class GameScreen implements Screen {
         font = new BitmapFont();
 
 
-        gameUI = new GameUI();
+        gameUI = new GameUI(PLAYER,  PLAYERS);
         InputMultiplexer multiplexer = new InputMultiplexer();
         touchEvents = new TouchManager(PLAYER, PLAYER.getCurrentWeapon(), localInputSender);
-        multiplexer.addProcessor(gameUI.getStage());
         multiplexer.addProcessor(touchEvents);
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -159,12 +289,12 @@ public class GameScreen implements Screen {
 
             shop.initializeRendeingObjects();
         }
-       if(mapManager.getArmorShopCoordinates()!=null) {
-           armorShop = new ArmorShop(mapManager.getArmorShopCoordinates().x, mapManager.getArmorShopCoordinates().y,
-               GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 3, "shops/armor_shop_sprite.png", armorLoader, PLAYER, touchEvents);
+        if(mapManager.getArmorShopCoordinates()!=null) {
+            armorShop = new ArmorShop(mapManager.getArmorShopCoordinates().x, mapManager.getArmorShopCoordinates().y,
+                GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 3, "shops/armor_shop_sprite.png", armorLoader, PLAYER, touchEvents);
 
-           armorShop.initializeRenderingObjects();
-       }
+            armorShop.initializeRenderingObjects();
+        }
         for (Weapon w : enemyWeapon) {
 
             w.setTexture(w.getSprite());
@@ -179,19 +309,19 @@ public class GameScreen implements Screen {
         }
 
         if(shop != null){
-        for (Weapon w : shop.getWeaponList()) {
+            for (Weapon w : shop.getWeaponList()) {
 
-            w.setTexture(w.getSprite());
-            w.convertTxtRegToSprite();
-        }}
+                w.setTexture(w.getSprite());
+                w.convertTxtRegToSprite();
+            }}
 
         if(armorShop != null){
-        for(Armor armor : armorShop.getArmorList()){
-            armor.loadTexture();
+            for(Armor armor : armorShop.getArmorList()){
+                armor.loadTexture();
+            }
         }
-    }
 
-        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop,  touchEvents);
+        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop,  touchEvents, gameUI);
         gameUpdate = new GameUpdate(Enemies, PLAYERS, mapManager, shop, armorShop);
         touchEvents.setISinglePlayer(true);
     }
@@ -223,6 +353,7 @@ public class GameScreen implements Screen {
 
 
       gameRendering.render();
+
     }
 
     @Override

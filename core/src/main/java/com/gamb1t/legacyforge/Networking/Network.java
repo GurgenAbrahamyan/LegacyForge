@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Network {
-    public static final int TCP_PORT = 54555;
-    public static final int UDP_PORT = 54777;
+    public static final int TCP_PORT = 54559;
+    public static final int UDP_PORT = 54778;
 
     public static class StateMessageOnConnection {
         public int newPlayerId;
@@ -238,7 +238,7 @@ public class Network {
 
     public static class PvpRequest {
         public String playerId;
-        public String mode; // e.g., "1v1"
+        public String mode;
     }
 
     public static class PvpMatchStart {

@@ -109,8 +109,9 @@ public class ClientGameScreen implements Screen {
 
 
         weaponLoader = new WeaponLoader(connection.playerWeaponJson, true);
-        weaponLoader2 = new WeaponLoader(connection.enemyWeaponJson, true);
-
+        if(connection.enemyWeaponJson != null) {
+            weaponLoader2 = new WeaponLoader(connection.enemyWeaponJson, true);
+        }
         for (Weapon w : weaponLoader.getWeaponList()) {
 
             w.setTexture(w.getSprite());
@@ -261,10 +262,12 @@ public class ClientGameScreen implements Screen {
             player.setTexture("player_sprites/player_spritesheet.png");
             player.setRespPoint(mapManager.getRespPlayer());
         }
-        enemyWeapon = weaponLoader2.getWeaponList();
+        if(weaponLoader2 != null) {
+            enemyWeapon = weaponLoader2.getWeaponList();
 
-        enemyLoader= new EnemyLoader(PLAYERS, enemyWeapon, connection.jsonPath, mapManager.getRespEnemy(), mapManager);
+            enemyLoader = new EnemyLoader(PLAYERS, enemyWeapon, connection.jsonPath, mapManager.getRespEnemy(), mapManager);
 
+        }
         networkInputSender = new NetworkInputSender(PLAYER, PLAYER.getCurrentWeapon(), client);
 
 
@@ -315,10 +318,9 @@ public class ClientGameScreen implements Screen {
         font = new BitmapFont();
 
 
-        gameUI = new GameUI();
+        gameUI = new GameUI(PLAYER, PLAYERS);
         InputMultiplexer multiplexer = new InputMultiplexer();
         touchEvents = new TouchManager(PLAYER, PLAYER.getCurrentWeapon(), networkInputSender);
-        multiplexer.addProcessor(gameUI.getStage());
         multiplexer.addProcessor(touchEvents);
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -353,6 +355,7 @@ public class ClientGameScreen implements Screen {
 
 
 
+        if(enemyWeapon != null){
         for (Weapon w : enemyWeapon) {
 
             w.setTexture(w.getSprite());
@@ -364,9 +367,9 @@ public class ClientGameScreen implements Screen {
             if(w instanceof RangedWeapon){
                 ((RangedWeapon)  w).initProj();
             }
-        }
+        }}
 
-        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop, touchEvents);
+        gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop, touchEvents, gameUI);
     }
 
     public void createProjectile(Network.CreateProjectileMessage projectileMessage){
@@ -829,10 +832,7 @@ public class ClientGameScreen implements Screen {
             font = null;
         }
 
-        if (gameUI != null) {
-            gameUI.dispose();
-            gameUI = null;
-        }
+
         if (multiplayerUi != null) {
             multiplayerUi.dispose();
             multiplayerUi = null;

@@ -36,7 +36,7 @@ public class Dungeon implements Runnable {
     protected Server server;
     protected MapManaging mapManager;
 
-    private ArrayList<Enemy> Enemies = new ArrayList<>();
+    protected ArrayList<Enemy> Enemies = new ArrayList<>();
 
     public float playerX, playerY;
 
@@ -175,7 +175,7 @@ public class Dungeon implements Runnable {
 
                 synchronized (playersConnections) {
                     if (!playersConnections.isEmpty()) {
-                        System.out.println("Warning: " + playersConnections.size() + " players still in dungeon " + roomId);
+                      playersConnections.replaceAll(null);
                     }
                 }
 
@@ -183,7 +183,7 @@ public class Dungeon implements Runnable {
                 System.out.println("Cleaning up dungeon " + roomId);
                 ConnectionManager.deleteRoom("Dungeon", roomId);
                 roomManager.getDungeons().remove(this);
-                running = false; // Stop the dungeon thread
+                running = false;
             }
 
             long sleep = frameTime - (System.nanoTime() - now);
@@ -293,18 +293,19 @@ public class Dungeon implements Runnable {
             }
         }
         msg.enemies = new ArrayList<>();
-        for (Enemy e : Enemies) {
-            EnemyState es = new EnemyState();
-            es.id = e.getID();
-            es.x = e.getEntityPos().x / GameConstants.Sprite.SIZE;
-            es.y = e.getEntityPos().y / GameConstants.Sprite.SIZE;
-            es.dirX = e.getDirX();
-            es.dirY = e.getDirY();
-            es.hp = (int) e.getHp();
-            es.speed = e.getSpeed();
-            msg.enemies.add(es);
+        if(Enemies != null) {
+            for (Enemy e : Enemies) {
+                EnemyState es = new EnemyState();
+                es.id = e.getID();
+                es.x = e.getEntityPos().x / GameConstants.Sprite.SIZE;
+                es.y = e.getEntityPos().y / GameConstants.Sprite.SIZE;
+                es.dirX = e.getDirX();
+                es.dirY = e.getDirY();
+                es.hp = (int) e.getHp();
+                es.speed = e.getSpeed();
+                msg.enemies.add(es);
+            }
         }
-
         msg.mapInfo.hitboxPath = mapManager.getHitboxFile().replace(asset, "");
         msg.mapInfo.mapPath = mapManager.getMapName().replace(asset, "");
         msg.mapInfo.renderPath = mapManager.getTilesSpritesheet();
@@ -359,6 +360,7 @@ public class Dungeon implements Runnable {
             p.setRespPoint(mapManager.getRespPlayer());
             p.setId(c.getID());
             p.setServer(server, roomId, gameMode);
+            p.setFirebaseId(newPlayer.firebaseId);
 
             p.addInventoryWeapons(weaponLoader.getWeaponsFromMap(newPlayer.items.weapons));
             p.setCurrentWeapon(p.getInventory().getWeaponByName((String) newPlayer.items.weapons.get(newPlayer.equippedWeapon).get("name")));

@@ -80,19 +80,23 @@ public class GameUpdate {
             if (PLAYER.getCurrentWeapon().getAttacking()) {
                 if (PLAYER.getCurrentWeapon() instanceof RangedWeapon || PLAYER.getCurrentWeapon() instanceof MeleeWeapon) {
                     PLAYER.getCurrentWeapon().update(delta);
-                    PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);
+                    if(enemies != null){
+                    PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);}
                     PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
                 }
             }
 
             if (PLAYER.getCurrentWeapon() instanceof MagicWeapon) {
                 PLAYER.getCurrentWeapon().update(delta);
-                PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);
+                if (enemies != null) {
+
+                PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);}
                 PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
             }
         }
 
 
+        if(enemies != null){
         for (Enemy enemy : enemies) {
             enemy.getWeapon().setDelta(delta);
             enemy.updateMove(delta);
@@ -152,6 +156,8 @@ public class GameUpdate {
 
 
 
+
+        }
 
         }
 

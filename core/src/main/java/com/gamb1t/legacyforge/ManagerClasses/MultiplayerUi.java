@@ -18,10 +18,9 @@ public class MultiplayerUi {
     private boolean isShopOpen = false;
     private boolean isNearShop = false;
     private boolean isSquadPanelOpen = false;
-    private boolean isInSquad = false;
+    private boolean isInDungeonSquad = false;
     private float squadCountdown = -1;
     private ArrayList<String> squadMemberNames = new ArrayList<>();
-    private String pvpOpponentName = null;
 
     private float shopX, shopY;
     private float shopWidth, shopHeight;
@@ -36,7 +35,7 @@ public class MultiplayerUi {
 
     private Client client;
 
-    private Sprite btnJoinSquad, btnLeaveSquad, btnClosePanel, openPanelBtn, openPanelSprite, btnStartPvp;
+    private Sprite btnJoinSquad, btnLeaveSquad, btnClosePanel, openPanelBtn, openPanelSprite;
 
     private float panelTile;
     private float btnWidth = GameConstants.Sprite.SIZE * 4;
@@ -47,7 +46,6 @@ public class MultiplayerUi {
     private Rectangle leaveSquadButtonBounds;
     private Rectangle closePanelButtonBounds;
     private Rectangle openPanelButtonBounds;
-    private Rectangle startPvpButtonBounds;
 
     public MultiplayerUi(Player player, Client client) {
         this.player = player;
@@ -58,6 +56,7 @@ public class MultiplayerUi {
     public void initializeRendeingObjects() {
         this.panelTexture = new Sprite(new Texture("ui/play_window_open.png"));
         this.font = new BitmapFont();
+        this.font.getData().setScale(1.5f); // Increased font size
 
         panelY = 0;
         panelWidth = GameConstants.GET_HEIGHT;
@@ -71,29 +70,21 @@ public class MultiplayerUi {
         btnJoinSquad = new Sprite(new Texture("ui/join_btn.png"));
         btnLeaveSquad = new Sprite(new Texture("ui/leave_btn.png"));
         btnClosePanel = new Sprite(new Texture("ui/close_btn.png"));
-        btnStartPvp = new Sprite(new Texture("ui/join_btn.png"));
 
         float buttonSpacing = 10;
         float panelCenterX = panelX + panelWidth / 2;
         float panelCenterY = panelY + panelHeight / 2;
 
         joinSquadButtonBounds = new Rectangle(
-            panelCenterX - btnWidth * 1.5f - buttonSpacing,
-            panelCenterY - btnHeight / 2,
+            panelCenterX - btnWidth / 2,
+            panelCenterY + btnHeight / 2 + buttonSpacing,
             btnWidth,
             btnHeight
         );
 
         leaveSquadButtonBounds = new Rectangle(
-            panelCenterX + buttonSpacing / 2,
-            panelCenterY - btnHeight / 2,
-            btnWidth,
-            btnHeight
-        );
-
-        startPvpButtonBounds = new Rectangle(
             panelCenterX - btnWidth / 2,
-            panelCenterY - btnHeight * 1.5f - buttonSpacing,
+            panelCenterY - btnHeight / 2 - buttonSpacing,
             btnWidth,
             btnHeight
         );
@@ -137,22 +128,18 @@ public class MultiplayerUi {
         } else {
             if (closePanelButtonBounds.contains(touchX, touchY)) {
                 isSquadPanelOpen = false;
-            } else if (!isInSquad && joinSquadButtonBounds.contains(touchX, touchY)) {
+            } else if (!isInDungeonSquad && joinSquadButtonBounds.contains(touchX, touchY)) {
                 Network.SquadAction action = new Network.SquadAction();
                 action.playerId = player.getID();
                 action.action = "join";
                 client.sendTCP(action);
-            } else if (isInSquad && leaveSquadButtonBounds.contains(touchX, touchY)) {
+                Gdx.app.log("MultiplayerUi", "Sent join dungeon squad request for player " + player.getID());
+            } else if (isInDungeonSquad && leaveSquadButtonBounds.contains(touchX, touchY)) {
                 Network.SquadAction action = new Network.SquadAction();
                 action.playerId = player.getID();
                 action.action = "leave";
                 client.sendTCP(action);
-            } else if (!isInSquad && startPvpButtonBounds.contains(touchX, touchY)) {
-                Network.PvpRequest request = new Network.PvpRequest();
-                request.playerId = player.getFirebaseId();
-                request.mode = "1v1";
-                client.sendTCP(request);
-                Gdx.app.log("MultiplayerUi", "Sent 1v1 request for player " + player.getID());
+                Gdx.app.log("MultiplayerUi", "Sent leave dungeon squad request for player " + player.getID());
             }
         }
     }
@@ -171,7 +158,7 @@ public class MultiplayerUi {
             panelTexture.setBounds(panelX, panelY, panelWidth, panelHeight);
             panelTexture.draw(batch);
 
-            if (!isInSquad) {
+            if (!isInDungeonSquad) {
                 btnJoinSquad.setBounds(
                     joinSquadButtonBounds.x,
                     joinSquadButtonBounds.y,
@@ -179,14 +166,6 @@ public class MultiplayerUi {
                     joinSquadButtonBounds.height
                 );
                 btnJoinSquad.draw(batch);
-
-                btnStartPvp.setBounds(
-                    startPvpButtonBounds.x,
-                    startPvpButtonBounds.y,
-                    startPvpButtonBounds.width,
-                    startPvpButtonBounds.height
-                );
-                btnStartPvp.draw(batch);
             } else {
                 btnLeaveSquad.setBounds(
                     leaveSquadButtonBounds.x,
@@ -196,6 +175,7 @@ public class MultiplayerUi {
                 );
                 btnLeaveSquad.draw(batch);
             }
+
             btnClosePanel.setBounds(
                 closePanelButtonBounds.x,
                 closePanelButtonBounds.y,
@@ -204,37 +184,30 @@ public class MultiplayerUi {
             );
             btnClosePanel.draw(batch);
 
-            if (squadCountdown > 0) {
+            float rosterY = panelY + panelHeight - 100;
+            if (isInDungeonSquad && squadCountdown > 0) {
                 String countdownText = "Dungeon starts in: " + (int) Math.ceil(squadCountdown) + "s";
                 font.draw(batch, countdownText, panelX + panelWidth / 2 - 50, panelY + panelHeight - 50);
             }
-            float rosterY = panelY + panelHeight - 100;
-            if (pvpOpponentName != null) {
-                font.draw(batch, "1v1 Match vs: " + pvpOpponentName, panelX + panelWidth / 2 - 50, rosterY);
-            } else if (squadMemberNames.isEmpty()) {
-                font.draw(batch, "No players in squad", panelX + panelWidth / 2 - 50, rosterY);
+            if (isInDungeonSquad) {
+                font.draw(batch, "Dungeon Squad:", panelX + panelWidth / 2 - 50, rosterY);
+            }
+            if (squadMemberNames.isEmpty()) {
+                font.draw(batch, "No players in squad", panelX + panelWidth / 2 - 50, rosterY - 20);
             } else {
                 for (int i = 0; i < squadMemberNames.size(); i++) {
-                    font.draw(batch, squadMemberNames.get(i), panelX + panelWidth / 2 - 50, rosterY - i * 20);
+                    font.draw(batch, squadMemberNames.get(i), panelX + panelWidth / 2 - 50, rosterY - (i + 1) * 20);
                 }
             }
         }
         batch.end();
     }
 
-
     public void setSquadStatus(boolean inSquad, float countdown, ArrayList<String> memberNames) {
-        this.isInSquad = inSquad;
+        this.isInDungeonSquad = inSquad;
         this.squadCountdown = countdown;
         this.squadMemberNames = memberNames != null ? new ArrayList<>(memberNames) : new ArrayList<>();
-        this.pvpOpponentName = null;
-    }
-
-    public void setPvpMatch(String opponentName) {
-        this.pvpOpponentName = opponentName;
-        this.isInSquad = false;
-        this.squadMemberNames.clear();
-        Gdx.app.log("MultiplayerUi", "1v1 match started vs " + opponentName);
+        Gdx.app.log("MultiplayerUi", "Squad status updated: inDungeonSquad=" + isInDungeonSquad + ", members=" + squadMemberNames);
     }
 
     public void dispose() {
@@ -244,7 +217,6 @@ public class MultiplayerUi {
         btnJoinSquad.getTexture().dispose();
         btnLeaveSquad.getTexture().dispose();
         btnClosePanel.getTexture().dispose();
-        btnStartPvp.getTexture().dispose();
         font.dispose();
     }
 }

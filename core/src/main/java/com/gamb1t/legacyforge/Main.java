@@ -38,7 +38,7 @@ public class Main extends Game {
         assets = new AssetManager();
 
 
-        gameScreen = new GameScreen(user, playerChangeListener);
+        gameScreen = new GameScreen(user, playerChangeListener, this);
 
         this.setScreen(gameScreen);
 

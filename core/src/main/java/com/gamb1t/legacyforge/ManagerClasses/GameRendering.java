@@ -26,10 +26,11 @@ public class GameRendering {
     private final Shop shop;
     private final ArmorShop armorShop;
     private final TouchManager touchEvents;
+    private final  GameUI gameUi;
 
     public GameRendering(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font,
                          Player PLAYER, ArrayList< Enemy> Enemies, List<Player> players,
-                         MapManaging mapManager, Shop shop, ArmorShop armorShop, TouchManager touchEvents) {
+                         MapManaging mapManager, Shop shop, ArmorShop armorShop, TouchManager touchEvents, GameUI gameUI) {
         this.batch = batch;
         this.shapeRenderer = shapeRenderer;
         this.font = font;
@@ -40,6 +41,7 @@ public class GameRendering {
         this.shop = shop;
         this.armorShop =armorShop;
         this.touchEvents = touchEvents;
+        this.gameUi= gameUI;
     }
 
     public void render() {
@@ -66,24 +68,26 @@ if(player.getEquipment() !=null)
         }
 
 
-        for (Enemy enemy : Enemies) {
-            batch.draw(enemy.getIsAlive()? enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()) : enemy.getSprite(6, 0),
-                enemy.getEntityPos().x + PLAYER.cameraX - GameConstants.Sprite.SIZE / 2,
-                enemy.getEntityPos().y + PLAYER.cameraY - GameConstants.Sprite.SIZE / 2,
-                GameConstants.Sprite.SIZE,
-                GameConstants.Sprite.SIZE);
+        if(Enemies != null) {
+            for (Enemy enemy : Enemies) {
+                batch.draw(enemy.getIsAlive() ? enemy.getSprite(enemy.getAniIndex(), enemy.getFaceDir()) : enemy.getSprite(6, 0),
+                    enemy.getEntityPos().x + PLAYER.cameraX - GameConstants.Sprite.SIZE / 2,
+                    enemy.getEntityPos().y + PLAYER.cameraY - GameConstants.Sprite.SIZE / 2,
+                    GameConstants.Sprite.SIZE,
+                    GameConstants.Sprite.SIZE);
 
-            enemy.getWeapon().draw(batch,
-                enemy.getEntityPos().x + PLAYER.cameraX - GameConstants.Sprite.SIZE / 2,
-                enemy.getEntityPos().y + PLAYER.cameraY - GameConstants.Sprite.SIZE / 2);
+                enemy.getWeapon().draw(batch,
+                    enemy.getEntityPos().x + PLAYER.cameraX - GameConstants.Sprite.SIZE / 2,
+                    enemy.getEntityPos().y + PLAYER.cameraY - GameConstants.Sprite.SIZE / 2);
+            }
         }
-
         if(shop != null){
         shop.draw(batch, PLAYER.cameraX, PLAYER.cameraY);}
         if(armorShop != null){
         armorShop.draw(batch, PLAYER.cameraX, PLAYER.cameraY);}
 
         batch.end();
+
 
         for (Enemy enemy : Enemies) {
             enemy.drawBar(batch, shapeRenderer, font);
@@ -96,12 +100,14 @@ if(player.getEquipment() !=null)
         }
         }
 
-        if(shop != null){
-        shop.drawShopUi(batch);}
-        if(armorShop != null){
-        armorShop.drawShopUi(batch);}
 
         PLAYER.drawBar(batch, shapeRenderer, font);
+        gameUi.render(batch, new BitmapFont());
+        if(shop != null){
+            shop.drawShopUi(batch);}
+        if(armorShop != null){
+            armorShop.drawShopUi(batch);}
+
         touchEvents.draw(batch);
     }
 }

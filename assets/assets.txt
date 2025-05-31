@@ -1,7 +1,10 @@
 1room.txt
 1roomHitbox.txt
+1v1Hitboxes.txt
+1v1Textures.txt
 Tiles/Dungeon_Tileset.png
 Tiles/tileset_floor.png
+aram_daun.png
 armor.json
 armor_sprites/assassin_helmet.png
 armor_sprites/assassin_robe.png

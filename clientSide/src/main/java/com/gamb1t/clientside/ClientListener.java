@@ -38,6 +38,11 @@ public class ClientListener implements Listener {
                     clientM.initGamescreenDungeon(stateMessageOnConnection);
                 }
 
+                else if (stateMessageOnConnection.gameMode.equals("1v1")){
+                    System.out.println(connection.getID());
+                    clientM.initGamescreenDungeon(stateMessageOnConnection);
+                }
+
                 for(Network.PlayerState state : player){
                     clientM.gameScreen.addPlayer(state);
                 }
@@ -47,14 +52,6 @@ public class ClientListener implements Listener {
 
         }
         if(clientM.gameScreen != null){
-
-            if (object instanceof Network.PvpMatchStart) {
-                Network.PvpMatchStart match = (Network.PvpMatchStart) object;
-                if (match.playerId.equals (clientM.gameScreen.getPLAYER().getFirebaseId())) {
-                    clientM.gameScreen.getMultiplayerUi().setPvpMatch(match.opponentName);
-                }
-            }
-
         if (object instanceof Network.PlayerState) {
 
 

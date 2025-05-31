@@ -472,21 +472,13 @@ public class Player extends GameCharacters {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.DARK_GRAY);
-        shapeRenderer.rect(GameConstants.Sprite.SIZE  ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, (float) GameConstants.GET_WIDTH /6, (float) GameConstants.GET_HEIGHT/5);
+        shapeRenderer.rect(GameConstants.Sprite.SIZE*3 + GameConstants.Sprite.SIZE*1/16   ,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2, (float) GameConstants.Sprite.SIZE*3.8f, GameConstants.Sprite.SIZE*0.25f);
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(GameConstants.Sprite.SIZE ,  GameConstants.GET_HEIGHT-GameConstants.GET_HEIGHT/4, GameConstants.GET_WIDTH /6 * hp / maxHp, GameConstants.GET_HEIGHT/5);
+        shapeRenderer.rect(GameConstants.Sprite.SIZE  ,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2, (float) GameConstants.Sprite.SIZE*5.8f* hp / maxHp, GameConstants.Sprite.SIZE*0.25f);
 
 
 
         shapeRenderer.end();
-        batch.begin();
-
-        font.getData().setScale(GameConstants.Sprite.SIZE/20);
-        font.draw(batch, "HP " + hp, GameConstants.GET_WIDTH / 9-GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
-        font.draw(batch, "Money \n" + money, GameConstants.GET_WIDTH / 9- GameConstants.Sprite.SIZE , GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 3);
-        if(weapon instanceof MagicWeapon) {
-            font.draw(batch, "Manna \n" + mana, GameConstants.GET_WIDTH - GameConstants.GET_WIDTH / 5 + GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
-        }batch.end();
     }
     public void setIsClient(boolean b){
         isClient =b;

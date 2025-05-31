@@ -1,94 +1,50 @@
 package com.gamb1t.legacyforge.ManagerClasses;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+
+
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.gamb1t.legacyforge.Entity.Player;
+import com.gamb1t.legacyforge.Weapons.MagicWeapon;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameUI {
-    private Stage stage;
-    private Label nicknameLabel, levelLabel;
-    private ProgressBar hpBar;
-    private TextButton menuButton;
-    private Table uiTable;
-    private Table pauseMenu;
-    private boolean isPaused = false;
+    private List<Player> playerList;
+    private  Player main;
+    private Sprite stats;
 
-    public GameUI() {
-        stage = new Stage(new ScreenViewport());
 
-        nicknameLabel = new Label("Nickname: ???", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        levelLabel = new Label("Level:", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+    public GameUI(Player main, List<Player> player) {
 
-        hpBar = new ProgressBar(0, 100, 1, false, new Skin(Gdx.files.internal("ui/uiskin.json")));
-        hpBar.setValue(100);
+        this.main = main;
+        this.playerList = player;
 
-        menuButton = new TextButton("☰", new Skin(Gdx.files.internal("ui/uiskin.json")));
+        stats = new Sprite(new Texture("aram_daun.png"));
 
-        uiTable = new Table();
-        uiTable.top().left();
-        uiTable.setFillParent(true);
-        uiTable.add(nicknameLabel).pad(10);
-        uiTable.row();
-        uiTable.add(levelLabel).pad(10);
-        uiTable.row();
-        uiTable.add(hpBar).width(200).pad(10);
 
-        pauseMenu = new Table();
-        pauseMenu.setVisible(false);
-        pauseMenu.center();
-        pauseMenu.setFillParent(true);
-        pauseMenu.add(new Label("Paused", new Label.LabelStyle(new BitmapFont(), Color.WHITE))).pad(10);
-        pauseMenu.row();
-
-        TextButton resumeButton = new TextButton("Resume", new Skin(Gdx.files.internal("ui/uiskin.json")));
-        pauseMenu.add(resumeButton).pad(10);
-
-        menuButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                isPaused = !isPaused;
-                pauseMenu.setVisible(isPaused);
-            }
-        });
-
-        resumeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                isPaused = false;
-                pauseMenu.setVisible(false);
-            }
-        });
-
-        stage.addActor(uiTable);
-        stage.addActor(menuButton);
-        stage.addActor(pauseMenu);
     }
 
-    public void update(String nickname, int level, float hp) {
-        nicknameLabel.setText("Nickname: " + nickname);
-        levelLabel.setText("Level: " + level);
-        hpBar.setValue(hp);
+
+    public void render(SpriteBatch batch, BitmapFont font) {
+        batch.begin();
+
+
+        batch.draw(stats,  GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3, GameConstants.Sprite.SIZE*6,  GameConstants.Sprite.SIZE*2);
+
+        batch.end();
+
+        batch.begin();
+
+        font.getData().setScale(GameConstants.Sprite.SIZE/22);
+        font.draw(batch, "" + main.getHp(), GameConstants.Sprite.SIZE + GameConstants.Sprite.SIZE/2  ,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2);
+        font.draw(batch, "" + main.getMoney(), GameConstants.Sprite.SIZE*4- GameConstants.Sprite.SIZE/2  , GameConstants.GET_HEIGHT - GameConstants.Sprite.SIZE*2);
+        if(main.getCurrentWeapon() instanceof MagicWeapon) {
+            font.draw(batch, "Manna \n" + main.getManna(), GameConstants.GET_WIDTH - GameConstants.GET_WIDTH / 5 + GameConstants.Sprite.SIZE, GameConstants.GET_HEIGHT - GameConstants.GET_HEIGHT / 8);
+        }batch.end();
     }
 
-    public void render() {
-        stage.act();
-        stage.draw();
-    }
-
-    public Stage getStage() {
-        return stage;
-    }
-
-    public boolean isPaused() {
-        return isPaused;
-    }
-
-    public void dispose() {
-        stage.dispose();
-    }
 }

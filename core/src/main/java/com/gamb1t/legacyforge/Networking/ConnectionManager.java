@@ -16,7 +16,7 @@ public class ConnectionManager {
             .computeIfAbsent(gameMode, k -> new HashMap<>())
             .computeIfAbsent(roomId, k -> new ArrayList<>())
             .add(connection);
-        System.out.println("Added connection " + connection.getID() + " to " + gameMode + ", room " + roomId);
+
     }
 
     public static synchronized void removeConnection(String gameMode, int roomId, Connection connection) {
@@ -25,7 +25,7 @@ public class ConnectionManager {
             List<Connection> connections = roomMap.get(roomId);
             if (connections != null) {
                 connections.remove(connection);
-                System.out.println("Removed connection " + connection.getID() + " from " + gameMode + ", room " + roomId);
+
                 if (connections.isEmpty()) {
                     roomMap.remove(roomId);
                 }
@@ -59,7 +59,6 @@ public class ConnectionManager {
         for (Connection conn : connections) {
             conn.sendTCP(packet);
         }
-        System.out.println("Sent packet to " + connections.size() + " connections in " + gameMode + ", room " + roomId);
     }
 
 
@@ -70,6 +69,5 @@ public class ConnectionManager {
                 conn.sendTCP(packet);
             }
         }
-        System.out.println("Sent packet to " + (connections.size() - (connections.stream().anyMatch(c -> c.getID() == exceptId) ? 1 : 0)) + " connections (except " + exceptId + ") in " + gameMode + ", room " + roomId);
     }
 }
