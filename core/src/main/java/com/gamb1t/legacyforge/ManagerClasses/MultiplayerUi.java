@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.gamb1t.legacyforge.Entity.GameCharacters;
 import com.gamb1t.legacyforge.Entity.Player;
 import com.gamb1t.legacyforge.Networking.Network;
 import com.esotericsoftware.kryonet.Client;
@@ -77,14 +78,15 @@ public class MultiplayerUi {
 
         joinSquadButtonBounds = new Rectangle(
             panelCenterX - btnWidth / 2,
-            panelCenterY + btnHeight / 2 + buttonSpacing,
+            Math.abs(panelCenterY + btnHeight / 2 + buttonSpacing - GameConstants.GET_HEIGHT),
+
             btnWidth,
             btnHeight
         );
 
         leaveSquadButtonBounds = new Rectangle(
             panelCenterX - btnWidth / 2,
-            panelCenterY - btnHeight / 2 - buttonSpacing,
+            Math.abs(panelCenterY + btnHeight / 2 + buttonSpacing - GameConstants.GET_HEIGHT),
             btnWidth,
             btnHeight
         );
