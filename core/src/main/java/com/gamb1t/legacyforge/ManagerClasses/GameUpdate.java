@@ -24,6 +24,7 @@ public class GameUpdate {
     private String roomName;
     private int id;
     private List<Player> PLAYERS;
+    private boolean friendlyFire;
 
     public GameUpdate(ArrayList<Enemy> enemies, List<Player> allPlayers,
                       MapManaging mapManager, Shop shop, ArmorShop armorShop) {
@@ -39,6 +40,10 @@ public class GameUpdate {
         this.server= server;
         this.roomName= roomName;
         this.id = id;
+    }
+
+    public void setFriendlyFire(boolean t){
+        friendlyFire = t;
     }
 
     public void update(float delta) {
@@ -59,6 +64,7 @@ public class GameUpdate {
             if (PLAYER.getCurrentWeapon() instanceof MagicWeapon) {
                 ((MagicWeapon) PLAYER.getCurrentWeapon()).setCameraValues(PLAYER.cameraX, PLAYER.cameraY);
             }
+
 
             if (PLAYER.getMovePlayer()) {
                 PLAYER.updateAnim();
@@ -92,6 +98,22 @@ public class GameUpdate {
 
                 PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(enemies);}
                 PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
+            }
+
+            if(friendlyFire){
+            if (PLAYER.getCurrentWeapon().getAttacking()) {
+                if (PLAYER.getCurrentWeapon() instanceof RangedWeapon || PLAYER.getCurrentWeapon() instanceof MeleeWeapon) {
+
+                        PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(PLAYERS);
+                    PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
+                }
+            }
+
+            if (PLAYER.getCurrentWeapon() instanceof MagicWeapon) {
+
+                    PLAYER.getCurrentWeapon().checkHitboxCollisionsEntity(PLAYERS);
+                PLAYER.getCurrentWeapon().checkHitboxCollisionsMap(mapManager);
+            }
             }
         }
 

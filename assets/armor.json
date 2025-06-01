@@ -31,7 +31,7 @@
   "type":          "helmet",
   "damageMultiplier": 0.3,
   "armorPoints":      10,
-  "hpBonus":          10,
+  "hpBonus":          100,
   "price":            5000,
   "spritePath":    "armor_sprites/champions_helmet.png"
   },
@@ -71,6 +71,6 @@
     "armorPoints":      10,
     "hpBonus":          200,
     "price":            10000,
-    "spritePath":    "armor_sprites/champions_helmet.png"
+    "spritePath":    "armor_sprites/melee_chestplate.png"
   }
 ]

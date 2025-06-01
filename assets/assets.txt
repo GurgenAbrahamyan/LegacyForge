@@ -54,7 +54,10 @@ ui/uiskin.png
 weapons.json
 weapons_spritesheet/magic_spritesheet/fire_projectile.png
 weapons_spritesheet/magic_spritesheet/wooden_staff.png
+weapons_spritesheet/ranged_spritesheet/golden_bow.png
 weapons_spritesheet/ranged_spritesheet/regular_bow.png
 weapons_spritesheet/ranged_spritesheet/wooden_arrow.aseprite
 weapons_spritesheet/ranged_spritesheet/wooden_arrow.png
+weapons_spritesheet/swords_spritesheet/diamond_sword.png
+weapons_spritesheet/swords_spritesheet/golden_sword.png
 weapons_spritesheet/swords_spritesheet/regular_sword.png

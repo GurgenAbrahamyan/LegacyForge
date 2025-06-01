@@ -86,7 +86,7 @@ public class MultiplayerUi {
 
         leaveSquadButtonBounds = new Rectangle(
             panelCenterX - btnWidth / 2,
-            Math.abs(panelCenterY + btnHeight / 2 + buttonSpacing - GameConstants.GET_HEIGHT),
+            Math.abs(panelCenterY + btnHeight / 2 + buttonSpacing - GameConstants.GET_HEIGHT + btnHeight),
             btnWidth,
             btnHeight
         );

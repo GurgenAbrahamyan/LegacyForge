@@ -15,7 +15,7 @@ public class Squad {
     private final int id;
     private final Map<Player, Connection> membersConnections = new ConcurrentHashMap<>();
     private static final int MAX_MEMBERS = 4;
-    private static final float COUNTDOWN_DURATION = 15;
+    private static final float COUNTDOWN_DURATION = 10;
     private float countdown = -1;
     private boolean isActive = false;
 

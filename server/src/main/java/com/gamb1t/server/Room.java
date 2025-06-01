@@ -66,6 +66,7 @@ public class Room implements Runnable {
     private final Map<Integer, Connection> playersByIdConnection = new HashMap<>();
 
     public Room(int roomId, String hub, Server server, RoomManager roomManager) {
+
         this.roomManager = roomManager;
         GameConstants.init();
 
@@ -97,6 +98,7 @@ public class Room implements Runnable {
 
         gameUpdate = new GameUpdate(null, PLAYERS, mapManager, shop, armorShop);
         gameUpdate.setServ(server, gameMode, roomId);
+        gameUpdate.setFriendlyFire(true);
     }
 
     public boolean isFull() {
@@ -140,6 +142,7 @@ public class Room implements Runnable {
         broadcastState(c, p, newPlayer);
         PLAYERS.add(p);
     }
+
 
     public void handleSquadAction(int playerId, String action) {
         Player player = playersById.get(playerId);

@@ -20,7 +20,7 @@
     "knockbackInTiles": 1.4,
     "frameAmountX": 4,
     "frameAmountY": 1,
-    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+    "sprite": "weapons_spritesheet/swords_spritesheet/golden_sword.png"
   },
   {
     "type": "ranged",
@@ -43,7 +43,7 @@
     "range": 5.0,
     "price": 500,
     "knockbackInTiles": 2.0,
-    "sprite": "weapons_spritesheet/ranged_spritesheet/regular_bow.png",
+    "sprite": "weapons_spritesheet/ranged_spritesheet/golden_bow.png",
     "frameAmountX": 4,
     "frameAmountY": 1,
     "projectilePath": "weapons_spritesheet/ranged_spritesheet/wooden_arrow.png"
@@ -58,7 +58,7 @@
     "knockbackInTiles": 1.4,
     "frameAmountX": 4,
     "frameAmountY": 1,
-    "sprite": "weapons_spritesheet/swords_spritesheet/regular_sword.png"
+    "sprite": "weapons_spritesheet/swords_spritesheet/diamond_sword.png"
 
   },
   {
