@@ -15,7 +15,7 @@ public class ServerCycle implements ApplicationListener {
 
     @Override
     public void create() {
-        server = new Server();
+        server = new Server(131072, 131072);
         Network.register(server.getKryo());
 
         RoomManager rm = new RoomManager(server);
@@ -60,11 +60,16 @@ public class ServerCycle implements ApplicationListener {
     private void sendIPToFirebase(String ip) {
         try {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference("serverIp");
-            ref.setValueAsync(ip);
-            System.out.println("Sent IP to Firebase: " + ip);
+            ref.setValue(ip, (error, ref1) -> {
+                if (error != null) {
+                    System.err.println("Failed to set server IP: " + error.getMessage());
+                } else {
+                    System.out.println("Successfully sent IP to Firebase: " + ip);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Failed to send IP to Firebase");
+            System.err.println("Exception while sending IP to Firebase: " + e.getMessage());
         }
     }
 

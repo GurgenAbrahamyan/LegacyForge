@@ -1,5 +1,6 @@
 package com.gamb1t.legacyforge.android;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -65,9 +66,7 @@ public class SinglePlayerActivity extends AndroidApplication {
                     });
 
                 } else if (object instanceof Armor) {
-
-
-                     DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
                     DatabaseReference userRef = usersRef.child(uId);
                     DatabaseReference armorRef = userRef.child("items").child("armor").push();
                     String armorId = armorRef.getKey();
@@ -78,17 +77,12 @@ public class SinglePlayerActivity extends AndroidApplication {
                     weaponData.put("level", ((Armor) object).getLevel());
 
                     armorRef.setValue(weaponData).addOnSuccessListener(v -> {
-                        if(((Armor) object).getType().equals("helmet")){
+                        if (((Armor) object).getType().equals("helmet")) {
                             userRef.child("equippedArmorHelmet").setValue(armorId);
-
-                        }
-                        else {
+                        } else {
                             userRef.child("equippedArmorChestPlate").setValue(armorId);
-
                         }
-                    }
-                        );
-
+                    });
                 }
             }
 
@@ -110,7 +104,6 @@ public class SinglePlayerActivity extends AndroidApplication {
 
             @Override
             public void onPlayerEquip(Object o) {
-
                 if (o instanceof Weapon) {
                     Weapon w = (Weapon) o;
                     System.out.println(w.getFireBaseId());
@@ -122,11 +115,21 @@ public class SinglePlayerActivity extends AndroidApplication {
                     Armor a = (Armor) o;
                     String id = a.getFirebaseId();
                     if (id != null) {
-                        String field = a.getType().equalsIgnoreCase("helmet")? "equippedArmorHelmet" : "equippedArmorChestPlate";
+                        String field = a.getType().equalsIgnoreCase("helmet") ? "equippedArmorHelmet" : "equippedArmorChestPlate";
                         database.child("users").child(uId).child(field).setValue(id);
                     }
                 }
+            }
 
+            @Override
+            public void onReturnToGameModeSelection(boolean is) {
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(SinglePlayerActivity.this, GameModeChoosing.class);
+                    intent.putExtra("user", main.convertPlayerToUser(main.gameScreen.getPlayer()));
+                    intent.putExtra("playerId", uId);
+                    startActivity(intent);
+                    finish();
+                });
             }
         };
 

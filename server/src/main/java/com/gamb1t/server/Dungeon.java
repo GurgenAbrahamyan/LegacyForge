@@ -311,7 +311,6 @@ public class Dungeon implements Runnable {
         msg.mapInfo.renderPath = mapManager.getTilesSpritesheet();
         msg.mapInfo.width = mapManager.getMapWidth();
         msg.mapInfo.height = mapManager.getMapHeight();
-
         msg.playerWeaponJson = weaponLoader.getRecourcePath().replace(asset, "");
         msg.enemyWeaponJson = weaponLoader2.getRecourcePath().replace(asset, "");
 

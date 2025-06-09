@@ -17,14 +17,12 @@ public class FirebaseServiceServer {
 
     private FirebaseServiceServer() {
         try {
-            // Initialize Firebase with service account and database URL
-            FileInputStream serviceAccount = new FileInputStream("legacyforge-adminsdk-fbsvc-b79f17aa2e.json");
+            FileInputStream serviceAccount = new FileInputStream("legacy-forge-firebase-adminsdk-fbsvc-27917c46d1.json");
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl("https://legacy-forge-default-rtdb.firebaseio.com/")
                 .setProjectId("legacy-forge")
                 .build();
-            // Check if FirebaseApp is already initialized to avoid duplicate initialization
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
                 System.out.println("Firebase initialized successfully");

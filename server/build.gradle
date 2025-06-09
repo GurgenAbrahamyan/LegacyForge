@@ -18,6 +18,7 @@ dependencies {
   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation 'com.google.firebase:firebase-admin:9.2.0'
   implementation 'com.github.crykn:kryonet:2.22.0-RC1'
+  implementation 'org.slf4j:slf4j-simple:2.0.9'
   implementation project(':core')
 }
 

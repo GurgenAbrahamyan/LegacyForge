@@ -132,22 +132,22 @@ public class Enemy extends GameCharacters {
                 switch (getFaceDir()) {
                     case GameConstants.Face_Dir.DOWN:
                         deltaY = deltaSpeed;
-                        if (entityPos.y + deltaY >= GET_HEIGHT) setFaceDir(GameConstants.Face_Dir.UP);
+
                         break;
 
                     case GameConstants.Face_Dir.UP:
                         deltaY = -deltaSpeed;
-                        if (entityPos.y + deltaY <= 0) setFaceDir(GameConstants.Face_Dir.DOWN);
+
                         break;
 
                     case GameConstants.Face_Dir.RIGHT:
                         deltaX = deltaSpeed;
-                        if (entityPos.x + deltaX >= GET_WIDTH) setFaceDir(GameConstants.Face_Dir.LEFT);
+
                         break;
 
                     case GameConstants.Face_Dir.LEFT:
                         deltaX = -deltaSpeed;
-                        if (entityPos.x + deltaX <= 0) setFaceDir(GameConstants.Face_Dir.RIGHT);
+
                         break;
                 }
             } else {
@@ -166,8 +166,10 @@ public class Enemy extends GameCharacters {
                     setFaceDir(dirY > 0 ? GameConstants.Face_Dir.DOWN : GameConstants.Face_Dir.UP);
                 }
             }
-            if (!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX, hitbox.getY() + deltaY)) {
+            if (!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX, hitbox.getY() )) {
                 entityPos.x += deltaX;
+            }
+            if (!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX(), hitbox.getY() + deltaY)) {
                 entityPos.y += deltaY;
             }
             setHitboxPosition();
@@ -418,6 +420,9 @@ public class Enemy extends GameCharacters {
 
     public void setHp(int hp) {
         this.hp = hp;
+        if(hp > maxHp){
+            maxHp = hp;
+        }
     }
 
     public void setMaxHp(int maxHp) {

@@ -1,15 +1,15 @@
 [
     {
+        "merged": "com.gamb1t.legacyforge.android-debug-44:/drawable_photo2pixel_download.png.flat",
+        "source": "com.gamb1t.legacyforge.android-android-45:/drawable/photo2pixel_download.png"
+    },
+    {
         "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable_chains.png.flat",
         "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable\\chains.png"
     },
     {
         "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-hdpi_ic_launcher.png.flat",
         "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-hdpi\\ic_launcher.png"
-    },
-    {
-        "merged": "com.gamb1t.legacyforge.android-debug-44:/layout_login_activity.xml.flat",
-        "source": "com.gamb1t.legacyforge.android-android-45:/layout/login_activity.xml"
     },
     {
         "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable_button.png.flat",
@@ -52,20 +52,24 @@
         "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\font\\pixel_font.ttf"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\layout_login_activity.xml.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\layout\\login_activity.xml"
-    },
-    {
         "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-xhdpi_ic_launcher.png.flat",
         "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable-xhdpi\\ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\font_gothicbyte.ttf.flat",
-        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\font\\gothicbyte.ttf"
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\layout_login_activity.xml.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\layout\\login_activity.xml"
+    },
+    {
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable_game_mode_choosing.png.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\drawable\\game_mode_choosing.png"
     },
     {
         "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\layout_activity_game_mode_choosing.xml.flat",
         "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\layout\\activity_game_mode_choosing.xml"
+    },
+    {
+        "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\font_gothicbyte.ttf.flat",
+        "source": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-android-45:\\font\\gothicbyte.ttf"
     },
     {
         "merged": "C:\\Users\\Gurgen\\.gradle\\daemon\\8.12\\com.gamb1t.legacyforge.android-debug-44:\\drawable-xxxhdpi_ic_launcher.png.flat",

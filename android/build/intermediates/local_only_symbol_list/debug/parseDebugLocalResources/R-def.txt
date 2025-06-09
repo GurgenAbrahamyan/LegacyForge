@@ -8,8 +8,10 @@ drawable button_background
 drawable button_pressed
 drawable chains
 drawable edittext
+drawable game_mode_choosing
 drawable ic_launcher
 drawable papyrus
+drawable photo2pixel_download
 font gothicbyte
 font pixel_font
 id back_button
@@ -20,6 +22,7 @@ id editTextEmail
 id editTextName
 id editTextPassword
 id guest
+id log_out_button
 id login
 id main
 id multi_player_button

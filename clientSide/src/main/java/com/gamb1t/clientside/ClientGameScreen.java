@@ -188,10 +188,10 @@ public class ClientGameScreen implements Screen {
 
         PLAYERS.add(PLAYER);
         isInHub = connection.gameMode.equals("Hub");
-        if (isInHub) {
+
             multiplayerUi = new MultiplayerUi(PLAYER, client);
 
-        }
+
 
 
 
@@ -257,6 +257,17 @@ public class ClientGameScreen implements Screen {
             }
         }
 
+        if(connection.gameMode.equals("1v1")){
+            Network.RoundStart roundStart = new Network.RoundStart();
+            roundStart.roundNumber = 1;
+
+            roundStart.playerScores = new HashMap<>();
+            for(int i : playersById.keySet()){
+                roundStart.playerScores.put(i, 0);
+            }
+            multiplayerUi.handleRoundStart(roundStart);
+        }
+
 
         for(Player player : PLAYERS){
             player.setTexture("player_sprites/player_spritesheet.png");
@@ -318,7 +329,9 @@ public class ClientGameScreen implements Screen {
         font = new BitmapFont();
 
 
-        gameUI = new GameUI(PLAYER, PLAYERS);
+
+        gameUI = new GameUI(PLAYER, PLAYERS, changeListener);
+       gameUI.setIsInHub(isInHub);
         InputMultiplexer multiplexer = new InputMultiplexer();
         touchEvents = new TouchManager(PLAYER, PLAYER.getCurrentWeapon(), networkInputSender);
         multiplexer.addProcessor(touchEvents);
@@ -370,6 +383,8 @@ public class ClientGameScreen implements Screen {
         }}
 
         gameRendering = new GameRendering(batch, shapeRenderer, font, PLAYER, Enemies, PLAYERS, mapManager, shop, armorShop, touchEvents, gameUI);
+        gameRendering.setMultiplayerUi(multiplayerUi);
+        gameRendering.setInHub(isInHub);
     }
 
     public void createProjectile(Network.CreateProjectileMessage projectileMessage){
@@ -696,13 +711,13 @@ public class ClientGameScreen implements Screen {
 
 
 
-        if (Gdx.input.isTouched()) {
+        if (Gdx.input.justTouched()) {
             if(shop != null){
             shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
             if(armorShop != null){
             armorShop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
-            if(multiplayerUi != null){
-            multiplayerUi.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
+            if(multiplayerUi != null && isInHub){
+                multiplayerUi.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
         }
 
 
@@ -793,8 +808,19 @@ public class ClientGameScreen implements Screen {
     @Override
     public void render(float delta) {
         gameRendering.render();
+
+
         if(isInHub){
-        multiplayerUi.render(batch);
+        multiplayerUi.updateHubCountdiwns(delta);
+        gameUI.handleTouch(Gdx.input.getX(), Gdx.input.getY());
+
+
+        }
+
+        else {
+            multiplayerUi.update(delta);
+            multiplayerUi.renderRoundCountdown(batch);
+            multiplayerUi.renderScore(batch);
         }
         update(delta);
     }
@@ -817,92 +843,6 @@ public class ClientGameScreen implements Screen {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        shapeRenderer.dispose();
-        if (batch != null) {
-            batch.dispose();
-            batch = null;
-        }
-        if (shapeRenderer != null) {
-            shapeRenderer.dispose();
-            shapeRenderer = null;
-        }
-        if (font != null) {
-            font.dispose();
-            font = null;
-        }
-
-
-        if (multiplayerUi != null) {
-            multiplayerUi.dispose();
-            multiplayerUi = null;
-        }
-
-        // Dispose shop and armor shop
-       /* if (shop != null) {
-            shop.dispose();
-            shop = null;
-        }
-        if (armorShop != null) {
-            armorShop.dispose();
-            armorShop = null;
-        }
-
-
-        if (mapManager != null) {
-            mapManager.dispose();
-            mapManager = null;
-        }
-
-        if (weaponLoader != null) {
-            weaponLoader.dispose(); // Implement if needed
-            weaponLoader = null;
-        }
-        if (weaponLoader2 != null) {
-            weaponLoader2.dispose(); // Implement if needed
-            weaponLoader2 = null;
-        }
-        if (armorLoader != null) {
-            armorLoader.dispose(); // Implement if needed
-            armorLoader = null;
-        }
-        if (enemyLoader != null) {
-            enemyLoader.dispose();
-            enemyLoader = null;
-        }
-
-        if (touchEvents != null) {
-            touchEvents.dispose();
-            touchEvents = null;
-        }*/
-        if (networkInputSender != null) {
-            networkInputSender = null;
-        }
-
-        if (Enemies != null) {
-            Enemies.clear();
-            Enemies = null;
-        }
-        if (EnemiesMap != null) {
-            EnemiesMap.clear();
-            EnemiesMap = null;
-        }
-        if (PLAYERS != null) {
-            PLAYERS.clear();
-            PLAYERS = null;
-        }
-        if (playersById != null) {
-            playersById.clear();
-            playersById = null;
-        }
-        if (weapon != null) {
-            weapon.clear();
-            weapon = null;
-        }
-        if (enemyWeapon != null) {
-            enemyWeapon.clear();
-            enemyWeapon = null;
-        }
     }
 
     public Map<Integer, Enemy> getEnemiesMap(){

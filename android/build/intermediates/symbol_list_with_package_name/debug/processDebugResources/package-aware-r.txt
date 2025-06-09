@@ -3060,6 +3060,7 @@ drawable design_ic_visibility_off
 drawable design_password_eye
 drawable design_snackbar_background
 drawable edittext
+drawable game_mode_choosing
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
 drawable ic_arrow_back_black_24
@@ -3158,6 +3159,7 @@ drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable papyrus
+drawable photo2pixel_download
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -3426,6 +3428,7 @@ id line3
 id linear
 id listMode
 id list_item
+id log_out_button
 id login
 id m3_side_sheet
 id main

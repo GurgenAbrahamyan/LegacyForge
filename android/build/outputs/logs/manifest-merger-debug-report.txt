@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:2:1-59:12
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml:2:1-59:12
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml:2:1-59:12
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml:2:1-59:12
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:2:1-60:12
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml:2:1-60:12
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml:2:1-60:12
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml:2:1-60:12
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\d07cb5fc384e75e944049fe67390c51a\transformed\firebase-analytics-22.4.0\AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:17:1-75:12
 MERGED from [com.google.firebase:firebase-database:21.0.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\eceedab5c9323b892a03f6415a02d65e\transformed\firebase-database-21.0.0\AndroidManifest.xml:15:1-38:12
@@ -84,25 +84,25 @@ MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\Gurgen\
 MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\ec8a0389b57b5d2195e43730b0e9c381\transformed\googleid-1.1.0\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\41d83480461291f7307c0eedc2c93d04\transformed\core-common-2.0.3\AndroidManifest.xml:2:1-21:12
 	package
-		INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+		INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 	android:versionName
-		INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+		INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 	xmlns:tools
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:3:5-51
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:3:5-51
 	android:versionCode
-		INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+		INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:2:11-69
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:2:11-69
 uses-feature#0x00020000
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:4:5-77
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:4:5-77
 MERGED from [com.badlogicgames.gdx:gdx-backend-android:1.13.1] C:\Users\Gurgen\.gradle\caches\8.12\transforms\c80b4761d8c2d6d3191bb9eceee15b0c\transformed\gdx-backend-android-1.13.1\AndroidManifest.xml:7:5-9:35
 MERGED from [com.badlogicgames.gdx:gdx-backend-android:1.13.1] C:\Users\Gurgen\.gradle\caches\8.12\transforms\c80b4761d8c2d6d3191bb9eceee15b0c\transformed\gdx-backend-android-1.13.1\AndroidManifest.xml:7:5-9:35
 	android:glEsVersion
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:4:19-51
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:4:19-51
 	android:required
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:4:52-75
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:4:52-75
 uses-permission#android.permission.INTERNET
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:5:5-66
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:5:5-66
 MERGED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:25:5-67
 MERGED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:25:5-67
 MERGED from [com.google.firebase:firebase-database:21.0.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\eceedab5c9323b892a03f6415a02d65e\transformed\firebase-database-21.0.0\AndroidManifest.xml:23:5-67
@@ -120,10 +120,10 @@ MERGED from [com.google.android.gms:play-services-measurement-impl:22.4.0] C:\Us
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\9db4f16ab805f268e1385a372b194e73\transformed\play-services-measurement-sdk-api-22.4.0\AndroidManifest.xml:23:5-67
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\9db4f16ab805f268e1385a372b194e73\transformed\play-services-measurement-sdk-api-22.4.0\AndroidManifest.xml:23:5-67
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:5:22-64
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:5:22-64
 application
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:7:5-57:19
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml:7:5-57:19
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:7:5-58:19
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml:7:5-58:19
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\d07cb5fc384e75e944049fe67390c51a\transformed\firebase-analytics-22.4.0\AndroidManifest.xml:7:5-20
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\d07cb5fc384e75e944049fe67390c51a\transformed\firebase-analytics-22.4.0\AndroidManifest.xml:7:5-20
 MERGED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:28:5-73:19
@@ -191,99 +191,101 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Gu
 MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\41d83480461291f7307c0eedc2c93d04\transformed\core-common-2.0.3\AndroidManifest.xml:11:5-19:19
 MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Gurgen\.gradle\caches\8.12\transforms\41d83480461291f7307c0eedc2c93d04\transformed\core-common-2.0.3\AndroidManifest.xml:11:5-19:19
 	android:extractNativeLibs
-		INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+		INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] C:\Users\Gurgen\.gradle\caches\8.12\transforms\77b570a99c494e4db65553f0c85fac0f\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 	android:label
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:13:9-41
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:13:9-41
 	android:fullBackupContent
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:9:9-41
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:9:9-41
 	android:appCategory
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:12:9-35
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:12:9-35
 	tools:ignore
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:14:9-39
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:14:9-39
+	android:largeHeap
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:15:9-33
 	android:icon
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:10:9-45
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:10:9-54
 	android:allowBackup
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:8:9-35
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:8:9-35
 	android:theme
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:15:9-59
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:16:9-59
 	android:isGame
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:11:9-30
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:11:9-30
 activity#com.gamb1t.legacyforge.android.AuthActivities.LoginActivity
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:17:9-28:20
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:18:9-29:20
 	android:screenOrientation
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:20:13-50
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:21:13-50
 	android:label
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:19:13-45
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:20:13-45
 	android:exported
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:22:13-36
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:23:13-36
 	android:configChanges
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:21:13-107
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:22:13-107
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:18:13-87
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:19:13-87
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:24:13-27:29
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:25:13-28:29
 action#android.intent.action.MAIN
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:25:17-68
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:26:17-68
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:25:25-66
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:26:25-66
 category#android.intent.category.LAUNCHER
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:26:17-76
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:27:17-76
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:26:27-74
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:27:27-74
 activity#com.gamb1t.legacyforge.android.SinglePlayerActivity
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:29:9-35:20
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:30:9-36:20
 	android:screenOrientation
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:32:13-50
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:33:13-50
 	android:label
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:31:13-45
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:32:13-45
 	android:exported
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:34:13-36
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:35:13-36
 	android:configChanges
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:33:13-107
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:34:13-107
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:30:13-79
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:31:13-79
 activity#com.gamb1t.legacyforge.android.MultiPlayerActivity
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:36:9-42:20
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:37:9-43:20
 	android:screenOrientation
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:39:13-50
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:40:13-50
 	android:label
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:38:13-45
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:39:13-45
 	android:exported
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:41:13-36
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:42:13-36
 	android:configChanges
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:40:13-107
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:41:13-107
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:37:13-78
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:38:13-78
 activity#com.gamb1t.legacyforge.android.AuthActivities.RegisterActivity
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:43:9-49:20
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:44:9-50:20
 	android:screenOrientation
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:46:13-50
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:47:13-50
 	android:label
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:45:13-45
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:46:13-45
 	android:exported
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:48:13-36
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:49:13-36
 	android:configChanges
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:47:13-107
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:48:13-107
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:44:13-90
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:45:13-90
 activity#com.gamb1t.legacyforge.android.GameModeChoosing
-ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:50:9-56:20
+ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:51:9-57:20
 	android:screenOrientation
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:53:13-50
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:54:13-50
 	android:label
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:52:13-45
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:53:13-45
 	android:exported
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:55:13-36
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:56:13-36
 	android:configChanges
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:54:13-107
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:55:13-107
 	android:name
-		ADDED from D:\Java\LegacyForge\android\AndroidManifest.xml:51:13-75
+		ADDED from D:\LegacyForgeFinal\android\AndroidManifest.xml:52:13-75
 uses-sdk
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
-INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
+INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\d07cb5fc384e75e944049fe67390c51a\transformed\firebase-analytics-22.4.0\AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\d07cb5fc384e75e944049fe67390c51a\transformed\firebase-analytics-22.4.0\AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:21:5-23:151
@@ -445,9 +447,9 @@ MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Gurgen\.gradle\
 	tools:overrideLibrary
 		ADDED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:23:9-148
 	android:targetSdkVersion
-		INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+		INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from D:\Java\LegacyForge\android\AndroidManifest.xml
+		INJECTED from D:\LegacyForgeFinal\android\AndroidManifest.xml
 uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from [com.google.firebase:firebase-auth:23.2.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\8ab77d1d42d3fd02526ec867b462acb8\transformed\firebase-auth-23.2.0\AndroidManifest.xml:26:5-79
 MERGED from [com.google.firebase:firebase-database:21.0.0] C:\Users\Gurgen\.gradle\caches\8.12\transforms\eceedab5c9323b892a03f6415a02d65e\transformed\firebase-database-21.0.0\AndroidManifest.xml:22:5-79

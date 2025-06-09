@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 public class FirebaseInitializer {
     public static void initFirebase() {
         try {
-            FileInputStream serviceAccount = new FileInputStream("legacy-forge-firebase-adminsdk-fbsvc-b79f17aa2e.json");
+            FileInputStream serviceAccount = new FileInputStream("legacy-forge-firebase-adminsdk-fbsvc-27917c46d1.json");
             FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl("https://legacy-forge-default-rtdb.firebaseio.com/")

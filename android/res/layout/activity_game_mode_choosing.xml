@@ -5,19 +5,43 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
+    android:background="@drawable/game_mode_choosing"
     android:id="@+id/main">
 
     <Button
         android:id="@+id/single_player_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="210dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/gothicbyte"
         android:text="Single Player"
-        android:theme="@style/Widget.AppCompat.Button.Colored" />
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textAllCaps="false"
+        android:textSize="24sp" />
 
     <Button
         android:id="@+id/multi_player_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="210dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/gothicbyte"
         android:text="Multiplayer"
-        android:theme="@style/Widget.AppCompat.Button.Colored" />
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textAllCaps="false"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/log_out_button"
+        android:layout_width="210dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/gothicbyte"
+        android:text="Log out"
+        android:textColor="#f75b5b"
+        android:textAllCaps="false"
+        android:textSize="24sp" />
+
 </LinearLayout>

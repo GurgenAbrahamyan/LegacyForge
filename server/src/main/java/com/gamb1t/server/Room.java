@@ -26,7 +26,6 @@ import com.gamb1t.legacyforge.Weapons.Weapon;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class Room implements Runnable {
 
@@ -45,7 +44,6 @@ public class Room implements Runnable {
     private TouchManager touchEvents;
 
     private WeaponLoader weaponLoader;
-
     private ArmorLoader armorLoader;
 
     private static List<Player> PLAYERS;
@@ -58,7 +56,6 @@ public class Room implements Runnable {
     public String asset = "assets\\";
 
     private Squad nextSquad;
-    private Squad next1v1Squad; // New: Squad for 1v1 matches
 
     private GameUpdate gameUpdate;
 
@@ -66,7 +63,6 @@ public class Room implements Runnable {
     private final Map<Integer, Connection> playersByIdConnection = new HashMap<>();
 
     public Room(int roomId, String hub, Server server, RoomManager roomManager) {
-
         this.roomManager = roomManager;
         GameConstants.init();
 
@@ -81,7 +77,7 @@ public class Room implements Runnable {
 
         weapon = weaponLoader.getWeaponList();
 
-        mapManager = new MapManaging(asset + "1room.txt", asset + "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 30, 30);
+        mapManager = new MapManaging(asset + "1room.txt", asset + "1roomHitbox.txt", "Tiles/Dungeon_Tileset.png", 17, 17);
 
         shop = new Shop(mapManager.getShopCoordinates().x, mapManager.getShopCoordinates().y,
             GameConstants.Sprite.SIZE * 4, GameConstants.Sprite.SIZE * 3, "shops/basic_shop.png", weaponLoader, null, null);
@@ -98,7 +94,7 @@ public class Room implements Runnable {
 
         gameUpdate = new GameUpdate(null, PLAYERS, mapManager, shop, armorShop);
         gameUpdate.setServ(server, gameMode, roomId);
-        gameUpdate.setFriendlyFire(true);
+        gameUpdate.setFriendlyFire(false);
     }
 
     public boolean isFull() {
@@ -142,7 +138,6 @@ public class Room implements Runnable {
         broadcastState(c, p, newPlayer);
         PLAYERS.add(p);
     }
-
 
     public void handleSquadAction(int playerId, String action) {
         Player player = playersById.get(playerId);
@@ -197,81 +192,8 @@ public class Room implements Runnable {
                     nextSquad = null;
                 }
             }
-        } else if (action.equals("join1v1")) {
-            if (next1v1Squad == null) {
-                next1v1Squad = new Squad(player, connection);
-            } else if (next1v1Squad.getMembersConnections().size() < 2) {
-                next1v1Squad.addMember(player, connection);
-                if (next1v1Squad.getMembersConnections().size() == 2) {
-                    startOneVsOne();
-                    return;
-                }
-            } else {
-                Network.SquadUpdate update = new Network.SquadUpdate();
-                update.inSquad = false;
-                update.countdown = -1;
-                update.memberNames = new ArrayList<>();
-                server.sendToTCP(playerId, update);
-                return;
-            }
-
-            for (Connection conn : playersByIdConnection.values()) {
-                Network.SquadUpdate update = new Network.SquadUpdate();
-                update.inSquad = next1v1Squad != null && next1v1Squad.getMembersConnections().containsKey(playersById.get(conn.getID()));
-                update.countdown = -1; // No countdown for 1v1
-                update.memberNames = new ArrayList<>();
-                if (next1v1Squad != null) {
-                    for (Player p : next1v1Squad.getMembersConnections().keySet()) {
-                        update.memberNames.add(p.getName());
-                    }
-                }
-                server.sendToTCP(conn.getID(), update);
-            }
-        } else if (action.equals("leave1v1")) {
-            if (next1v1Squad != null) {
-                next1v1Squad.removeMember(player, connection);
-
-                for (Connection conn : playersByIdConnection.values()) {
-                    Network.SquadUpdate update = new Network.SquadUpdate();
-                    update.inSquad = next1v1Squad != null && next1v1Squad.getMembersConnections().containsKey(playersById.get(conn.getID()));
-                    update.countdown = -1; // No countdown for 1v1
-                    update.memberNames = new ArrayList<>();
-                    if (next1v1Squad != null) {
-                        for (Player p : next1v1Squad.getMembersConnections().keySet()) {
-                            update.memberNames.add(p.getName());
-                        }
-                    }
-                    server.sendToTCP(conn.getID(), update);
-                }
-
-                if (next1v1Squad.getMembersConnections().isEmpty()) {
-                    next1v1Squad = null;
-                }
-            }
         }
-    }
-
-    private void startOneVsOne() {
-        List<Player> players = new ArrayList<>(next1v1Squad.getMembersConnections().keySet());
-        if (players.size() != 2) {
-            System.err.println("Error: 1v1 squad does not have exactly 2 players: " + players.size());
-            return;
-        }
-        List<Connection> connections = new ArrayList<>();
-        for (Player p : players) {
-            Connection c = playersByIdConnection.get(p.getID());
-            if (c != null) {
-                connections.add(c);
-            } else {
-                System.err.println("No connection for player ID: " + p.getID());
-            }
-        }
-        if (connections.size() != 2) {
-            System.err.println("Error: Only found " + connections.size() + " connections for 1v1");
-            return;
-        }
-        roomManager.assignToOneVsOne(connections, players, next1v1Squad);
-        next1v1Squad = null;
+        // 1v1 actions are now handled by RoomManager
     }
 
     @Override
@@ -358,12 +280,6 @@ public class Room implements Runnable {
                     nextSquad = null;
                 }
             }
-            if (next1v1Squad != null) {
-                next1v1Squad.removeMember(p, c);
-                if (next1v1Squad.getMembersConnections().isEmpty()) {
-                    next1v1Squad = null;
-                }
-            }
         }
     }
 
@@ -401,7 +317,7 @@ public class Room implements Runnable {
                 newPlayers.add(p);
                 PLAYERS.add(p);
             }
-            System.out.println("Added player " + p.getID() + " to dungeon " + roomId + ", PLAYERS size: " + PLAYERS.size());
+            System.out.println("Added player " + p.getID() + " to room " + roomId + ", PLAYERS size: " + PLAYERS.size());
             for (Weapon weapon : p.getInventory().getWeapons()) {
                 weapon.setServer(server, gameMode, roomId);
                 if (weapon instanceof MagicWeapon) {
@@ -556,4 +472,12 @@ public class Room implements Runnable {
     public int getRoomId() {
         return roomId;
     }
+
+    public boolean isInSquad(Connection c){
+        if(nextSquad== null){
+            return false;
+        }
+        return nextSquad.getMembersConnections().containsValue(c);
+    }
+
 }

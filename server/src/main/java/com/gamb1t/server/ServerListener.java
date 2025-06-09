@@ -18,9 +18,11 @@ public class ServerListener implements Listener {
 
     @Override
     public void disconnected(Connection c) {
-
+        rm.removeConnection(c);
         rm.removeFromDungeon(c);
         rm.removeFrom1v1(c);
+        rm.removeFrom1v1Queue(c);
+        rm.removeFromPendingMatches(c);
     }
 
     @Override
@@ -29,9 +31,16 @@ public class ServerListener implements Listener {
             rm.assignToRoom(c, (User) o);
         }
 
-         if (o instanceof Network.SquadAction) {
+        if (o instanceof Network.SquadAction) {
             Network.SquadAction action = (Network.SquadAction) o;
-            if (rm.containsInRoom(c)) {
+            if ((action.action.equals("join1v1") || action.action.equals("leave1v1")) && !rm.getRoomFor(c).isInSquad(c)) {
+                if (action.action.equals("join1v1")) {
+                    System.out.println("Adding to 1v1 queue");
+                    rm.addTo1v1Queue(c);
+                } else {
+                    rm.removeFrom1v1Queue(c);
+                }
+            } else if (rm.containsInRoom(c) && !rm.containsIn1v1Queue(c) && !rm.isInPendingMatch(c) ) {
                 rm.getRoomFor(c).handleSquadAction(action.playerId, action.action);
             }
         }
@@ -82,6 +91,5 @@ public class ServerListener implements Listener {
             else if (rm.containsInDungeon(c)) rm.getDungeonFor(c).attackDragged((Network.AttackDragged) o);
             else if (rm.containsIn1v1(c)) rm.getRoomFor1v1(c).attackDragged((Network.AttackDragged) o);
         }
-
     }
 }

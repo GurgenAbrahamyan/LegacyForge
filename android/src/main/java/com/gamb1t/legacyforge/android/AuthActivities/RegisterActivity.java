@@ -57,6 +57,11 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            if(nickname.length() > 14){
+                Toast.makeText(this, "Nickname should not be longer than 14 characters.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             checkNicknameExists(nickname, () -> registerUser(email, password, nickname));
         });
 

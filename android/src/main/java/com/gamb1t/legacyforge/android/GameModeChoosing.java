@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.gamb1t.legacyforge.R;
 import com.gamb1t.legacyforge.Entity.User;
+import com.gamb1t.legacyforge.android.AuthActivities.LoginActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -19,6 +20,7 @@ public class GameModeChoosing extends AppCompatActivity {
 
     private Button singlePlayerButton;
     private Button multiPlayerButton;
+    private Button logOut;
 
     private User user;
     private String uId;
@@ -33,6 +35,7 @@ public class GameModeChoosing extends AppCompatActivity {
 
         singlePlayerButton = findViewById(R.id.single_player_button);
         multiPlayerButton = findViewById(R.id.multi_player_button);
+        logOut = findViewById(R.id.log_out_button);
 
         user = (User) getIntent().getSerializableExtra("user");
         uId = getIntent().getStringExtra("playerId");
@@ -52,6 +55,12 @@ public class GameModeChoosing extends AppCompatActivity {
         multiPlayerButton.setOnClickListener(v -> {
             multiPlayerButton.setEnabled(false);
             fetchServerIp();
+        });
+
+        logOut.setOnClickListener(v -> {
+            Intent intent = new Intent(GameModeChoosing.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

@@ -7,11 +7,12 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/photo2pixel_download"
         android:isGame="true"
         android:appCategory="game"
         android:label="@string/app_name"
         tools:ignore="UnusedAttribute"
+        android:largeHeap="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
         <activity

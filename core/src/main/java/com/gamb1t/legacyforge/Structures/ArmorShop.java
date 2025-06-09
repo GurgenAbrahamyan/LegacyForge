@@ -30,7 +30,7 @@ public class ArmorShop {
     private Player player;
     private TouchManager touchManager;
 
-    private Sprite btnBuyAvailable, btnBuyUnavailable, btnEquip, btnEquipped;
+    private Sprite btnBuyAvailable, btnBuyUnavailable, btnEquip, btnEquipped, btnClosePanel;
 
     private float panelTile;
 
@@ -45,6 +45,7 @@ public class ArmorShop {
     private float showPannelX, showPannelY, panelWidth, panelHeight;
 
     private Rectangle openShopButtonBounds;
+    private Rectangle closePanelButtonBounds;
     private Sprite openShopButtonSprite;
 
     public ArmorShop(float shopX, float shopY, float shopWidth, float shopHeight, String shopTexture, ArmorLoader wp, Player player, TouchManager touchManager) {
@@ -65,7 +66,7 @@ public class ArmorShop {
         this.armorList = wp.getArmorList();
         this.player = player;
         this.touchManager = touchManager;
-        this.armorPath = wp.getResourcePath(); // Assuming getResourcePath() exists in ArmorLoader
+        this.armorPath = wp.getResourcePath();
     }
 
     public void initializeRenderingObjects() {
@@ -87,6 +88,21 @@ public class ArmorShop {
         btnBuyUnavailable = new Sprite(new Texture("shops/buy_unavailable.png"));
         btnEquip = new Sprite(new Texture("shops/equip.png"));
         btnEquipped = new Sprite(new Texture("shops/equipped.png"));
+        btnClosePanel = new Sprite(new Texture("ui/close_btn.png"));
+
+        openShopButtonBounds = new Rectangle(
+            GameConstants.GET_WIDTH / 2f - btnWidth / 2f,
+            GameConstants.GET_HEIGHT / 4f - btnHeight,
+            btnWidth,
+            btnHeight
+        );
+
+        closePanelButtonBounds = new Rectangle(
+            showPannelX+panelWidth,
+            showPannelY+panelHeight - GameConstants.Sprite.SIZE * 2,
+            GameConstants.Sprite.SIZE * 2,
+            GameConstants.Sprite.SIZE * 2
+        );
     }
 
     public void update(Polygon playerPolygon) {
@@ -106,17 +122,18 @@ public class ArmorShop {
         batch.begin();
 
         if (isNearShop && !isShopOpen) {
-            openShopButtonBounds = new Rectangle(
-                GameConstants.GET_WIDTH / 2f - btnWidth / 2f,
-                GameConstants.GET_HEIGHT / 4f - btnHeight,
-                btnWidth,
-                btnHeight
-            );
             batch.draw(openShopButtonSprite, openShopButtonBounds.x, Math.abs(openShopButtonBounds.y), openShopButtonBounds.width, openShopButtonBounds.height);
         }
 
         if (isShopOpen) {
             openShopUI(batch);
+            btnClosePanel.setBounds(
+                closePanelButtonBounds.x,
+                closePanelButtonBounds.y,
+                closePanelButtonBounds.width,
+                closePanelButtonBounds.height
+            );
+            btnClosePanel.draw(batch);
         }
 
         batch.end();
@@ -135,21 +152,21 @@ public class ArmorShop {
         batch.draw(panelTexture, showPannelX, showPannelY, panelWidth, panelHeight);
     }
 
-    int MAX_SLOTS = 8; // 2 rows, 4 columns
+    int MAX_SLOTS = 8;
 
     private void drawArmorCards(SpriteBatch batch) {
         float startX = showPannelX + panelTile;
         float startY = showPannelY + panelTile;
         float btnW = panelTile * 6;
         float btnH = panelTile * 2;
-        float colOffset = panelWidth / 4f; // 4 columns
+        float colOffset = panelWidth / 4f;
         float rowOffset = panelHeight / 2f;
 
         for (int slot = 0; slot < MAX_SLOTS; slot++) {
-            int col = slot % 4; // 4 columns
-            int row = slot / 4; // 0 = top row, 1 = bottom row
+            int col = slot % 4;
+            int row = slot / 4;
             float x = startX + col * colOffset;
-            float y = startY + (1 - row) * rowOffset; // Invert row: row 0 at top
+            float y = startY + (1 - row) * rowOffset;
 
             Sprite tex;
             if (slot >= armorList.size()) {
@@ -184,6 +201,11 @@ public class ArmorShop {
     public void handleTouchInput(float touchX, float touchY) {
         touchY = GameConstants.GET_HEIGHT - touchY;
 
+        if (isShopOpen && closePanelButtonBounds.contains(touchX, touchY)) {
+            closeShopUI();
+            return;
+        }
+
         if (isNearShop && !isShopOpen && openShopButtonBounds.contains(touchX, touchY)) {
             isShopOpen = true;
             return;
@@ -194,7 +216,7 @@ public class ArmorShop {
         float startY = showPannelY + panelTile;
         float btnW = panelTile * 6;
         float btnH = panelTile * 2;
-        float colOffset = panelWidth / 4f; // 4 columns
+        float colOffset = panelWidth / 4f;
         float rowOffset = panelHeight / 2f;
 
         for (int slot = 0; slot < MAX_SLOTS; slot++) {
@@ -227,7 +249,6 @@ public class ArmorShop {
         player.equipArmor(armor);
     }
 
-    // Getter methods
     public float getShopX() {
         return shopX;
     }

@@ -31,17 +31,14 @@ public class Shop {
     private Player player;
     private TouchManager touchManager;
 
-    private Sprite btnBuyAvailable, btnBuyUnavailable, btnEquip, btnEquipped;
+    private Sprite btnBuyAvailable, btnBuyUnavailable, btnEquip, btnEquipped, btnClosePanel;
 
     private float panelTile;
 
     private String shopTexture;
-    private  String weaponPath;
+    private String weaponPath;
 
     private WeaponLoader weaponLoader;
-
-
-
 
     float btnWidth = GameConstants.Sprite.SIZE * 2;
     float btnHeight = GameConstants.Sprite.SIZE;
@@ -49,6 +46,7 @@ public class Shop {
     private float showPannelX, showPannelY, panelWidth, panelHeight;
 
     private Rectangle openShopButtonBounds;
+    private Rectangle closePanelButtonBounds;
     private Sprite openShopButtonSprite;
 
     public Shop(float shopX, float shopY, float shopWidth, float shopHeight, String shopTexture, WeaponLoader wp, Player player, TouchManager touchManager) {
@@ -66,22 +64,13 @@ public class Shop {
         this.shopTexture = shopTexture;
 
         weaponLoader = wp;
-
         this.weaponList = wp.getWeaponList();
-
-
-
         this.player = player;
-
         this.touchManager = touchManager;
-
         this.weaponPath = wp.getRecourcePath();
-
-
-
     }
-    public void initializeRendeingObjects(){
 
+    public void initializeRendeingObjects() {
         this.shopSprite = new Sprite(new Texture(shopTexture));
         this.shopSprite.setSize(shopWidth, shopHeight);
 
@@ -89,18 +78,32 @@ public class Shop {
         this.font = new BitmapFont();
 
         showPannelY = 0;
-        panelWidth =  GameConstants.GET_HEIGHT;
+        panelWidth = GameConstants.GET_HEIGHT;
         panelHeight = GameConstants.GET_HEIGHT;
-        showPannelX = (float) (GameConstants.GET_WIDTH / 2) - panelWidth/2;
+        showPannelX = (float) (GameConstants.GET_WIDTH / 2) - panelWidth / 2;
 
         panelTile = panelWidth / 32f;
 
         openShopButtonSprite = new Sprite(new Texture("shops/open_shop_button.png"));
-        btnBuyAvailable   = new Sprite(new Texture("shops/buy_available.png"));
+        btnBuyAvailable = new Sprite(new Texture("shops/buy_available.png"));
         btnBuyUnavailable = new Sprite(new Texture("shops/buy_unavailable.png"));
-        btnEquip          = new Sprite(new Texture("shops/equip.png"));
-        btnEquipped       = new Sprite(new Texture("shops/equipped.png"));
+        btnEquip = new Sprite(new Texture("shops/equip.png"));
+        btnEquipped = new Sprite(new Texture("shops/equipped.png"));
+        btnClosePanel = new Sprite(new Texture("ui/close_btn.png"));
 
+        openShopButtonBounds = new Rectangle(
+            GameConstants.GET_WIDTH / 2f - btnWidth / 2f,
+            GameConstants.GET_HEIGHT / 4f - btnHeight,
+            btnWidth,
+            btnHeight
+        );
+
+        closePanelButtonBounds = new Rectangle(
+            showPannelX + panelWidth,
+            showPannelY + panelHeight - GameConstants.Sprite.SIZE * 2,
+            GameConstants.Sprite.SIZE * 2,
+            GameConstants.Sprite.SIZE * 2
+        );
     }
 
     public void update(Polygon playerPolygon) {
@@ -120,20 +123,18 @@ public class Shop {
         batch.begin();
 
         if (isNearShop && !isShopOpen) {
-
-            openShopButtonBounds = new Rectangle(
-                GameConstants.GET_WIDTH / 2f - btnWidth / 2f,
-               GameConstants.GET_HEIGHT / 4f - btnHeight,
-                btnWidth,
-                btnHeight
-            );
             batch.draw(openShopButtonSprite, openShopButtonBounds.x, Math.abs(openShopButtonBounds.y), openShopButtonBounds.width, openShopButtonBounds.height);
-
-            System.out.println(openShopButtonBounds.x+" "+ openShopButtonBounds.y);
         }
 
         if (isShopOpen) {
             openShopUI(batch);
+            btnClosePanel.setBounds(
+                closePanelButtonBounds.x,
+                closePanelButtonBounds.y,
+                closePanelButtonBounds.width,
+                closePanelButtonBounds.height
+            );
+            btnClosePanel.draw(batch);
         }
 
         batch.end();
@@ -151,13 +152,14 @@ public class Shop {
     private void drawShopPanel(SpriteBatch batch) {
         batch.draw(panelTexture, showPannelX, showPannelY, panelWidth, panelHeight);
     }
+
     int MAX_SLOTS = 8;
 
     private void drawWeaponCards(SpriteBatch batch) {
-        float startX    = showPannelX + panelTile;
-        float startY    = showPannelY + panelTile;
-        float btnW      = panelTile * 6;
-        float btnH      = panelTile * 2;
+        float startX = showPannelX + panelTile;
+        float startY = showPannelY + panelTile;
+        float btnW = panelTile * 6;
+        float btnH = panelTile * 2;
         float colOffset = panelWidth / 4f;
         float rowOffset = panelHeight / 2f;
 
@@ -172,9 +174,9 @@ public class Shop {
                 tex = btnBuyUnavailable;
             } else {
                 Weapon w = weaponList.get(slot);
-                boolean owns     = player.getInventory().containsWeaponByName(w.getName());
+                boolean owns = player.getInventory().containsWeaponByName(w.getName());
                 boolean equipped = owns && player.getCurrentWeapon().getName().equals(w.getName());
-                boolean canBuy   = !owns && player.getMoney() >= w.getPrice();
+                boolean canBuy = !owns && player.getMoney() >= w.getPrice();
 
                 if (owns) {
                     tex = equipped ? btnEquipped : btnEquip;
@@ -187,25 +189,24 @@ public class Shop {
         }
     }
 
-
-
     public void handleTouchInput(float touchX, float touchY) {
+        touchY = GameConstants.GET_HEIGHT - touchY;
 
-            touchY = GameConstants.GET_HEIGHT - touchY;
+        if (isShopOpen && closePanelButtonBounds.contains(touchX, touchY)) {
+            closeShopUI();
+            return;
+        }
 
-
-
-        if (isNearShop && !isShopOpen
-            && openShopButtonBounds.contains(touchX, touchY)) {
+        if (isNearShop && !isShopOpen && openShopButtonBounds.contains(touchX, touchY)) {
             isShopOpen = true;
             return;
         }
         if (!isShopOpen) return;
 
-        float startX    = showPannelX + panelTile;
-        float startY    = showPannelY + panelTile;
-        float btnW      = panelTile * 6;
-        float btnH      = panelTile * 2;
+        float startX = showPannelX + panelTile;
+        float startY = showPannelY + panelTile;
+        float btnW = panelTile * 6;
+        float btnH = panelTile * 2;
         float colOffset = panelWidth / 4f;
         float rowOffset = panelHeight / 2f;
 
@@ -213,16 +214,14 @@ public class Shop {
             int col = slot % 4;
             int row = slot / 4;
             float x = startX + col * colOffset;
-            float y = startY + (1 - row) * rowOffset;  // <— same invert
+            float y = startY + (1 - row) * rowOffset;
 
-            if (touchX >= x && touchX <= x + btnW
-                && touchY >= y && touchY <= y + btnH) {
-
+            if (touchX >= x && touchX <= x + btnW && touchY >= y && touchY <= y + btnH) {
                 if (slot < weaponList.size()) {
                     Weapon w = weaponList.get(slot);
-                    boolean owns     = player.getInventory().containsWeaponByName(w.getName());
+                    boolean owns = player.getInventory().containsWeaponByName(w.getName());
                     boolean equipped = owns && player.getCurrentWeapon().getName().equals(w.getName());
-                    boolean canBuy   = !owns && player.getMoney() >= w.getPrice();
+                    boolean canBuy = !owns && player.getMoney() >= w.getPrice();
 
                     if (owns && !equipped) {
                         equipWeapon(player.getInventory().getWeaponByName(w.getName()));
@@ -237,26 +236,19 @@ public class Shop {
         }
     }
 
-
     private void buyWeapon(Weapon weapon, int level) {
         player.addMoney(-weapon.getPrice());
         addWeapon(weapon, level);
     }
 
     private void addWeapon(Weapon weapon, int level) {
-
         player.addWeapon(weapon, level);
-
-
     }
 
-    public void equipWeapon(Weapon weapon){
+    public void equipWeapon(Weapon weapon) {
         touchManager.setWeapon(weapon);
         player.setCurrentWeapon(weapon);
-
     }
-
-
 
     public float getShopX() {
         return shopX;
@@ -273,7 +265,8 @@ public class Shop {
     public float getShopWidth() {
         return shopWidth;
     }
-    public ArrayList<Weapon> getWeaponList(){
+
+    public ArrayList<Weapon> getWeaponList() {
         return weaponList;
     }
 

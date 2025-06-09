@@ -4,10 +4,10 @@
 1v1Textures.txt
 Tiles/Dungeon_Tileset.png
 Tiles/tileset_floor.png
-aram_daun.png
 armor.json
 armor_sprites/assassin_helmet.png
 armor_sprites/assassin_robe.png
+armor_sprites/champions_chestplate.png
 armor_sprites/champions_helmet.png
 armor_sprites/melee_chestplate.png
 armor_sprites/melee_helmet.png
@@ -25,6 +25,8 @@ enemies_spritesheet/skeleton_spritesheet.png
 enemies_spritesheet/warrior_spritesheet.png
 enemies_spritesheet/wizard_spritesheet.png
 enemyWeapons.json
+gothicbyte.ttf
+hitbar.png
 joystick.png
 libgdx.png
 player_sprites/player_spritesheet.png
@@ -46,8 +48,10 @@ ui/font-window.fnt
 ui/font.fnt
 ui/join_btn.png
 ui/leave_btn.png
+ui/multiplayerpanelbackground.png
 ui/play_btn.png
 ui/play_window_open.png
+ui/return_button.png
 ui/uiskin.atlas
 ui/uiskin.json
 ui/uiskin.png

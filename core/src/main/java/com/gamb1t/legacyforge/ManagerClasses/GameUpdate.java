@@ -74,6 +74,7 @@ public class GameUpdate {
                 shop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
                 if(armorShop != null){
                 armorShop.handleTouchInput(Gdx.input.getX(), Gdx.input.getY());}
+
             }
 
             if (PLAYER.getCurrentWeapon().getAttacking()) {
@@ -192,6 +193,7 @@ public class GameUpdate {
         float minDist = Float.MAX_VALUE;
 
         for (Player p : PLAYERS) {
+
             float dx = p.getEntityPos().x - enemy.getEntityPos().x;
             float dy = p.getEntityPos().y - enemy.getEntityPos().y;
             float dist = dx * dx + dy * dy;

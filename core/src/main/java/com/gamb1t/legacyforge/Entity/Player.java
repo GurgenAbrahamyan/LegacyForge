@@ -25,7 +25,7 @@ public class Player extends GameCharacters {
 
     private boolean movePlayer;
     private Vector2 lastTouchDiff;
-    private int DEATH_COOLDOWN_TIME = 5000;
+    private int DEATH_COOLDOWN_TIME = 3;
     private boolean isClient;
 
     private int level;
@@ -60,9 +60,6 @@ public class Player extends GameCharacters {
     private  int rating;
 
 
-
-    private long lastTimeGetHit = System.currentTimeMillis();
-    private long deathCooldown = System.currentTimeMillis();
 
     private final List<PlayerChangeListener> listeners = new ArrayList<>();
     private Inventory inventory;
@@ -200,7 +197,7 @@ public class Player extends GameCharacters {
             setFaceDir(moveY > 0 ? GameConstants.Face_Dir.DOWN : GameConstants.Face_Dir.UP);
         }
 
-        if(entityPos.x != prevX && entityPos.y != prevY){
+        if(entityPos.x != prevX || entityPos.y != prevY){
             prevX = entityPos.x;
             prevY = entityPos.y;
             movePlayer = true;
@@ -307,7 +304,7 @@ public class Player extends GameCharacters {
 
         if(!isDead()){
 
-        speed = (float) (delta * 400);
+        speed = (float) (delta * GameConstants.Sprite.SIZE*3);
         float ratio = Math.abs(lastTouchDiff.y) / Math.abs(lastTouchDiff.x);
         double angle = Math.atan(ratio);
 
@@ -338,15 +335,17 @@ public class Player extends GameCharacters {
 
 
              if (mapManager.canMoveHere(xPosToCheck , yPosToCheck)) {
-            if(!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX * -1, hitbox.getY() + deltaY * -1)){
-                entityPos.x -= deltaX;
+            if(!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX(), hitbox.getY() + deltaY * -1)){
                 entityPos.y -= deltaY;
-                setHitboxPosition();
-
-                cameraX = -entityPos.x + GameConstants.GET_WIDTH / 2;
                 cameraY = -entityPos.y + GameConstants.GET_HEIGHT / 2;
 
      }
+
+                 if(!mapManager.checkNearbyWallCollision(hitbox, hitbox.getX() + deltaX * -1, hitbox.getY())){
+                     entityPos.x -= deltaX;
+                     cameraX = -entityPos.x + GameConstants.GET_WIDTH / 2;
+
+                 }
 
 
 
@@ -360,7 +359,7 @@ public class Player extends GameCharacters {
 
 
     public void die() {
-        if(deathCooldown- DEATH_COOLDOWN_TIME > 0) {
+
             isAlive = false;
 
             movePlayer = false;
@@ -378,16 +377,19 @@ public class Player extends GameCharacters {
             isAlive = true;
 
             sendHp(this);
-        }
 
     }
 
 
+    public float time = 0;
     public void update(float delta) {
         if (isDead()) {
-
-                deathCooldown = System.currentTimeMillis();
+            time+=delta;
+            if(time >= DEATH_COOLDOWN_TIME){
                 die();
+            time = 0;
+
+            }
         }
 
         updatePlayerMove(delta);
@@ -402,7 +404,7 @@ public class Player extends GameCharacters {
 
     }
     public boolean isDead(){
-        return hp < 0;
+        return hp <= 0;
     }
 
 
@@ -420,7 +422,7 @@ public class Player extends GameCharacters {
         hp -= net;
         if (hp <= 0) {
             hp = 0;
-            die();
+            isAlive = false;
         }
 
         sendHp(this);
@@ -472,9 +474,9 @@ public class Player extends GameCharacters {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.DARK_GRAY);
-        shapeRenderer.rect(GameConstants.Sprite.SIZE*3 + GameConstants.Sprite.SIZE*1/16   ,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2, (float) GameConstants.Sprite.SIZE*3.8f, GameConstants.Sprite.SIZE*0.25f);
+        shapeRenderer.rect(GameConstants.Sprite.SIZE*7/2,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2 - GameConstants.Sprite.SIZE*1/16, GameConstants.Sprite.SIZE* 9/2 ,GameConstants.Sprite.SIZE*5/16);
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(GameConstants.Sprite.SIZE  ,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2, (float) GameConstants.Sprite.SIZE*5.8f* hp / maxHp, GameConstants.Sprite.SIZE*0.25f);
+        shapeRenderer.rect(GameConstants.Sprite.SIZE*7/2,  GameConstants.GET_HEIGHT-GameConstants.Sprite.SIZE*3/2- GameConstants.Sprite.SIZE*1/16, GameConstants.Sprite.SIZE* 9/2 * ((float) hp /maxHp) ,GameConstants.Sprite.SIZE*5/16);
 
 
 
@@ -550,6 +552,11 @@ public class Player extends GameCharacters {
         this.hp = hp;
         if(hp > maxHp){
             maxHp = hp;
+        }
+        if(server != null){
+
+            sendHp(this);
+
         }
     }
 

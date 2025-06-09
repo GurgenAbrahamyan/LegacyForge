@@ -1,18 +1,20 @@
 package com.gamb1t.legacyforge.android;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.gamb1t.legacyforge.Entity.User;
 import com.gamb1t.legacyforge.Networking.PlayerChangeListener;
 import com.gamb1t.legacyforge.Weapons.Armor;
 import com.gamb1t.legacyforge.Weapons.Weapon;
+import com.gamb1t.clientside.ClientMain;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.*;
-import com.gamb1t.clientside.ClientMain;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,13 +31,10 @@ public class MultiPlayerActivity extends AndroidApplication {
         user = (User) getIntent().getSerializableExtra("user");
         uId = getIntent().getStringExtra("playerId");
 
-
         FirebaseApp.initializeApp(this);
 
-
-       serverIp = getIntent().getStringExtra("serverIp");
-        System.out.println(serverIp);
-
+        serverIp = getIntent().getStringExtra("serverIp");
+        System.out.println("Server IP: " + serverIp);
 
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
@@ -53,7 +52,6 @@ public class MultiPlayerActivity extends AndroidApplication {
 
         startGame();
     }
-
 
     private void startGame() {
         PlayerChangeListener playerChangeListener = new PlayerChangeListener() {
@@ -130,6 +128,27 @@ public class MultiPlayerActivity extends AndroidApplication {
                     }
                 }
             }
+
+            @Override
+            public void onReturnToGameModeSelection(boolean intended) {
+                runOnUiThread(() -> {
+                    if (main != null && !intended) {
+                        Toast.makeText(MultiPlayerActivity.this, "Connection to the server failed. Please try again.", Toast.LENGTH_LONG).show();
+                    }
+                    if (main != null) {
+                        main.disconnect();
+                        if(main.isIntentionalDisconnect()){
+                        user = main.convertPlayerToUser(main.gameScreen.getPLAYER());
+                            System.out.println("converted");
+                        }
+                    }
+                    Intent intent = new Intent(MultiPlayerActivity.this, GameModeChoosing.class);
+                    intent.putExtra("user", user);
+                    intent.putExtra("playerId", uId);
+                    startActivity(intent);
+                    finish();
+                });
+            }
         };
 
         main = new ClientMain(user, playerChangeListener, serverIp);
@@ -142,7 +161,8 @@ public class MultiPlayerActivity extends AndroidApplication {
     protected void onDestroy() {
         super.onDestroy();
         if (main != null) {
-         // Assuming ClientMain has a disconnect method
+            main.disconnect();
+            main = null;
         }
     }
 }

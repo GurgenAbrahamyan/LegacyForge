@@ -27,6 +27,10 @@ public class GameRendering {
     private final ArmorShop armorShop;
     private final TouchManager touchEvents;
     private final  GameUI gameUi;
+    private MultiplayerUi multiplayerUi;
+    private SinglePlayerUi singlePlayerUi;
+
+    private boolean isInHub;
 
     public GameRendering(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font,
                          Player PLAYER, ArrayList< Enemy> Enemies, List<Player> players,
@@ -58,11 +62,11 @@ public class GameRendering {
             int   dir   = player.getFaceDir();
             int   frame = player.getAniIndex();
 
-            batch.draw( player.getSprite(frame, dir), drawX, drawY, size, size);
+            batch.draw(!player.isDead() ? player.getSprite(frame, dir) : player.getSprite(6, 0), drawX, drawY, size, size);
 
-if(player.getEquipment() !=null)
-            player.getEquipment().draw(batch,drawX, drawY, size, size,dir, frame);
-
+if(player.getEquipment() !=null) {
+    player.getEquipment().draw(batch, drawX, drawY, size, size, !player.isDead() ? dir : 0, !player.isDead() ? frame : 6);
+}
             if(player.getCurrentWeapon()!= null){
             player.getCurrentWeapon().draw(batch,drawX, drawY);}
         }
@@ -103,11 +107,32 @@ if(player.getEquipment() !=null)
 
         PLAYER.drawBar(batch, shapeRenderer, font);
         gameUi.render(batch, new BitmapFont());
+        if(isInHub){
+        if(singlePlayerUi != null){
+            singlePlayerUi.render(batch);
+        }
+        if(multiplayerUi != null){
+            multiplayerUi.render(batch);
+        }
+
+        }
         if(shop != null){
             shop.drawShopUi(batch);}
         if(armorShop != null){
             armorShop.drawShopUi(batch);}
 
         touchEvents.draw(batch);
+    }
+
+    public void setMultiplayerUi(MultiplayerUi multiplayerUi) {
+        this.multiplayerUi = multiplayerUi;
+    }
+
+    public void setSinglePlayerUi(SinglePlayerUi singlePlayerUi) {
+        this.singlePlayerUi = singlePlayerUi;
+    }
+
+    public void setInHub(boolean inHub) {
+        isInHub = inHub;
     }
 }

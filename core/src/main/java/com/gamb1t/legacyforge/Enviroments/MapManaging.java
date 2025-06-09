@@ -14,7 +14,9 @@ import com.gamb1t.legacyforge.Networking.ConnectionManager;
 import com.gamb1t.legacyforge.Networking.Network;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class MapManaging {
     private GameMap currentMap;
@@ -41,11 +43,10 @@ public class MapManaging {
     private String roomName;
     private int roomId;
     private boolean goingBack;
-
     private String gameMode = " ";
     private List<Player> players;
     private boolean pvpStarted = false;
-
+    private static final Random rand = new Random();
 
     private static class Door {
         Vector2 position;
@@ -95,7 +96,6 @@ public class MapManaging {
         this.cameraX = cameraX;
         this.cameraY = cameraY;
     }
-
 
     public void updateCameraToFollowPlayer(float playerX, float playerY) {
         float screenWidth = Gdx.graphics.getWidth();
@@ -214,23 +214,29 @@ public class MapManaging {
         if (currentMap == null || hitbox == null) return;
         for (Vector2 door : doorPairs) {
             if (door.equals(doorPos)) {
-
                 currentMap.setSpriteID((int) doorPos.x, (int) doorPos.y, 11);
-                currentMap.setSpriteID((int) doorPos.x+1, (int) doorPos.y, 11);
-                currentMap.setSpriteID((int) doorPos.x, (int) doorPos.y+1, 11);
-                currentMap.setSpriteID((int) doorPos.x+1, (int) doorPos.y+1, 11)
-                ;
+                currentMap.setSpriteID((int) doorPos.x + 1, (int) doorPos.y, 11);
+                currentMap.setSpriteID((int) doorPos.x, (int) doorPos.y + 1, 11);
+                currentMap.setSpriteID((int) doorPos.x + 1, (int) doorPos.y + 1, 11);
                 hitboxes.setSpriteID((int) doorPos.x, (int) doorPos.y, 0);
                 hitbox[(int) doorPos.y][(int) doorPos.x] = null;
-                if(server != null){
+                if (server != null) {
                     Network.DoorOpened doorOpened = new Network.DoorOpened();
-                    doorOpened.x= (int) doorPos.x;
+                    doorOpened.x = (int) doorPos.x;
                     doorOpened.y = (int) doorPos.y;
                     ConnectionManager.sendToConnections(roomName, roomId, doorOpened);
                 }
             }
-
         }
+    }
+
+    public void closeDoor(Vector2 doorPos){
+
+        System.out.println(doorPos.x+ " " + doorPos.y);
+                currentMap.setSpriteID((int) doorPos.x, (int) doorPos.y, 36);
+                currentMap.setSpriteID((int) doorPos.x + 1, (int) doorPos.y, 37);
+                currentMap.setSpriteID((int) doorPos.x, (int) doorPos.y + 1, 36);
+                currentMap.setSpriteID((int) doorPos.x + 1, (int) doorPos.y + 1, 37);
     }
 
     public void update(float delta) {
@@ -242,11 +248,10 @@ public class MapManaging {
                 Gdx.app.log("MapManaging", "Starting door opened after 5 seconds");
                 countdownTimer = 5;
             }
-        }
-        else if(areAllDoorsOpened() && !gameMode.equals("1v1")){
+        } else if (areAllDoorsOpened() && !gameMode.equals("1v1")) {
             countdownTimer -= delta;
-            if(countdownTimer <= 0){
-                goingBack= true;
+            if (countdownTimer <= 0) {
+                goingBack = true;
             }
         }
         updateKillCountAndOpenDoors();
@@ -270,7 +275,7 @@ public class MapManaging {
             killCount = currentKillCount;
             Gdx.app.log("MapManaging", "Kill count updated to: " + killCount);
             int doorIndexToOpen = killCount / KILLS_PER_DOOR;
-            if (doorIndexToOpen > 0 && doorIndexToOpen <= doorPairs.size()-1) {
+            if (doorIndexToOpen > 0 && doorIndexToOpen <= doorPairs.size() - 1) {
                 Vector2 doorPos = doorPairs.get(doorIndexToOpen);
                 openDoor(doorPos);
                 Gdx.app.log("MapManaging", "Door pair " + (doorIndexToOpen) + " opened");
@@ -281,10 +286,8 @@ public class MapManaging {
     }
 
     public boolean areAllDoorsOpened() {
-        return doorPairs.size() <= killCount/KILLS_PER_DOOR;
+        return doorPairs.size() <= killCount / KILLS_PER_DOOR;
     }
-
-
 
     private GameMap LoadFile(String mapName, int mapLengthInTiles, int mapHeightInTiles) {
         if (mapName == null) {
@@ -310,11 +313,13 @@ public class MapManaging {
                     String value = numbers[col];
                     int id = Integer.parseInt(value);
                     if (id == -1) {
+                        System.out.println("Added respPlayer");
                         respPlayer.add(new Vector2(col * GameConstants.Sprite.SIZE, row * GameConstants.Sprite.SIZE));
                     } else if (id == -2) {
                         respEnemy.add(new Vector2(col * GameConstants.Sprite.SIZE, row * GameConstants.Sprite.SIZE));
                     } else if (id >= -30 && id <= -12) {
-                        System.out.println(col +" "+ row);
+                        System.out.println("Added doors");
+                        System.out.println(col + " " + row);
                         doors.add(new Door(new Vector2(col, row), id));
                     } else if (id == -5) {
                         shopCoordinates = new Vector2(col * GameConstants.Sprite.SIZE, row * GameConstants.Sprite.SIZE);
@@ -333,7 +338,7 @@ public class MapManaging {
         doorPairs.clear();
         for (Door door : doors) {
             doorPairs.add(door.position);
-            System.out.println("The id is" +door.id +" ArrayPos is" + door.position.x +" " + door.position.y);
+            System.out.println("The id is" + door.id + " ArrayPos is" + door.position.x + " " + door.position.y);
         }
 
         return new GameMap(spriteIds);
@@ -344,17 +349,14 @@ public class MapManaging {
         Gdx.app.log("MapManaging", "Game mode set to: " + gameMode);
     }
 
-
     public void setPlayers(List<Player> players) {
         this.players = players;
         Gdx.app.log("MapManaging", "Players set, count: " + (players != null ? players.size() : 0));
     }
 
-
     public boolean isPvpStarted() {
         return isStartingDoorOpened;
     }
-
 
     public void resetRound() {
         countdownTimer = 5;
@@ -364,6 +366,7 @@ public class MapManaging {
         Gdx.app.log("MapManaging", "Round reset for room: " + roomId);
         if (server != null) {
             Network.RoundReset reset = new Network.RoundReset();
+            reset.countdownInSeconds = 3;
             ConnectionManager.sendToConnections(roomName, roomId, reset);
         }
     }
@@ -431,15 +434,88 @@ public class MapManaging {
         return isStartingDoorOpened;
     }
 
-    public boolean getGoingBack(){
-        return  goingBack;
+    public boolean getGoingBack() {
+        return goingBack;
     }
-
 
     public void setServer(Server server, String roomName, int roomId) {
         this.server = server;
-        this.roomName=roomName;
-        this.roomId= roomId;
+        this.roomName = roomName;
+        this.roomId = roomId;
     }
 
+    public void closeAllDoors() {
+        if (currentMap == null || hitbox == null || doorPairs.isEmpty()) {
+            Gdx.app.error("MapManaging", "Cannot close doors: map or doorPairs empty");
+            return;
+        }
+        for (Vector2 doorPos : doorPairs) {
+            int x = (int) doorPos.x;
+            int y = (int) doorPos.y;
+            currentMap.setSpriteID(x, y, -12);
+            currentMap.setSpriteID(x + 1, y, -12);
+            currentMap.setSpriteID(x, y + 1, -12);
+            currentMap.setSpriteID(x + 1, y + 1, -12);
+            hitboxes.setSpriteID(x, y, 1);
+            Polygon polygon = new Polygon(new float[]{
+                0, 0,
+                GameConstants.Sprite.SIZE * 2, 0,
+                GameConstants.Sprite.SIZE * 2, GameConstants.Sprite.SIZE * 2,
+                0, GameConstants.Sprite.SIZE * 2
+            });
+            polygon.setPosition(x * GameConstants.Sprite.SIZE, y * GameConstants.Sprite.SIZE);
+            hitbox[y][x] = polygon;
+            if (server != null) {
+                Network.DoorClosed doorClosed = new Network.DoorClosed();
+                doorClosed.x = x;
+                doorClosed.y = y;
+                ConnectionManager.sendToConnections(roomName, roomId, doorClosed);
+            }
+        }
+        isStartingDoorOpened = false;
+        pvpStarted = false;
+        Gdx.app.log("MapManaging", "All doors closed for room: " + roomId);
+    }
+
+    public void openAllDoors() {
+        if (currentMap == null || hitbox == null || doorPairs.isEmpty()) {
+            Gdx.app.error("MapManaging", "Cannot open doors: map or doorPairs empty");
+            return;
+        }
+        for (Vector2 doorPos : doorPairs) {
+            int x = (int) doorPos.x;
+            int y = (int) doorPos.y;
+            currentMap.setSpriteID(x, y, 11);
+            currentMap.setSpriteID(x + 1, y, 11);
+            currentMap.setSpriteID(x, y + 1, 11);
+            currentMap.setSpriteID(x + 1, y + 1, 11);
+            hitboxes.setSpriteID(x, y, 0);
+            hitbox[y][x] = null;
+            if (server != null) {
+                Network.DoorOpened doorOpened = new Network.DoorOpened();
+                doorOpened.x = x;
+                doorOpened.y = y;
+                ConnectionManager.sendToConnections(roomName, roomId, doorOpened);
+            }
+        }
+        isStartingDoorOpened = true;
+        pvpStarted = true;
+        Gdx.app.log("MapManaging", "All doors opened for room: " + roomId);
+    }
+
+    public void assignRandomSpawnPoints(List<Player> players) {
+        if (respPlayer.size() != 2 || players.size() != 2) {
+            Gdx.app.error("MapManaging", "Invalid spawn points or player count: spawns=" + respPlayer.size() + ", players=" + players.size());
+            return;
+        }
+        List<Vector2> spawns = new ArrayList<>(respPlayer);
+        Collections.shuffle(spawns, rand);
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            Vector2 spawn = spawns.get(i);
+            p.setPosition(spawn.x + GameConstants.Sprite.SIZE / 2, spawn.y + GameConstants.Sprite.SIZE / 2);
+            p.setRespPoint(spawn);
+            Gdx.app.log("MapManaging", "Player " + p.getName() + " assigned spawn at (" + spawn.x + ", " + spawn.y + ")");
+        }
+    }
 }

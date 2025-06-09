@@ -6,6 +6,7 @@ import com.gamb1t.legacyforge.Entity.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Network {
     public static final int TCP_PORT = 54559;
@@ -71,7 +72,16 @@ public class Network {
         public PlayerDeleted() {}
     }
 
+    public static class RoundStart{
+        public int roundNumber; // Current round number
+        public Map<Integer, Integer> playerScores;
+        public RoundStart() {
+            playerScores = new HashMap<>();
+        }
+    }
+
     public static class RoundReset {
+        public int countdownInSeconds;
     }
 
     public static class MatchEnd {
@@ -96,6 +106,10 @@ public class Network {
         }
         public EnemyPos() {}
     }
+
+        public static class DoorClosed {
+            public int x, y;
+        }
 
     public static class MovePacket {
         public float x;
@@ -270,6 +284,18 @@ public class Network {
 
     }
 
+    public static class DungeonSquadUpdate {
+        public boolean inSquad;
+        public float countdown;
+        public ArrayList<String> memberNames;
+    }
+
+    public static class OneVsOneQueueUpdate {
+        public boolean inQueue;
+        public float countdown;
+        public ArrayList<String> opponentNames;
+    }
+
     public static void register(Kryo kryo) {
         kryo.register(java.util.ArrayList.class);
         kryo.register(StateMessageOnConnection.class);
@@ -310,5 +336,13 @@ public class Network {
         kryo.register(DoorOpened.class);
         kryo.register(PvpMatchStart.class);
         kryo.register(PvpRequest.class);
+        kryo.register(RoundStart.class);
+        kryo.register(DoorClosed.class);
+        kryo.register(RoundReset.class);
+        kryo.register(OneVsOneQueueUpdate.class);
+
+
+
+
     }
 }
