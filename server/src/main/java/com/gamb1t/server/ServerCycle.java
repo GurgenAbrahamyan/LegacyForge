@@ -73,6 +73,38 @@ public class ServerCycle implements ApplicationListener {
         }
     }
 
+    private void sendPortTcpToFirebase(int tcp) {
+        try {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Tcp");
+            ref.setValue(tcp, (error, ref1) -> {
+                if (error != null) {
+                    System.err.println("Failed to set Tcp Port: " + error.getMessage());
+                } else {
+                    System.out.println("Successfully sent Tcp to Firebase: " + tcp);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Exception while sending Tcp to Firebase: " + e.getMessage());
+        }
+    }
+
+    private void sendPortUdpToFirebase(int udp) {
+        try {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Udp");
+            ref.setValue(udp, (error, ref1) -> {
+                if (error != null) {
+                    System.err.println("Failed to set Udp Port: " + error.getMessage());
+                } else {
+                    System.out.println("Successfully sent Udp to Firebase: " + udp);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Exception while sending Udp to Firebase: " + e.getMessage());
+        }
+    }
+
     @Override
     public void dispose() {
         if (server != null) {

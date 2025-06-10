@@ -24,6 +24,7 @@ public class MultiPlayerActivity extends AndroidApplication {
     private ClientMain main;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     private String serverIp;
+    private int tcp, udp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

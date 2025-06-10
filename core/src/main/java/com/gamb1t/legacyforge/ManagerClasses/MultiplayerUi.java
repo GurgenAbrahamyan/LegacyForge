@@ -322,12 +322,28 @@ public class MultiplayerUi {
         batch.begin();
         if (!playerScores.isEmpty()) {
             StringBuilder scoreText = new StringBuilder();
-            boolean first = true;
-            for (Integer score : playerScores.values()) {
-                if (!first) scoreText.append(" : ");
-                scoreText.append(score);
-                first = false;
+
+            Integer mainPlayerScore = playerScores.get(player.getID());
+            if (mainPlayerScore != null) {
+                scoreText.append(mainPlayerScore);
+            } else {
+                scoreText.append("0");
             }
+
+            Integer opponentScore = null;
+            for (Map.Entry<Integer, Integer> entry : playerScores.entrySet()) {
+                if (!entry.getKey().equals(player.getID())) {
+                    opponentScore = entry.getValue();
+                    break;
+                }
+            }
+            scoreText.append(" : ");
+            if (opponentScore != null) {
+                scoreText.append(opponentScore);
+            } else {
+                scoreText.append("0");
+            }
+
             glyphLayout.setText(scoreFont, scoreText.toString());
             float textWidth = glyphLayout.width;
             float textX = (GameConstants.GET_WIDTH - textWidth) / 2;
@@ -392,7 +408,7 @@ public class MultiplayerUi {
             roundCountdownTimer = 3;
         } else {
             countdownText = "Round starts in: ";
-            roundCountdownTimer = 3; // Default round countdown
+            roundCountdownTimer = 3;
         }
 
         Gdx.app.log("MultiplayerUi", "Round " + currentRound + " started, scores: " + playerScores);
